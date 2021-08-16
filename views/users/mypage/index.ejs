@@ -1,0 +1,32 @@
+<div>
+    <div class="mypage-header">
+        <h2>タイトル（仮）</h2>
+        <p>おかえりなさいませ、<%= currentUser.fullName %>さん</p>
+    </div>
+    <div class="account">
+        <a href="/users/mypage/show">アカウント</a>
+        <a href="/users/mypage/edit">アカウントの編集</a>
+    </div>
+    <div class="profile">
+        <p><a href="/users/mypage/profile">アカウント詳細設定</a>はこちらから</p><!-- p要素を用いて文書の量を後々増やす（写真やイラストを用いるかも） -->
+        
+
+        <% if(currentUser.profile) { %>
+            <p><a href="/users/mypage/profile/edit">アカウント詳細編集</a>はこちらから</p>
+        <% } %>
+    </div>
+    <div class="delete">       
+        <a onclick="deleteCheck();">アカウントの削除</a>
+    </div>
+</div>
+
+<script>
+    function deleteCheck(){
+        var confirmation = window.confirm("本当に削除してもよろしいですか？");
+        if(confirmation){
+            window.location.href = "<%= `/users/mypage/delete?_method=DELETE` %>"; //OKの場合、Deleteの実行
+        }else{
+            window.alert("アカウントの削除の停止をしました。");
+        }
+    }
+</script>

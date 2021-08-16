@@ -1,0 +1,105 @@
+<!-- 考えられる追加機能 -->
+<!-- ①メッセージ検索機能　②メンバー機能（これは作るものによる　③タイトル検索　単純なものを考えれば、チャットページの作成とそのチャットの閲覧ページへの遷移だけで事足りる -->
+
+<form action="/chat/channel" method="GET">
+    <input type="text" id="search" name="search" placeholder="検索">
+    <select name="sort" id="sort">
+        <option value=0>更新順（新）</option><!-- 流石に名称は変える -->
+        <option value=1>更新順（古）</option>
+        <option value=2>作成順（新）</option>
+        <option value=3>作成順（古）</option>
+    </select>
+    <input type="hidden" name="page" value="1">
+    <input type="submit" value="検索">
+</form>
+
+<div class="title">
+    <h2>タイトル名</h2><!-- イラストを使うかも ちなみにタイトルにアンカータグを用いるかも-->
+</div>
+
+<div class="new-update">
+    <% if(channel.length===0) { %>
+        <div class="no-result">
+            <p>チャンネルを作成してください。</p>
+        </div>
+    <% }else { %>
+        <div class="result">
+            <p>最近更新されたチャンネル</p>
+            <% for(var i=0;i<5;i++){ %> <!-- ここの数値は迷い中 -->
+                <% if(channel[i]){ %>
+                    <a href="/chat/<%= channel[i]._id %>"><%= channel[i].channelName %></a>
+                    <p><%= channel[i].channelDetail %></p>
+                    <p><%= channel[i].createdBy %></p>
+                <% } %>
+            <% }　%>
+        </div>
+    <% } %>
+</div>
+
+<div class="guide">
+    <!-- ここにこれの簡単な説明などのページを入れるかも -->
+    <p>Guide</p>
+    <a href="#">書き込み方法</a>
+    <a href="#">作成方法</a>
+</div>
+
+<div class="channel-creater">
+    <p>チャンネル</p>
+    <a id="addChannel" style="cursor: pointer;">＋</a>
+</div>
+
+<form class="popup" id="popup" name="test">
+    <div class="content">
+        <div class="popup-header">
+            <h3>チャンネルを作成する</h3>
+            <p class="close-popup" style="cursor: pointer;">×</p>
+        </div>
+        <div class="description">
+            <label for="description">説明</label>
+            <p>ここにチャンネル作成の説明を記載。</p>
+        </div>
+        <div id="errorMsg"></div>
+        <div class="channnelName">
+            <label for="name">名前</label>
+            <input type="text" name="channelName" id="chanName">
+        </div>
+        <div class="detail">
+            <label for="detail">説明</label>
+            <input type="text" name="channelDetail" id="chanDetail" required>
+        </div>
+        <div class="createdBy">
+            <input type="hidden" name="createdBy" value="<%= currentUser._id %>">
+        </div>
+        <input type="submit" value="作成" id="popup-end" required>
+    </div>    
+</form>
+
+<script src="/jquery/test.js"></script>
+<script src="/javascripts/chats/modalForm.js"></script>
+<script>
+    /* 後で場所を移す */
+
+</script>
+<style>
+    .popup {
+        display: none;
+        height: 100vh;
+        width: 100%;
+        background: black;
+        opacity: 0.7;
+        position: fixed;
+        top: 0;
+        left: 0;
+    }
+    .content{
+        background: #fff;
+        padding: 30px;
+        width: 50%;
+    }
+    .show {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+<!-- cssをタグ内に作成しているものは後ほどファイルを作るのでそこに作成 -->

@@ -2,12 +2,51 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Document</title>
+    <title>Application</title>
     <link rel="stylesheet" href="/stylesheets/layout.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 </head>
 <body>
-    <h1 id="test1">テスト</h1>
+    <header>
+        <div class="header-left">
 
-    <%- body %>
+        </div>
+        <div class="header-right">
+            <a href="/">Home</a>
+            <a href="/users">Account</a>
+            <a href="/chat">Chat</a>
+            <a href="/record">Record</a>
+
+            <div class="login-status">
+                <% if(loggedIn) { %>
+                    <a href="/users/logout">Logout</a>
+                <% }else{ %>
+                    <a href="/users/login">Login</a>
+                <% } %>
+            </div>
+        </div>
+        <div class="clear"></div>
+    </header>
+    <div class="main">
+        <div class="main-top">
+            <% if(flashMessages) { %>
+                <% if(flashMessages.success) { %>
+                    <div class="flash-success">
+                        <%= flashMessages.success %>
+                    </div>
+                <% } else if(flashMessages.error) { %>
+                    <div class="flash-error">
+                        <%= flashMessages.error %>
+                    </div>
+                <% } %>
+            <% } %>
+        </div>
+        <div class="user">
+            <% if(loggedIn) { %>
+                <p>Logged in as <a href="/users/mypage/show"><%= currentUser.fullName %></a></p>
+            <% } %>
+        </div>
+        <%- body %>
+    </div>
 </body>
 </html>

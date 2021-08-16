@@ -1,0 +1,116 @@
+<div class="chat-header">
+    <h3>チャンネル名 : <%= channel.channelName %></h3>
+    <p>チャンネル詳細 : <%= channel.channelDetail %></p>
+    <p>チャンネル作成者 : <%= channel.createdBy %></p>
+</div>
+
+<div class="time-emitter">
+    <!-- チャットの文字の出力のタイミングで時間を上に出力（時間差が少ない場合はなしにする・日付の出力はその日の最初の出力時のみ） -->
+</div>
+
+<div class="chat-saving">
+    <% for(var i=0;i<channel.messages.length;i++) { %>
+        <div class="chat-devider">
+            <a href="/users/<%= channel.messages[i].user %>"><%= channel.messages[i].userName %></a>
+            <p><%= channel.messages[i].getTime.time %></p>
+            <p class="message"><%= channel.messages[i].text %></p>
+            <input class="msgId" type="hidden" value="<%= channel.messages[i]._id %>">
+        </div>
+    <% } %>
+</div>
+
+
+<div id="chat">
+    <div class="socket-saving">
+        <a href="#" class="socketUser"></a>
+        <p class="socketTime"></p>
+        <p class="socketMsg" onmouseover="mouseover()" onmouseout="mouseout()"></p>
+        <input type="hidden" class="customId" value="">
+    </div>
+</div>
+
+<% if(currentUser) { %> 
+    <form id="chat-form">
+        <input id="chat-input" type="text"　placeholder="メッセージ">
+        <input id="chat-user" type="hidden" value="<%= currentUser.fullName %>">
+        <input id="chat-id" type="hidden" value="<%= currentUser._id %>">
+        <input type="submit" value="送信" id="click">
+    </form>
+<% } %>
+
+
+<!-- 想定　現在のアカウントとカーソルを合わせた要素のアカウントが一致した場合は、その要素の編集を可能とするpopupを出現させる。さもなくば、返信や反応等のpopup -->
+
+<div class="selfMsgResponser">
+    <div class="response">
+        <button>👍</button>
+        <button>👎</button>
+    </div>
+    <input type="button" class="replyMsg" value="返信">
+    <!-- 下記二つに関しては、ボタンのクリックで、メッセージの編集もしくは削除のpopup出現 -->
+    <input type="button" class="updateMsg" value="メッセージの編集">
+    <input type="button" class="deleteMsg" value="送信取消">
+</div>
+
+<div class="msgResponser">
+    <div class="response">
+        <button>👍</button>
+        <button>👎</button>
+    </div>
+    <input type="button" class="replyMsg" value="返信">
+</div>
+
+<div class="toUpdate">
+    <input type="text" class="newMsg" value=""><!-- ここに、現在記載されているメッセージを -->
+    <input type="button" class="close-popup" value="キャンセル">
+    <input type="submit" class="update" value="変更を保存する">
+</div>
+
+<script type="module" src="https://cdn.jsdelivr.net/gh/tracker1/node-uuid4/browser.mjs"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script type="module" src="/javascripts/chats/socket.js"></script>
+
+<script>
+    /* あくまで仮置き　別ファイルに移したい（socket.js） */
+    var userId = document.getElementById("chat-id").value;
+    function mouseover(){//一応機能はしているけど、不明なエラーが出力されてしまう
+        var data = jQuery(":hover")[4];
+        var pointedId = data.children[0].href.split("/")[4];
+        var customId = data.children[3].value; //これを用いて編集をする場所の指定をする
+
+        if(pointedId===userId){
+            $(".selfMsgResponser").addClass(".show").fadeIn();
+            return true;
+        }else{
+            $(".msgResponser").addClass(".show").fadeIn();
+            return false;
+        }
+    };
+
+    function mouseout(){
+        if(mouseover()){
+            $(".selfMsgResponser").fadeOut();
+        }else{
+            $(".msgResponser").fadeOut();
+        }
+    };
+</script>
+
+<style>
+    .msgResponser{
+        display: none;
+    }
+    .selfMsgResponser{
+        display: none;
+    }
+    .show{
+        display: flex;
+        opacity: 1;
+    }
+
+    .toUpdate{
+        display: none;
+    }
+</style>
+
+<!-- opacityが不満である場合、クラスの削除を検討する -->
