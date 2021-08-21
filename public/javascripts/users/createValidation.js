@@ -1,4 +1,32 @@
 window.addEventListener("DOMContentLoaded",() => { //DOMContentLoaded これに関してはDOMツリーの解析が完了してから
+    //ここに初期値としてそれぞれの値に対してcookieを代入していく（ただし、いまだに成功した場合のcookieの削除はできていない）
+    //ちなみにこのcookieはそれぞれのクライアントごとに保管されるものなのか
+
+
+    //ちなみにこの関数に関して、cookieの扱いづらい配列を変化させている
+    function getCookieArray(){
+        var arr = new Array();
+        if(document.cookie != ''){
+            var tmp = document.cookie.split('; ');
+            for(var i=0;i<tmp.length;i++){
+            var data = tmp[i].split('=');
+            arr[data[0]] = decodeURIComponent(data[1]);
+            }
+        }
+        return arr;
+    };
+
+    var arr = getCookieArray();
+    var result = arr["first"];
+    
+    if(result){
+        document.getElementsByClassName("first")[0].value = arr["first"];
+        document.getElementsByClassName("last")[0].value = arr["last"];
+        document.getElementsByClassName("email")[0].value = arr["email"];
+        document.getElementsByClassName("age")[0].value = arr["age"];
+    }
+
+
     var submit = document.querySelector(".submit");
     submit.addEventListener("click",(e) => {
         e.preventDefault();

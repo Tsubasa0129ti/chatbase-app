@@ -2,17 +2,19 @@
 const User = require("../models/user"),
     Profile = require("../models/profile"),
     passport = require("passport"),
-    {body,validationResult} = require("express-validator"),
-    getUserParams = body => {
-        return {
-            name : {
-                first : body.first,
-                last : body.last
-            },
-            email : body.email,
-            age : body.age
-        }
+
+function getUserParams(body){
+    var obj = new Object();
+    obj = {
+        name : {
+            first : body.first,
+            last : body.last
+        },
+        email : body.email,
+        age : body.age
     };
+    return obj;
+};
 
 module.exports = {
     index : (req,res) => {   
@@ -22,52 +24,92 @@ module.exports = {
             res.render("users/index");
         }
     },
-    new : (req,res) => {  
+    new : (req,res) => {
         res.render("users/new");
     },
     create : (req,res,next) => {
         let newUser = new User(getUserParams(req.body));
-        
         User.register(newUser,req.body.password,(error,user) => {
             if(user) {
                 req.flash("success","アカウント作成されました。");
-                res.locals.redirect = "/users";
+                res.locals.result = "success";
                 next();
             }else if(error){
-                function getError(){
-                    res.locals.redirect = "/users/new";
-                    next()
-                }
-                //以下エラー時の分岐をして、日本語での表示に変更
+                function getError(errMsg){
+                    req.flash("error",errMsg)
+                    res.locals.user = newUser;
+                    next();
+                };
                 if(error.name === "UserExistsError"){
-                    console.log("getName");
-                    req.flash("error","このメールアドレスはすでに利用されています。");
-                    getError();
+                    var errMsg = "このメールアドレスは、すでに使用されています。";
+                    getError(errMsg);
                 }else{
-                    console.log("なんかエラー");
-                    req.flash("error",error.message);
-                    getError();
+                    var errMsg = "不明なエラーが発生しました。";
+                    getError(errMsg);
                 }
             }
         });
+    },
+    cookie : (req,res,next) => {
+        var success = res.locals.result;
+        if(success){
+            //cookieの削除 複数の削除の方法は不明
+            res.clearCookie("first",{path:"/users/new"});
+            /* res.clearCookie("last",{path:"/users/new"});
+            res.clearCookie("email",{path:"/users/new"});
+            res.clearCookie("age",{path:"/users/new"});
+            res.redirect("/users",{path:"/users/new"}); */
+            res.locals.redirect = "/users";
+        }else{
+            //cookieの作成 arrayに関してはオブジェクトからの変換をどうにかしたい
+            var newUser = res.locals.user;
+            var array = [
+                ["first",`${newUser.name.first}`],["last",`${newUser.name.last}`],["email",`${newUser.email}`],["age",`${newUser.age}`]
+            ];
+            for(var i=0;i<array.length;i++){
+                res.cookie(`${array[i][0]}`,array[i][1],{
+                    path  : "/users/new",
+                    maxAge : 60*60*1000
+                });
+            }
+            res.locals.redirect = "/users/new";
+        }
+        next();
     },
     redirectView : (req,res,next) => {
         var redirectPath = res.locals.redirect;
         if(redirectPath) {
             res.redirect(redirectPath);
         }else{
-            next();  //一旦飛ばすがこの処理について後で戻る
+            next();
         }
     },
     login : (req,res) => {
         res.render("users/login");
     },
-    authenticate : passport.authenticate("local",{ //ok
-        successRedirect : "/users/mypage",
-        successFlash : "ログイン成功",
-        failureRedirect : "/users/login",
-        failureFlash : "ログイン失敗"
-    }),
+    authenticate : (req,res,next) => {
+        passport.authenticate("local",(err,user,info) => {
+            if(err){
+                return next(err);
+            }
+            if(!user){
+                req.flash("error","ログイン失敗");
+                res.cookie("username",req.query.email,{
+                    path : "/users/login",
+                    maxAge : 60*60*1000
+                });
+                return res.redirect("/users/login");
+            }
+            req.login(user,function(err){
+                if(err){
+                    return next(err);
+                }
+                res.clearCookie("username",{path:"/users/login"});
+                req.flash("success","ログイン成功");
+                return res.redirect("/users/mypage");
+            });
+        })(req,res,next);
+    },
     loginCheck : (req,res,next) => {
         if(req.isAuthenticated()){
             next();

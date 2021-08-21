@@ -1,16 +1,18 @@
 var express = require("express");
 var router = express.Router();
+var passport = require("passport");
 
 const userControllers = require("../controllers/userController");
 const profileController = require("../controllers/profileController");
+const User = require("../models/user");
 
 //以下routeing処理
 router.get("/",userControllers.index);
 router.get("/new",userControllers.new);
-router.post("/create",userControllers.create,userControllers.redirectView);
+router.post("/create",userControllers.create,userControllers.cookie,userControllers.redirectView);
 
 router.get("/login",userControllers.login);
-router.post("/auth",userControllers.authenticate);
+router.get("/auth",userControllers.authenticate);
 router.get("/logout",userControllers.logout);
 
 router.get("/mypage",userControllers.loginCheck,userControllers.redirectView,userControllers.mypageView);

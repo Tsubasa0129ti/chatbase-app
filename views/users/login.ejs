@@ -1,7 +1,7 @@
-<form action="/users/auth" method="POST">
+<form action="/users/auth" method="GET">
     <div>
         <label for="username">Username</label>
-        <input type="email" name="email">
+        <input type="email" name="email" class="username">
     </div>
     <div>
         <label for="password">Password</label>
@@ -9,3 +9,4 @@
     </div>
     <input type="submit" value="ログイン">
 </form>
+<script src="/javascripts/users/loginCheck.js"></script>
