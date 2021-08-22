@@ -55,18 +55,6 @@ module.exports = {
             res.redirect = "/users/login";
         }
     },
-    show : (req,res) => {
-        var currentUser = req.user;
-        User.findById(currentUser._id)
-        .populate("profile")
-        .exec(function(err,user){
-            if(err){
-                console.log(err.message);
-            }else{
-                res.render("profile/view",{currentUser:user});
-            }
-        });
-    },
     redirect : (req,res,next) => {
         var redirectPath = res.locals.redirect;
         if(redirectPath) {

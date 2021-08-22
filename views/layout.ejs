@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Application</title>
+    <title>Chatter</title>
     <link rel="stylesheet" href="/stylesheets/layout.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 </head>
@@ -27,10 +27,11 @@
         </div>
         <div class="clear"></div>
     </header>
+    
     <div class="main">
         <div class="main-top">
             <% if(flashMessages) { %>
-                <% if(flashMessages.success) { %>
+                <% if(flashMessages.success) { %>　<!-- 発見　フラッシュメッセージの第一引数はここで決めるのか -->
                     <div class="flash-success">
                         <%= flashMessages.success %>
                     </div>
@@ -48,5 +49,6 @@
         </div>
         <%- body %>
     </div>
+    
 </body>
 </html>

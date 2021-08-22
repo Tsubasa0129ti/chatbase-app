@@ -4,7 +4,6 @@ var passport = require("passport");
 
 const userControllers = require("../controllers/userController");
 const profileController = require("../controllers/profileController");
-const User = require("../models/user");
 
 //以下routeing処理
 router.get("/",userControllers.index);

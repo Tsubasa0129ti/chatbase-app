@@ -35,7 +35,9 @@ window.addEventListener("DOMContentLoaded",() => {
         //check関数
         function addressChecker(str) {
             var checker = str.match(/^[0-9]{3}-[0-9]{4}$/);
-            if(!checker){
+            if(checker || str===""){
+                return false;
+            }else{
                 return true;
             }
         };

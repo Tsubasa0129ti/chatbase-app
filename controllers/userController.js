@@ -127,7 +127,18 @@ module.exports = {
         res.render("users/mypage");
     },
     show : (req,res) => {
-        res.render("users/mypage/show");
+        var currentUser = req.user;
+        User.findById(currentUser._id)
+        .populate("profile")
+        .exec((err,user) => {
+            if(err){
+                console.log(error.message);
+                res.render("error"); //エラー処理は仮おき　ステータスコードを得て、分岐させ　エラーメッセージも渡すようにする
+            }else{
+                console.log(user);
+                res.render("users/mypage/show",{currentUser:user});
+            }
+        })
     },
     edit : (req,res) => {
         res.render("users/mypage/edit");

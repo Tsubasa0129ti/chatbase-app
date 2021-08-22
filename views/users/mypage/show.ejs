@@ -1,17 +1,42 @@
 <table>
     <div class="userName">
-        <label for="userName">First Name</label>
-        <p class="userName"><%= currentUser.fullName %></p>
+        <label for="fullName">First Name</label>
+        <p class="fullName"><%= currentUser.fullName %></p>
     </div>
     <div class="userEmail">
-        <label for="userEmail">Email</label>
-        <p class="userEmail"><%= currentUser.email %></p>
+        <label for="email">Email</label>
+        <p class="email"><%= currentUser.email %></p>
     </div>
     <div class="userAge">
-        <label for="userAge">Age</label>
-        <p class="userAge"><%= currentUser.age %></p>
+        <label for="age">Age</label>
+        <p class="age"><%= currentUser.age %></p>
     </div>
-    <div class="profile">
-        <label for="profile">User詳細情報</label><!-- UIに関しては一旦おいておく　その上で、profileをUserから取り出すことができるようにする（association） -->
-    </div>
+
+    <% if(currentUser.profile){ %>
+        <div class="profile">
+            <label for="profile">User詳細情報</label>
+
+            <div class="userIntro">
+                <label for="intro">自己紹介</label>
+                <p class="userProfile"><%= currentUser.profile.intro %></p>
+            </div>
+            <div class="userPrefecture">
+                <label for="prefecture">都道府県</label>
+                <p class="prefecture"><%= currentUser.profile.prefecture %></p>
+            </div>
+            <div class="userAddress">
+                <label for="address">住所</label>
+                <p class="address"><%= currentUser.profile.address %></p>
+            </div>
+            <div class="userBirthday">
+                <label for="birthday">誕生日</label>
+                <p class="birthday"><%= currentUser.profile.birthday %></p>
+            </div>
+            <div class="userBelongings">
+                <label for="belongings">所属</label>
+                <p class="belongings"><%= currentUser.profile.belongings %></p>
+            </div>
+        </div>
+    <% } %>
+    
 </table>

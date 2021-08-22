@@ -1,4 +1,3 @@
-
 <form action="/chat/channel" method="GET">
     <input type="text" id="search" name="search" placeholder="検索">
     <select name="sort" class="sort">
@@ -11,7 +10,7 @@
     <input type="submit" value="検索">
 </form>
 
-<div class="title">
+<div class="chat-top">
     <h2>検索結果</h2>
     <p><%= count %>件の結果が見つかりました。</p>
     <input type="hidden" class="searchResult" value="<%= count %>">
@@ -24,7 +23,7 @@
         </div>
     <% }else { %>
         <div class="result">
-            <% for(var i=0;i<10;i++){ %> <!-- ここの数値は迷い中 -->
+            <% for(var i=0;i<5;i++){ %>
                 <% if(channel[i]){ %>
                     <a href="/chat/<%= channel[i]._id %>"><%= channel[i].channelName %></a>
                     <p><%= channel[i].channelDetail %></p>
@@ -71,80 +70,6 @@
     </div>    
 </form>
 
-    
-
-<script src="/jquery/test.js"></script>
 <script src="/javascripts/chats/modalForm.js"></script>
-
-<script>
-    window.addEventListener("DOMContentLoaded",() => {
-
-        var urlParams = new URLSearchParams(window.location.search); //urlの取得
-        var currentPage = parseInt(urlParams.get("page"));
-        
-        var searchResult = document.getElementsByClassName("searchResult")[0].value;
-        var lastPage = Math.ceil(searchResult/5);
-
-        //再検索の際のoptionの初期値の設定
-        var initial = urlParams.get("sort");
-        var search = urlParams.get("search");
-
-        var select = document.getElementsByClassName("sort")[0];
-        for(var i=0;i<3;i++){
-            if(initial ===select.options[i].value){
-                select.options[i].selected = true;
-            }
-        };
-
-        //pagination
-        var pagination = document.getElementsByClassName("pagination")[0];
-        var next = document.getElementById("next");
-        var previous = document.getElementById("previous");
-        var current = document.getElementById("currentPage");
-
-        if(currentPage!==lastPage){
-            next.href = `/chat/channel?search=${search}&sort=${initial}&page=${currentPage+1}`;
-        }
-        
-        if(currentPage!==1){
-            previous.href =  `/chat/channel?search=${search}&sort=${initial}&page=${currentPage-1}`;
-        }
-
-        
-        if(currentPage<=lastPage){
-            current.innerHTML = `${currentPage}/${lastPage}`;
-        }else{
-            while(pagination.lastChild){
-                pagination.removeChild(pagination.lastChild);
-            }
-            var error = document.createElement("p");
-            error.innerHTML = "指定したページは存在しません。";
-            pagination.appendChild(error);
-        }
-
-    },false);
-    
-</script>
-
-<style>
-    .popup {
-        display: none;
-        height: 100vh;
-        width: 100%;
-        background: black;
-        opacity: 0.7;
-        position: fixed;
-        top: 0;
-        left: 0;
-    }
-    .content{
-        background: #fff;
-        padding: 30px;
-        width: 50%;
-    }
-    .show {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-</style>
+<script src="/javascripts/chats/pagination.js"></script>
+<link rel="stylesheet" href="/stylesheets/popup.css">
