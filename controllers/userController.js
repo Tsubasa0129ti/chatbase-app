@@ -1,7 +1,7 @@
 /* モジュールのロード */
 const User = require("../models/user"),
     Profile = require("../models/profile"),
-    passport = require("passport"),
+    passport = require("passport");
 
 function getUserParams(body){
     var obj = new Object();
