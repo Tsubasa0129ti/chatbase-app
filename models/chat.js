@@ -53,5 +53,3 @@ var chatSchema = new Schema(
 
 
 module.exports = mongoose.model("Chat",chatSchema);
-
-//チャンネル作成者も表示させる

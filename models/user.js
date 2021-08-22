@@ -1,13 +1,11 @@
-/* モジュールのロード */
 const mongoose = require("mongoose"),
     Schema = mongoose.Schema,
     passport = require("passport"),
     passportLocalMongoose = require("passport-local-mongoose");
 
-/* スキーマの作成 */
-var userSchema = new Schema(  //スキーマ内のバリデーション機能でエラーログの出力をもう少し見直す
+
+var userSchema = new Schema(
     {
-        //具体的なカラムの追加
         name : {
             first : {
                 type : String,
@@ -30,7 +28,7 @@ var userSchema = new Schema(  //スキーマ内のバリデーション機能で
             min : 15,
             max : 100
         },
-        profile : { //単数のため、配列形式ではない
+        profile : {
             type : Schema.Types.ObjectId,
             ref : "Profile"
         }
@@ -40,7 +38,6 @@ var userSchema = new Schema(  //スキーマ内のバリデーション機能で
     }
 );
 
-/* その他設定 */
 userSchema.virtual("fullName").get(function(){
     return this.name.first + "_" + this.name.last;
 });
