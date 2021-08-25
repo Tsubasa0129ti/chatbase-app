@@ -1,3 +1,4 @@
+//ページネーションと検索の並び替えの初期値の設定をしている
 window.addEventListener("DOMContentLoaded",() => {
 
     var urlParams = new URLSearchParams(window.location.search); //urlの取得
@@ -10,12 +11,16 @@ window.addEventListener("DOMContentLoaded",() => {
     var initial = urlParams.get("sort");
     var search = urlParams.get("search");
 
-    var select = document.getElementsByClassName("sort")[0];
-    for(var i=0;i<3;i++){
-        if(initial ===select.options[i].value){
-            select.options[i].selected = true;
-        }
+    function initialValue(){
+        var select = document.getElementsByClassName("sort")[0];
+        var selectOptions = select.children.length
+        for(var i=1;i<selectOptions;i++){
+            if(initial ===select.options[i].value){
+                select.options[i].selected = true;
+            }
+        };
     };
+    initialValue();
 
     //pagination
     var pagination = document.getElementsByClassName("pagination")[0];
@@ -23,17 +28,22 @@ window.addEventListener("DOMContentLoaded",() => {
     var previous = document.getElementById("previous");
     var current = document.getElementById("currentPage");
 
-    if(currentPage!==lastPage){
-        next.href = `/chat/channel?search=${search}&sort=${initial}&page=${currentPage+1}`;
-    }
-    
-    if(currentPage!==1){
-        previous.href =  `/chat/channel?search=${search}&sort=${initial}&page=${currentPage-1}`;
-    }
+    var previousPage = `/chat/channel?search=${search}&sort=${initial}&page=${currentPage-1}`;
+    var nextPage = `/chat/channel?search=${search}&sort=${initial}&page=${currentPage+1}`;
 
-    
     if(currentPage<=lastPage){
         current.innerHTML = `${currentPage}/${lastPage}`;
+        if(currentPage===lastPage===1){
+            console.log("none");
+        }else if(currentPage===1){
+            next.href = nextPage;
+        }else if(currentPage===lastPage){
+            previous.href =  previousPage;
+        }else{
+            previous.href =  previousPage;
+            next.href = nextPage;
+        }
+
     }else{
         while(pagination.lastChild){
             pagination.removeChild(pagination.lastChild);
@@ -44,3 +54,7 @@ window.addEventListener("DOMContentLoaded",() => {
     }
 
 },false);
+
+/* 不足点
+    変数が多く、これをまとめるというか減らしたい
+    さらに、分岐の順番を逆にしたい */

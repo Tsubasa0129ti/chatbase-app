@@ -1,9 +1,5 @@
 window.addEventListener("DOMContentLoaded",() => { //DOMContentLoaded これに関してはDOMツリーの解析が完了してから
-    //ここに初期値としてそれぞれの値に対してcookieを代入していく（ただし、いまだに成功した場合のcookieの削除はできていない）
-    //ちなみにこのcookieはそれぞれのクライアントごとに保管されるものなのか
-
-
-    //ちなみにこの関数に関して、cookieの扱いづらい配列を変化させている
+    
     function getCookieArray(){
         var arr = new Array();
         if(document.cookie != ''){

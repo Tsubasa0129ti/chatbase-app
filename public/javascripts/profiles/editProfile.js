@@ -1,3 +1,4 @@
+//edit Validationとまとめることも可能
 window.addEventListener("DOMContentLoaded",() => {
 
     //都道府県の初期値設定

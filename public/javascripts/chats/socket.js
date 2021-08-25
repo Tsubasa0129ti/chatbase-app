@@ -1,3 +1,4 @@
+//これも未完　socketが完了したら取り掛かる
 import {uuid4} from "https://cdn.jsdelivr.net/gh/tracker1/node-uuid4/browser.mjs";
 
 window.addEventListener("DOMContentLoaded",() => {
@@ -21,21 +22,19 @@ window.addEventListener("DOMContentLoaded",() => {
             time : `${date.getHours()}:${date.getMinutes()}`
         }
 
-        if(data.val){ //仮
+        if(data.val){
             socket.emit("message",data);
             $("#chat-input").val("");
             return false;
-        }
-
-        
+        } 
     });
 
 
     socket.on("accepter",(message) => {
-        var element = document.getElementById("chat");
-        var copied = element.lastElementChild.cloneNode(true);
+        var element = document.getElementById("chat");　//chat（親クラスの取得）
+        var copied = element.lastElementChild.cloneNode(true);　//子クラスのコピー
         element.appendChild(copied);
-        display(message);
+        display(message); //中身の書き換えを行なっている
     });
 
 
@@ -51,6 +50,7 @@ window.addEventListener("DOMContentLoaded",() => {
 
     /* これかなり簡単に作ってしまっており、拡張性が皆無なため、後で修正する（とりあえず、今は先のが実行可能かを確かめる） */
     //下記は、カーソルを合わせた時の処理
+    //下記は編集時の動作であり、今後大幅に変更するため、一旦飛ばす
     $(".message").mouseover(function(){
         var data = jQuery(":hover")[4];
         var cursolUser_id = data.children[0].href.split("/")[4];
