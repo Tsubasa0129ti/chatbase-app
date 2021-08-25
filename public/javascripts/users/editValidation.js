@@ -1,27 +1,33 @@
-window.addEventListener("DOMContentLoaded",() => { //DOMContentLoaded これに関してはDOMツリーの解析が完了してから
+window.addEventListener("DOMContentLoaded",() => {
     var submit = document.querySelector(".submit");
     submit.addEventListener("click",(e) => {
         e.preventDefault();
 
-        //エラーメッセージの取得
+        //エラーメッセージのクリア
         const errorMsg = document.getElementsByClassName("errorMsg")[0];
-        console.log(errorMsg);
-
-        //エラーメッセージのクリアをする
         if(errorMsg.firstChild){
             errorMsg.removeChild(errorMsg.firstChild);
         }
-        
 
+        (function(){
+            if(fnValidator()&&lnValidator()){
+                editForm();
+            }else{
+                throw new Error();
+            }
+        }());
+
+        /* 以下、定義済み関数 */
         //first name
         function fnValidator(){
             var firstName = document.getElementsByClassName("first")[0].value;
             if(nameChecker(firstName)){
                 var msg = "First Name : 1文字目は大文字で全てアルファベットで記入してください。";
                 errorCreater(msg);
+            }else{
+                return true;
             }
         };
-        fnValidator();
 
         //last name
         function lnValidator(){
@@ -29,9 +35,10 @@ window.addEventListener("DOMContentLoaded",() => { //DOMContentLoaded これに�
             if(nameChecker(lastName)){
                 var msg = "Last Name : 1文字目は大文字で全てアルファベットで記入してください。";
                 errorCreater(msg);
+            }else{
+                return true;
             }
-        }
-        lnValidator();
+        };
 
         //check関数
         function nameChecker(str){
@@ -46,17 +53,16 @@ window.addEventListener("DOMContentLoaded",() => { //DOMContentLoaded これに�
             var errorElement = document.createElement("p");
             errorElement.innerHTML = msg;
             errorMsg.appendChild(errorElement);
-            throw Error("エラー");
+            return false;
         };
 
-        //formの送信 user作成の場合
+        //formの送信関数
         function editForm(){
             var form = document.getElementById("userEdit");
             form.method = "POST";
             form.action = "/users/mypage/update?_method=PUT";
             form.submit();
         };
-        editForm();
 
     },false);
 },false);

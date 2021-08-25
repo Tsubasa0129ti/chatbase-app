@@ -1,62 +1,48 @@
-window.addEventListener("DOMContentLoaded",() => { //DOMContentLoaded これに関してはDOMツリーの解析が完了してから
+window.addEventListener("DOMContentLoaded",() => {
     
-    function getCookieArray(){
-        var arr = new Array();
-        if(document.cookie != ''){
-            var tmp = document.cookie.split('; ');
-            for(var i=0;i<tmp.length;i++){
-            var data = tmp[i].split('=');
-            arr[data[0]] = decodeURIComponent(data[1]);
-            }
-        }
-        return arr;
-    };
-
-    var arr = getCookieArray();
-    var result = arr["first"];
-    
-    if(result){
-        document.getElementsByClassName("first")[0].value = arr["first"];
-        document.getElementsByClassName("last")[0].value = arr["last"];
-        document.getElementsByClassName("email")[0].value = arr["email"];
-        document.getElementsByClassName("age")[0].value = arr["age"];
-    }
-
-
     var submit = document.querySelector(".submit");
     submit.addEventListener("click",(e) => {
         e.preventDefault();
 
         //エラーメッセージの取得
         const errorMsg = document.getElementsByClassName("errorMsg")[0];
-        console.log(errorMsg);
 
         //エラーメッセージのクリアをする
         if(errorMsg.firstChild){
             errorMsg.removeChild(errorMsg.firstChild);
         }
         
+        //バリデーション実行関数
+        (function(){
+            if(fnValidator()&&lnValidator()&&emailValidator()&&passValidator()&&pcValidator()){
+                postForm();
+            }else{
+                throw new Error();
+            }
+        }());
 
+        /* 以下、定義済関数 */
         //first name
         function fnValidator(){
             var firstName = document.getElementsByClassName("first")[0].value;
             if(nameChecker(firstName)){
                 var msg = "First Name : 1文字目は大文字で全てアルファベットで記入してください。";
                 errorCreater(msg);
+            }else{
+                return true;
             }
         };
-        fnValidator();
-
+        
         //last name
         function lnValidator(){
             var lastName = document.getElementsByClassName("last")[0].value;
             if(nameChecker(lastName)){
                 var msg = "Last Name : 1文字目は大文字で全てアルファベットで記入してください。";
                 errorCreater(msg);
+            }else{
+                return true;
             }
-        }
-        lnValidator();
-
+        };
         
         //email
         function emailValidator(){
@@ -64,10 +50,11 @@ window.addEventListener("DOMContentLoaded",() => { //DOMContentLoaded これに�
             if(emailChecker(email)){
                 var msg = "Email : 正しいメールアドレスを記入してください。";
                 errorCreater(msg);
+            }else{
+                return true;
             }
         };
-        emailValidator();
-
+        
         //password
         function passValidator(){
             var password = document.getElementsByClassName("password")[0].value;
@@ -76,6 +63,7 @@ window.addEventListener("DOMContentLoaded",() => { //DOMContentLoaded これに�
                     if(numIncluder(password)){
                         if(strChecker(password)){
                             console.log("Clear");
+                            return true;
                         }else{
                             var msg = "Password : 半角英数字で設定してください。";
                             errorCreater(msg);
@@ -93,8 +81,7 @@ window.addEventListener("DOMContentLoaded",() => { //DOMContentLoaded これに�
                 errorCreater(msg);
             }
         };
-        passValidator();
-
+        
         //password confirm
         function pcValidator(){
             var password = document.getElementsByClassName("password")[0].value;
@@ -102,10 +89,11 @@ window.addEventListener("DOMContentLoaded",() => { //DOMContentLoaded これに�
             if(password !== passCheck){
                 var msg = "Password Confirm : パスワードとパスワードの確認が一致しません。";
                 errorCreater(msg);
-            }                
+            }else{
+                return true;
+            }              
         };
-        pcValidator();
-
+        
         //check関数
         function nameChecker(str){
             var checker = str.match(/[A-Z]{1}[A-Za-z]*/);
@@ -138,8 +126,11 @@ window.addEventListener("DOMContentLoaded",() => { //DOMContentLoaded これに�
         };
 
         function strChecker(str){
-            var checker = str.match(/^[A-Za-z0-9]/);
+            console.log(str);
+            var checker = str.match(/^[A-Za-z0-9]+$/);
+            console.log(checker);
             if(checker){
+                console.log(checker);
                 return true;
             }
         };
@@ -149,7 +140,7 @@ window.addEventListener("DOMContentLoaded",() => { //DOMContentLoaded これに�
             var errorElement = document.createElement("p");
             errorElement.innerHTML = msg;
             errorMsg.appendChild(errorElement);
-            throw Error("エラー");
+            return false;
         };
 
         //formの送信 user作成の場合
@@ -159,7 +150,6 @@ window.addEventListener("DOMContentLoaded",() => { //DOMContentLoaded これに�
             form.action = "/users/create";
             form.submit();
         };
-        postForm();
 
     },false);
 },false);
