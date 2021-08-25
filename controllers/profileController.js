@@ -1,6 +1,7 @@
 var User = require("../models/user");
 var Profile = require("../models/profile");
-var getProfile = body => {
+
+function getProfile(body) {
     return {
         intro : body.intro,
         prefecture : body.prefecture,
@@ -14,15 +15,13 @@ module.exports = {
     index : (req,res) => {
         res.render("profile/index");
     },
-    create : (req,res,next) => {
+    create : (req,res,next) => {　//一応短く分離することは可能ではあるものの、必要性を感じない（別に可読性が上がるわけではないと思う）ため、一旦保留
         if(req.isAuthenticated()){
-            //ログイン時の処理
-            var currentUser = req.user; //現在のuserとprofileの結び付けを行う（1対１）
+            var currentUser = req.user;
             if(currentUser.profile===undefined){
                 let profileParams = getProfile(req.body);
                 Profile.create(profileParams)
                 .then(profile => { 
-                    //ここにデータベースへの干渉ができるものを入れる
                     var userId = currentUser._id;
                     User.findByIdAndUpdate(userId,{
                         $addToSet : {
@@ -31,16 +30,17 @@ module.exports = {
                     })
                     .then(() => {
                         res.locals.redirect = "/users/mypage";
-                        console.log("clear");
                         next();
                     })
                     .catch((err) => {
+                        //user編集をする際のエラー
                         res.locals.redirect = "/users/mypage/profile";
                         console.log(err);
                         next();
                     });
                 })
                 .catch(err => {
+                    //profile作成のエラー
                     console.log(err);
                     res.locals.redirect = "/users/mypage/profile";
                     next();
@@ -52,10 +52,11 @@ module.exports = {
             }
         }
         else{
-            res.redirect = "/users/login";
+            res.locals.redirect = "/users/login";
+            next();
         }
     },
-    redirect : (req,res,next) => {
+    redirectView : (req,res,next) => {
         var redirectPath = res.locals.redirect;
         if(redirectPath) {
             res.redirect(redirectPath);
@@ -77,7 +78,6 @@ module.exports = {
     },
     edit : (req,res) => {
         var currentUser = req.user;
-
         if(currentUser.profile){
             User.findById(currentUser._id)
             .populate("profile")
@@ -90,31 +90,23 @@ module.exports = {
             });
         }else{
             req.flash("error","profileを作成してください。");
-            res.redirect("/users/mypage/profile");
+            res.locals.redirect = "/users/mypage/profile";
         }
-    },
-    findByCurrent : (req,res,next) => {
-        var currentUser = req.user;
-        User.findById(currentUser._id)
-        .populate("profile")
-        .exec(function(err,user){
-            if(err){
-                next(err);
-            }else{
-                next(user);
-            }
-        });
     },
     update : (req,res,next) => {
         let profileParams = getProfile(req.body);
-        console.log(profileParams);
         var id = req.user.profile;
         Profile.findByIdAndUpdate(id,{
             $set : profileParams
         }).then(profile => {
-            res.redirect("/users/mypage");
+            res.locals.redirect = "/users/mypage";
+            next();
         }).catch(err => {
             console.log(err);
+            next();
         });
     }
 }
+
+//エラー処理がある場所　create profile edit update
+/* 一応想定としては、ステータスコードを用いた分岐を行う　これには、errorControllerを作成して、これを呼び出す形にする　ステータスコード別のエラーページを作成 */
