@@ -33,7 +33,7 @@ window.addEventListener("DOMContentLoaded",() => {
 
     if(currentPage<=lastPage){
         current.innerHTML = `${currentPage}/${lastPage}`;
-        if(currentPage===lastPage===1){
+        if(currentPage===1&&lastPage===1){
             console.log("none");
         }else if(currentPage===1){
             next.href = nextPage;

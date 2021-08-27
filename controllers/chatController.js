@@ -1,5 +1,6 @@
 var Chat = require("../models/chat");
-const getChatParams = body => {
+
+function getChatParams(body){
     return {
         channelName : body.channelName,
         channelDetail : body.channelDetail,
@@ -22,14 +23,27 @@ module.exports = {
     guide : (req,res) => {
         res.render("chats/guide");
     },
-    create : (req,res) => { //モーダル上の作成のため、一応これでよいはず。メソッドの間違いはあるかもしれないけど。flashと閉じるタイミングに注視
+    create : (req,res,next) => {
         let newChat = new Chat(getChatParams(req.body));
-        newChat.save((err) => {
-            if(!err){
-                req.flash("success","チャンネルの作成ができました。");
-            }else{
-                req.flash("error","チャンネルの作成に失敗しました。");
-                throw err;
+        newChat.save((err,chat) => {
+            if(chat){
+                var channelName = req.body.channelName;
+                Chat.findOne({channelName:channelName})
+                .then(channel =>{
+                    var id = channel._id;
+                    req.flash("success","チャンネル作成に成功しました。");
+                    res.locals.redirect = `/chat/${id}`;
+                    next();
+                }).catch(err => {
+                    res.locals.redirect = "/chat";
+                    next();
+                });
+            }else if(err){
+                if(err.name==="MongoError"){
+                    req.flash("error","このチャンネル名はすでに存在します。");
+                    res.locals.redirect = "/chat";
+                    next();
+                }
             }
         });
     },
@@ -51,7 +65,30 @@ module.exports = {
         }).catch(err => {
             res.send(err);
         });
+    },
+    search : (req,res,next) => {
+        var q = req.query.search;
+        var sorting = req.query.sort;
+        var sortVal = [{updatedAt : -1},{updatedAt : 1},{createdAt : -1},{createdAt :1}];
+        var page = req.query.page;  
+        var skipIndex = (page-1)*5;
+    
+        Chat.countDocuments({$or : [{channelName : new RegExp(".*" + q + ".*" , "i")},{channelDetail : new RegExp(".*" + q + ".*" , "i")}]})
+        .then(count => {
+            res.locals.count = count;
+            Chat.find({$or : [{channelName : new RegExp(".*" + q + ".*" , "i")},{channelDetail : new RegExp(".*" + q + ".*" , "i")}]})
+            .sort(sortVal[sorting]).limit(5).skip(skipIndex)
+            .then(channel => {
+                res.locals.channel = channel;
+                res.render("chats/result",channel);
+            }).catch(err => {
+                console.log(err.message);
+            });
+        }).catch(err => {
+            console.log(err);
+        });
+        
     }
 }
 
-
+//エラー処理　create findAll talk search

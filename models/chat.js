@@ -6,7 +6,8 @@ var chatSchema = new Schema(
     {
         channelName : {
             type : String,
-            required : true
+            required : true,
+            unique : true
         },
         channelDetail : {
             type : String,
@@ -18,7 +19,7 @@ var chatSchema = new Schema(
         }],
         messages : [{
             userName : {
-                type : String, //とりあえず連結を解除
+                type : String,
                 required : true
             },
             user : {
