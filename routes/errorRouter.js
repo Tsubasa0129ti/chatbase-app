@@ -8,3 +8,5 @@ router.use(errorController.logError);
 router.use(errorController.internalServerError);
 
 module.exports = router;
+
+//このrouterというmoduleをそのままapp.js内部において読み込むことができない（正確には、errorControllerの処理を実行することができない）

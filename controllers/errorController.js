@@ -8,6 +8,8 @@ module.exports = {
         next(err);
     },
     internalServerError : (err,req,res,next) => { //500
-        res.status(500).send(err);
+        console.log("500エラー")
+        res.status(500).send("エラー");
     }
+
 }

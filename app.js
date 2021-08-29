@@ -79,6 +79,7 @@ app.use((req,res,next) => {
     res.locals.currentUser = req.user;
     var url = req.url;
     pathId = url.split("/"); //これをio内部で行いたい
+    console.log(url);
     next();
 });
 
@@ -88,8 +89,62 @@ app.use("/users",userRoutes);
 app.use("/chat",chatRoutes);
 app.use("/users/mypage",profileRoutes);
 
-/* errorハンドラー */
-app.use(errorRoutes);
+/* errorハンドラー　一旦エラーハンドラはこちらで定義してm、後に有効化する */
+//app.use(errorRoutes);
+
+app.use(function internalServerError(err,req,res,next){
+    res.status(500).send("error---");
+    console.log("Error");
+}); 
+
+app.use(function notFoundError(req,res,next){
+    var url = req.url;
+    res.status(404).render("errors/404",{url:url});
+});
+
+app.use(function(err,req,res,next){
+    console.log(err.stack);
+    next(err);
+});
+
+app.use(function customError(err,req,res,next) {
+    var statusCode = res.locals.status;
+    
+    if(!statusCode){
+        internalServerError()
+    }else{
+        switch(statusCode){
+            case 400 :
+                createError(400,"送信されたデータが無効です。");
+                break;
+            case 401 :
+                Unauthorized(err,req,res,next);
+                break;
+            case 403 : 
+                Forbidden(err,req,res,next);
+                break;
+
+            case 500 || undefined :
+                internalServerError(err,req,res,next);
+                break;
+        }
+    }
+});
+
+function internalServerError(err,req,res,next){
+    console.log(`internalServerError:${err}`);
+    var redirectPath = res.locals.redirect;
+    res.status(500).redirect(redirectPath);
+};
+
+function Unauthorized(err,req,res,next){
+    console.log(`error:${err}`);
+    res.status(401);
+    //ここからリダイレクトを行うように設定とか？　ぶっちゃけやらない方がわかりやすいけど
+    var redirectPath = res.locals.redirect;
+    res.redirect(redirectPath);
+};
+
 
 /* サーバーの起動 */
 const PORT = 3000;
@@ -151,3 +206,6 @@ io.on("connection",(socket) => {
         console.log("user disconnected");
     });
 });
+
+//残り　エラールーターを読み込んでも、これがミドルウェアとして常に読み込まれない　ここの要素としてエラーハンドリングを記載し、nextで繋げることはできるが、errorRouterを読み込むだけだとこれがなされない
+//結果としては、errorRouterをapp.js内部で読み込むことで、全てのcontrollerからのnext(error)からここに繋げるようにしたい
