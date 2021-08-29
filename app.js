@@ -132,7 +132,7 @@ app.use(function customError(err,req,res,next) {
 });
 
 function internalServerError(err,req,res,next){
-    console.log(`internalServerError:${err}`);
+    console.log(`internalServerError:${err}`); //このエラーに関してをデータ化して、クライアントに出力する
     var redirectPath = res.locals.redirect;
     res.status(500).redirect(redirectPath);
 };

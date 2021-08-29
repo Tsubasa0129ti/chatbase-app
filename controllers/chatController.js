@@ -36,7 +36,8 @@ module.exports = {
                     next();
                 }).catch(err => {
                     res.locals.redirect = "/chat";
-                    next();
+                    res.locals.status = 500;
+                    next(err);
                 });
             }else if(err){
                 if(err.name==="MongoError"){
@@ -53,7 +54,10 @@ module.exports = {
             res.locals.channel = channel;
             next();
         }).catch(err => {
+            res.locals.redirect = "/"; //ホームに戻すかも
+            res.locals.status = 500;
             console.log(err.message);
+            next(err);
         });
     },
     talk : (req,res) => {
@@ -63,7 +67,10 @@ module.exports = {
             res.locals.channel = channel;
             res.render("chats/channel",channel);
         }).catch(err => {
-            res.send(err);
+            res.locals.redirect = "/chat";
+            res.locals.status = 500;
+            console.log(err.message);
+            next(err);
         });
     },
     search : (req,res,next) => {
@@ -82,13 +89,17 @@ module.exports = {
                 res.locals.channel = channel;
                 res.render("chats/result",channel);
             }).catch(err => {
+                res.locals.redirect = "/chat";
+                res.locals.status = 500;
                 console.log(err.message);
+                next(err);
             });
         }).catch(err => {
-            console.log(err);
+            res.locals.redirect = "/chat";
+            res.locals.status = 500;
+            console.log(err.message);
+            next(err);
         });
         
     }
 }
-
-//エラー処理　create findAll talk search

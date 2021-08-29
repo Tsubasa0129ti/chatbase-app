@@ -40,13 +40,15 @@ module.exports = {
                     res.locals.user = newUser;
                     next();
                 };
-                if(error.name === "UserExistsError"){
+                if(err.name === "UserExistsError"){ //その他のを用いる場合は,エラー分岐を追加可能
                     var errMsg = "このメールアドレスは、すでに使用されています。";
-                    console.log(error);
+                    console.log(err);
                     getError(errMsg);
-                }else{
-                    var errMsg = "不明なエラーが発生しました。";
-                    getError(errMsg);
+                }else{ //想定では、registerを行うことができない
+                    req.flash("error","アカウントの作成に失敗しました。もう一度お試しください。");
+                    res.locals.redirect = "/users/new";
+                    res.locals.status = 500;
+                    next(err);
                 }
             }
         });
@@ -78,7 +80,7 @@ module.exports = {
         next();
     },
     redirectView : (req,res,next) => {
-        var redirectPath = res.locals.redirect; //そもそもredirectが存在しないことを想定していない？　だからぶっちゃけこの分岐いらないな
+        var redirectPath = res.locals.redirect;
         if(redirectPath) {
             res.redirect(redirectPath);
         }else{
@@ -142,7 +144,6 @@ module.exports = {
         .populate("profile")
         .exec((err,user) => {
             if(err){
-                //ここに関しては、エラーを取得できる　next(err)にした場合,どれに分岐するのか不明
                 res.locals.redirect = "/users/mypage";
                 res.locals.status = 500;
                 console.log(err.message);
@@ -169,10 +170,12 @@ module.exports = {
             $set : newUser
         }).then(user=> {
             res.redirect("/users/mypage");
-        }).catch(error =>{
+        }).catch(err =>{
             req.flash("error","アカウント情報の変更に失敗しました。"); //ここもエラー情報の分岐をするかも
-            console.log(error.message);
-            //これもエラーの取得ができる
+            console.log(err.message);
+            res.locals.redirect = "/users/edit";
+            res.locals.status = 500;
+            next(err);
         });
     },
     delete : (req,res,next) => {　　//詳細アカウントの作成をした場合、同時にこちらから消せるように設定する
@@ -181,7 +184,7 @@ module.exports = {
         .then(() => {
             next();
         }).catch(err => {
-            res.locals.redirect = "/users/mypage/edit";
+            res.locals.redirect = "/users/mypage";
             res.locals.status = 500;
             console.log(err.message);
             next(err);
@@ -201,8 +204,3 @@ module.exports = {
         });
     }
 }
-
-//エラー処理　authenticate show update delete profileDelete
-
-// loginCheckに関しては、401を用いた　しかし、createのエラー処理の仕方は現状不明なため、一旦飛ばす（というか、特に問題はないためこれに関しては現状維持でも大丈夫かも）
-

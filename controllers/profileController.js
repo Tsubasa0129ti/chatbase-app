@@ -35,23 +35,24 @@ module.exports = {
                     .catch((err) => {
                         //user編集をする際のエラー
                         res.locals.redirect = "/users/mypage/profile";
-                        console.log(err);
-                        next();
+                        res.locals.status = 500;
+                        console.log(err.message);
+                        next(err);
                     });
                 })
                 .catch(err => {
                     //profile作成のエラー
-                    console.log(err);
                     res.locals.redirect = "/users/mypage/profile";
-                    next();
+                    res.locals.status = 500;
+                    console.log(err.message);
+                    next(err);
                 });
             }else{
                 req.flash("error","You have already created your profile. if you wanted to renew yours, go to edit page");
                 res.locals.redirect = "/users/mypage";
                 next();
             }
-        }
-        else{
+        }else{
             res.locals.redirect = "/users/login";
             next();
         }
@@ -70,7 +71,10 @@ module.exports = {
         .populate("profile")
         .exec(function(err,user){
             if(err){
-                console.log(err.message);
+                res.locals.redirect = "/users/mypage";
+                res.locals.status = 500;
+                console.log(err.message)
+                next(err);
             }else{
                 res.render("profile/show",{User:user});
             }
@@ -83,7 +87,10 @@ module.exports = {
             .populate("profile")
             .exec(function(err,user){
                 if(err){
-                    console.log(err.message);
+                    res.locals.redirect = "/users/mypage";
+                    res.locals.status = 500;
+                    console.log(err.message)
+                    next(err);
                 }else{
                     res.render("profile/edit",{currentUser:user});
                 }
@@ -91,6 +98,7 @@ module.exports = {
         }else{
             req.flash("error","profileを作成してください。");
             res.locals.redirect = "/users/mypage/profile";
+            next();
         }
     },
     update : (req,res,next) => {
@@ -99,14 +107,14 @@ module.exports = {
         Profile.findByIdAndUpdate(id,{
             $set : profileParams
         }).then(profile => {
+            req.flash("success","プロフィールの更新に成功しました。");
             res.locals.redirect = "/users/mypage";
             next();
         }).catch(err => {
+            res.locals.redirect = "/users/mypage/edit";
+            res.locals.status = 500;
             console.log(err);
             next();
         });
     }
 }
-
-//エラー処理がある場所　create profile edit update
-/* 一応想定としては、ステータスコードを用いた分岐を行う　これには、errorControllerを作成して、これを呼び出す形にする　ステータスコード別のエラーページを作成 */
