@@ -34,9 +34,9 @@ module.exports = {
                     next();
                 }).catch(err => {
                     req.flash("error","チャンネル作成に失敗しました。");
-                    console.log(err.message);
+                    res.locals.status = 500;
                     res.locals.redirect = "/chat";
-                    next();
+                    next(err);
                 });
             }else if(err){
                 if(err.name==="MongoError"){

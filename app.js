@@ -116,11 +116,11 @@ app.use(function(err,req,res,next){
     next(err);
 });
 
-/* app.use(function customError(err,req,res,next) {
+app.use(function customError(err,req,res,next) {
     var statusCode = res.locals.status;
     
     if(!statusCode){
-        internalServerError()
+        internalServerError(err,req,res,next);
     }else{
         switch(statusCode){
             case 400 :
@@ -138,13 +138,22 @@ app.use(function(err,req,res,next){
                 break;
         }
     }
-}); */
+});
 
-/* function internalServerError(err,req,res,next){
-    console.log(`internalServerError:${err}`); //このエラーに関してをデータ化して、クライアントに出力する
+function internalServerError(err,req,res,next){
+    console.log(`internalServerError:${err}`);
     var redirectPath = res.locals.redirect;
-    res.status(500).redirect(redirectPath);
-}; */
+    if(!redirectPath){
+        res.status(500).send(err);
+        //ここに関しては、500.ejsに繋げる　そして、そこで元に戻る画面と、エラー詳細の記載などをつける
+        /* res.status(500).render("errors/500",{
+            err : err,
+            status : 500
+        }); */
+    }else{
+        res.status(500).redirect(redirectPath);
+    }
+};
 
 function Unauthorized(err,req,res,next){
     console.log(`error:${err}`);
