@@ -29,7 +29,7 @@
     </div>
 </div>
 
-<% if(currentUser) { %> 
+<% if(currentUser) { %> <!-- ここに含まれるhiddenを消すためには、socketとsessionを接続する必要があるのでは -->
     <form id="chat-form">
         <input id="chat-input" type="text"　placeholder="メッセージ">
         <input id="chat-user" type="hidden" value="<%= currentUser.fullName %>">

@@ -91,7 +91,7 @@ module.exports = {
         res.render("users/login");
     },
     authenticate : (req,res,next) => { //ログイン時のターミナルを参照　セキュアでないかも
-        passport.authenticate("local",(err,user,info) => {
+        passport.authenticate("local",{session:true},(err,user,info) => {
             if(err){
                 req.flash("error","サーバー内でエラーが発生しました。もう一度お試しください。");
                 res.locals.redirect = "/users/login";
@@ -113,9 +113,21 @@ module.exports = {
                     res.locals.status = 500;
                     return next(err);
                 }
-                res.clearCookie("username",{path:"/users/login"});
-                req.flash("success","ログイン成功");
-                return res.redirect("/users/mypage");
+                //sessionに保管する際に、現状だとメールアドレスのみなので,検索をかけてuserそのものをsessionに入れ込むのは？
+                User.find({email:req.session.passport.user})
+                .then(user => {
+                    req.session.currentUser = user;
+                    console.log(`user:${req.session.currentUser}`);
+                    res.clearCookie("username",{path:"/users/login"});
+                    req.flash("success","ログイン成功");
+                    return res.redirect("/users/mypage");
+                }).catch(err => {
+                    req.flash("error","サーバー内でエラーが発生しました。もう一度お試しください。");
+                    res.locals.redirect = "/users/login";
+                    res.locals.status = 500;
+                    return next(err);
+                });
+                
             });
         })(req,res,next);
     },

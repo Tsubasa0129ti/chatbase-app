@@ -1,13 +1,5 @@
 var Chat = require("../models/chat");
 
-function getChatParams(body){
-    return {
-        channelName : body.channelName,
-        channelDetail : body.channelDetail,
-        createdBy : body.createdBy
-    }
-};
-
 module.exports = {
     index : (req,res) => {
         res.render("chats/index");
@@ -24,7 +16,13 @@ module.exports = {
         res.render("chats/guide");
     },
     create : (req,res,next) => {
-        let newChat = new Chat(getChatParams(req.body));
+        console.log(req.session.currentUser[0]._id);
+        var newChat = new Chat({
+            channelName : req.body.channelName,
+            channelDetail : req.body.channelDetail,
+            createdBy : req.session.currentUser[0]._id //作成者の情報をsessionから与えるように変更
+        });
+
         newChat.save((err,chat) => {
             if(chat){
                 var channelName = req.body.channelName;
@@ -35,9 +33,10 @@ module.exports = {
                     res.locals.redirect = `/chat/${id}`;
                     next();
                 }).catch(err => {
+                    req.flash("error","チャンネル作成に失敗しました。");
+                    console.log(err.message);
                     res.locals.redirect = "/chat";
-                    res.locals.status = 500;
-                    next(err);
+                    next();
                 });
             }else if(err){
                 if(err.name==="MongoError"){

@@ -12,6 +12,7 @@ const express = require("express"),
     connectFlash = require("connect-flash"),
     passport = require("passport"),
     mongoose = require("mongoose"),
+    MongoStore = require("connect-mongo");
     User = require("./models/user"),
     Chat = require("./models/chat");
 
@@ -46,8 +47,12 @@ app.use(session({
     resave : false,
     saveUninitialized : false,
     cookie : {
-        maxAge : 36000000
-    }
+        maxAge : 60 * 60 * 1000,
+        //secure : true 本番環境での有効化をする
+    },
+    store : MongoStore.create({
+        mongoUrl : "mongodb://localhost:27017/chatAppDB"
+    })
 }));
 
 /* mongooseとの接続 */
@@ -83,19 +88,23 @@ app.use((req,res,next) => {
     next();
 });
 
+//test
+var loginCheck = function(req,res,next) {
+    if(req.session.user){
+        next();
+    }else{
+        res.redirect("/users/login");
+    }
+}
+
 /* routerの読み込み */
 app.use("/",indexRoutes);
 app.use("/users",userRoutes);
 app.use("/chat",chatRoutes);
 app.use("/users/mypage",profileRoutes);
 
-/* errorハンドラー　一旦エラーハンドラはこちらで定義してm、後に有効化する */
+/* errorハンドラー　一旦エラーハンドラはこちらで定義して、後に有効化する */
 //app.use(errorRoutes);
-
-app.use(function internalServerError(err,req,res,next){
-    res.status(500).send("error---");
-    console.log("Error");
-}); 
 
 app.use(function notFoundError(req,res,next){
     var url = req.url;
@@ -107,7 +116,7 @@ app.use(function(err,req,res,next){
     next(err);
 });
 
-app.use(function customError(err,req,res,next) {
+/* app.use(function customError(err,req,res,next) {
     var statusCode = res.locals.status;
     
     if(!statusCode){
@@ -129,13 +138,13 @@ app.use(function customError(err,req,res,next) {
                 break;
         }
     }
-});
+}); */
 
-function internalServerError(err,req,res,next){
+/* function internalServerError(err,req,res,next){
     console.log(`internalServerError:${err}`); //このエラーに関してをデータ化して、クライアントに出力する
     var redirectPath = res.locals.redirect;
     res.status(500).redirect(redirectPath);
-};
+}; */
 
 function Unauthorized(err,req,res,next){
     console.log(`error:${err}`);
