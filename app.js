@@ -16,6 +16,8 @@ const express = require("express"),
     User = require("./models/user"),
     Chat = require("./models/chat");
 
+const { decycle, encycle } = require('json-cyclic');
+
 /* rooting */
 const indexRoutes = require("./routes/index");
 const userRoutes = require("./routes/userRouter");
@@ -42,7 +44,8 @@ app.use(
 );
 app.use(cookieParser("secret_passcode"));
 app.use(express.static(path.join(__dirname,"public")));
-app.use(session({
+
+var sessionMiddleware = session({
     secret : "keyboard cat",
     resave : false,
     saveUninitialized : false,
@@ -53,7 +56,8 @@ app.use(session({
     store : MongoStore.create({
         mongoUrl : "mongodb://localhost:27017/chatAppDB"
     })
-}));
+});
+app.use(sessionMiddleware);
 
 /* mongooseとの接続 */
 mongoose.Promise = global.Promise;
@@ -87,15 +91,6 @@ app.use((req,res,next) => {
     console.log(url);
     next();
 });
-
-//test
-var loginCheck = function(req,res,next) {
-    if(req.session.user){
-        next();
-    }else{
-        res.redirect("/users/login");
-    }
-}
 
 /* routerの読み込み */
 app.use("/",indexRoutes);
@@ -168,29 +163,33 @@ function Unauthorized(err,req,res,next){
 const PORT = 3000;
 const server = http.createServer(app); //こいつの位置に注意
 
+io = require("socket.io")(server);
+/* controllerに移行する予定 */
+io.use(function(socket, next) {
+    sessionMiddleware(socket.request, socket.request.res || {}, next);
+});
+
 server.listen(PORT,() => {
     console.log("LOCAL接続");
 });
 
-/* socket.ioの設定（passportとの連結が必要かも） */
-io = require("socket.io")(server);
-/* controllerに移行する予定 */
 io.on("connection",(socket) => {
-
+    console.log(socket.request.session);
     socket.on("message",(message) => {
-        console.log(socket);
+        var userId = socket.request.session.currentUser._id;
+        var username = socket.request.session.currentUser.name.first + "_" + socket.request.session.currentUser.name.last
         if(!room){
             var room = message.id;
             socket.join(room);
-            console.log(`${message.user}は、${message.id}に入室しました。`);
+            console.log(`${userId}は、${message.id}に入室しました。`);
             console.log("ここ"+message.customId);
         }
         //データベースへの保管
         Chat.findByIdAndUpdate(message.id,{
             $push : {messages : {
-                user : message.userId,
-                userName : message.user,
-                text : message.val,
+                userId : userId,
+                username : username,
+                text : message.text,
                 getTime : {
                     day : message.day,
                     time : message.time
@@ -205,10 +204,10 @@ io.on("connection",(socket) => {
 
         //指定のroomへの送出を行う
         io.to(room).emit("accepter",{
-            user : message.user,
+            userId : userId,
+            user : username,　//
             time : message.time,
-            text : message.val,
-            userId : message.userId,
+            text : message.text,
             customId : message.customId
         });
     });

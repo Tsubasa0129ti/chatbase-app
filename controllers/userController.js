@@ -116,7 +116,7 @@ module.exports = {
                 //sessionに保管する際に、現状だとメールアドレスのみなので,検索をかけてuserそのものをsessionに入れ込むのは？
                 User.find({email:req.session.passport.user})
                 .then(user => {
-                    req.session.currentUser = user;
+                    req.session.currentUser = user[0]; //なぜか配列形式になってしまっているため
                     console.log(`user:${req.session.currentUser}`);
                     res.clearCookie("username",{path:"/users/login"});
                     req.flash("success","ログイン成功");

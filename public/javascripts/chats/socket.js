@@ -4,7 +4,7 @@ import {uuid4} from "https://cdn.jsdelivr.net/gh/tracker1/node-uuid4/browser.mjs
 window.addEventListener("DOMContentLoaded",() => {
     const socket = io();
     //現在のログインユーザー
-    var currentUser_id = document.getElementById("chat-id").value;
+    var currentUser_id = document.getElementById("chat-id").value; //これの使用は、編集時のみのため、一旦保留（もちろん、これもsessionに変更予定） 最悪比較の方法は変える　（）
     
     //submit時の処理
     $("#chat-form").submit(() => {
@@ -12,18 +12,16 @@ window.addEventListener("DOMContentLoaded",() => {
         var date = new Date();
         var dayGetter = ["日","月","火","水","木","金","土"]; 
 
-        var data = {
-            val : document.getElementById("chat-input").value,
-            user : document.getElementById("chat-user").value,
-            userId : document.getElementById("chat-id").value,
+        var message = {
+            text : document.getElementById("chat-input").value,
             id : window.location.pathname.split("/")[2],
             customId : customId,
             day : `${date.getFullYear()}年 ${date.getMonth()+1}月${date.getDate()}日(${dayGetter[date.getDay()]})`,
             time : `${date.getHours()}:${date.getMinutes()}`
-        }
+        };
 
-        if(data.val){
-            socket.emit("message",data);
+        if(message.text){
+            socket.emit("message",message);
             $("#chat-input").val("");
             return false;
         } 

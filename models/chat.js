@@ -18,11 +18,11 @@ var chatSchema = new Schema(
             ref : "User"
         }],
         messages : [{
-            userName : {
+            username : {
                 type : String,
                 required : true
             },
-            user : {
+            userId : {
                 type : String,
                 required : true
             },

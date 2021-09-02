@@ -11,7 +11,7 @@
 <div class="chat-saving">
     <% for(var i=0;i<channel.messages.length;i++) { %>
         <div class="chat-devider">
-            <a href="/users/<%= channel.messages[i].user %>"><%= channel.messages[i].userName %></a>
+            <a href="/users/<%= channel.messages[i].userId %>"><%= channel.messages[i].username %></a>
             <p><%= channel.messages[i].getTime.time %></p>
             <p class="message"><%= channel.messages[i].text %></p>
             <input class="msgId" type="hidden" value="<%= channel.messages[i]._id %>">
@@ -29,14 +29,19 @@
     </div>
 </div>
 
-<% if(currentUser) { %> <!-- ここに含まれるhiddenを消すためには、socketとsessionを接続する必要があるのでは -->
+<% if(currentUser) { %> 
     <form id="chat-form">
         <input id="chat-input" type="text"　placeholder="メッセージ">
-        <input id="chat-user" type="hidden" value="<%= currentUser.fullName %>">
         <input id="chat-id" type="hidden" value="<%= currentUser._id %>">
         <input type="submit" value="送信" id="click">
     </form>
-<% } %>
+<% } %> <!-- 比較用にchat-idのみ残してあるが、これもsessionに切り替えたら、ifもろとも消す 最終下の-->
+
+<!-- <form id="chat-form">
+    <input id="chat-input" type="text"　placeholder="メッセージ">
+    <input type="submit" value="送信" id="click">
+</form> -->
+
 
 
 <!-- 想定　現在のアカウントとカーソルを合わせた要素のアカウントが一致した場合は、その要素の編集を可能とするpopupを出現させる。さもなくば、返信や反応等のpopup -->
