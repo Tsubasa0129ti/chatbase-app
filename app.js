@@ -50,7 +50,7 @@ var sessionMiddleware = session({
     resave : false,
     saveUninitialized : false,
     cookie : {
-        maxAge : 60 * 60 * 1000,
+        maxAge : 60 * 1000,　// 60 * 60 * 1000
         //secure : true 本番環境での有効化をする
     },
     store : MongoStore.create({
@@ -89,6 +89,10 @@ app.use((req,res,next) => {
     var url = req.url;
     pathId = url.split("/"); //これをio内部で行いたい
     console.log(url);
+    if(req.session){
+        var limit = req.session.cookie.expires;
+        res.locals.sessionExpires = limit.toLocaleString();
+    }
     next();
 });
 

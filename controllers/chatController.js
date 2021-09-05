@@ -16,11 +16,10 @@ module.exports = {
         res.render("chats/guide");
     },
     create : (req,res,next) => {
-        console.log(req.session.currentUser[0]._id);
         var newChat = new Chat({
             channelName : req.body.channelName,
             channelDetail : req.body.channelDetail,
-            createdBy : req.session.currentUser[0]._id //作成者の情報をsessionから与えるように変更
+            createdBy : req.session.currentUser._id
         });
 
         newChat.save((err,chat) => {

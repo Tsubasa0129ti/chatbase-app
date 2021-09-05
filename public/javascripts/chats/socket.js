@@ -4,7 +4,7 @@ import {uuid4} from "https://cdn.jsdelivr.net/gh/tracker1/node-uuid4/browser.mjs
 window.addEventListener("DOMContentLoaded",() => {
     const socket = io();
     //現在のログインユーザー
-    var currentUser_id = document.getElementById("chat-id").value; //これの使用は、編集時のみのため、一旦保留（もちろん、これもsessionに変更予定） 最悪比較の方法は変える　（）
+    var currentUser_id = document.getElementById("chat-id").value; //これの使用は、編集時のみのため、一旦保留（もちろん、これもsessionに変更予定 編集の作成時で可） 最悪比較の方法は変える　（）
     
     //submit時の処理
     $("#chat-form").submit(() => {

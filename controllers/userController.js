@@ -117,7 +117,6 @@ module.exports = {
                 User.find({email:req.session.passport.user})
                 .then(user => {
                     req.session.currentUser = user[0]; //なぜか配列形式になってしまっているため
-                    console.log(`user:${req.session.currentUser}`);
                     res.clearCookie("username",{path:"/users/login"});
                     req.flash("success","ログイン成功");
                     return res.redirect("/users/mypage");
