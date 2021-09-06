@@ -4,7 +4,8 @@ const express = require("express"),
     path = require("path"),
     logger = require("morgan"),  
     session = require("express-session"),　
-    cookieParser = require("cookie-parser"), 
+    cookieParser = require("cookie-parser"),
+    uuid = require("uuid"), 
     layouts = require("express-ejs-layouts"),
     createError = require("http-errors"),
     httpStatus = require("http-status-codes"),
@@ -55,7 +56,11 @@ var sessionMiddleware = session({
     },
     store : MongoStore.create({
         mongoUrl : "mongodb://localhost:27017/chatAppDB"
-    })
+    }),
+    genid : function(req){
+        console.log("new sessionID is created");
+        return uuid.v4();
+    }
 });
 app.use(sessionMiddleware);
 
