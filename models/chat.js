@@ -13,44 +13,47 @@ var chatSchema = new Schema(
             type : String,
             required : true
         },
-        user : [{
-            type : Schema.Types.ObjectId,
-            ref : "User"
-        }],
-        messages : [{
-            username : {
-                type : String,
-                required : true
-            },
-            userId : {
-                type : String,
-                required : true
-            },
-            text : {
-                type : String,
-                required : true
-            },
-            getTime : {
-                day : {
-                    type : String
-                },
-                time : {
-                    type : String
-                }
-            },
-            customId : {
-                type : String
-            }
-        }],
         createdBy : {
             type : String,
             required : true
-        }
+        },
+        users : [{
+            type : Schema.Types.ObjectId,
+            ref : "User"
+        }],
+        chatData : [{
+            date : {
+                type : String,
+                required : true,
+                unique : true
+            },
+            messages : [{
+                userId : {
+                    type : String,
+                    required : true
+                },
+                username : {
+                    type : String,
+                    required : true
+                },
+                text : {
+                    type : String,
+                    required : true
+                },
+                time : {
+                    type : String,
+                    required : true
+                },
+                customId : {
+                    type : String,
+                    required : true
+                }
+            }]
+        }]
     },
     {
         timestamps : true
     }
-);
-
+)
 
 module.exports = mongoose.model("Chat",chatSchema);

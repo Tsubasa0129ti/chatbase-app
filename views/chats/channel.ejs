@@ -4,19 +4,20 @@
     <p>チャンネル作成者 : <%= channel.createdBy %></p>
 </div>
 
-<div class="time-emitter">
-    <!-- チャットの文字の出力のタイミングで時間を上に出力（時間差が少ない場合はなしにする・日付の出力はその日の最初の出力時のみ） -->
-</div>
-
 <div class="chat-saving">
-    <% for(var i=0;i<channel.messages.length;i++) { %>
-        <div class="chat-devider">
-            <a href="/users/<%= channel.messages[i].userId %>"><%= channel.messages[i].username %></a>
-            <p><%= channel.messages[i].getTime.time %></p>
-            <p class="message"><%= channel.messages[i].text %></p>
-            <input class="msgId" type="hidden" value="<%= channel.messages[i]._id %>">
+    <% for(var i=0;i<channel.chatData.length;i++) { %>
+        <div class="newDate">
+            <p><%= channel.chatData[i].date %></p>
+            <% for(var j=0;j<channel.chatData[i].messages.length;j++) { %>
+                <div class="chat-devider">
+                    <a href="/users/<%= channel.chatData[i].messages[j].userId %>"><%= channel.chatData[i].messages[j].username %></a>
+                    <p><%= channel.chatData[i].messages[j].time %></p>
+                    <p class="message"><%= channel.chatData[i].messages[j].text %></p>
+                    <input class="msgId" type="hidden" value="<%= channel.chatData[i].messages[j]._id %>">
+                </div>
+            <% } %>
         </div>
-    <% } %>
+    <% } %> 
 </div>
 
 
