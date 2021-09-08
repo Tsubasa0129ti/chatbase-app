@@ -52,7 +52,7 @@ var sessionMiddleware = session({
     saveUninitialized : false,
     cookie : {
         maxAge : 60 * 60 * 1000
-        //secure : true 本番環境での有効化をする
+        //secure : true 本番環境での有効化をする これ分岐によって実現したい
     },
     store : MongoStore.create({
         mongoUrl : "mongodb://localhost:27017/chatAppDB"
@@ -60,9 +60,17 @@ var sessionMiddleware = session({
     genid : function(req){
         console.log("new sessionID is created");
         return uuid.v4();
-    }
+    },
 });
+
 app.use(sessionMiddleware);
+app.use((req,res,next) => {
+    //これの確認を忘れずに
+    if(app.get("env") === "production") {
+        req.session.cookie.secure = true;
+    }
+    next();
+});
 
 /* mongooseとの接続 */
 mongoose.Promise = global.Promise;
@@ -94,10 +102,6 @@ app.use((req,res,next) => {
     var url = req.url;
     pathId = url.split("/"); //これをio内部で行いたい
     console.log(url);
-    if(req.session){
-        var limit = req.session.cookie.expires;
-        res.locals.sessionExpires = limit.toLocaleString();
-    }
     next();
 });
 

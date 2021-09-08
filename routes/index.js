@@ -81,4 +81,21 @@ router.get("/c",(req,res,next) => {
     
 });
 
+router.get("/d",(req,res,next) => {
+    //ここにて、expiresの延長のテストをする　延長の際に、UIにも反映させる（何時までなのかを記録） そして同様に、IDの変更も行う
+    req.session.cookie.maxAge = 60 * 60 * 1000;
+    console.log(req.session.cookie.maxAge);
+    //ここからlocal変数で送る　軽いテスト用
+    var now = new Date();
+    now.setHours(now.getHours()+1);
+    var limit =  `${now.toLocaleDateString()} ${now.toLocaleTimeString()}`; //limitをこのように変えればいいのか
+    console.log(limit);
+    res.send(req.session);
+});
+
+router.get("/e",(req,res,next) => {
+    req.session.name = "";
+    res.send("aaa");
+});
+
 module.exports = router;
