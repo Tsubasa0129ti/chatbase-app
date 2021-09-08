@@ -51,8 +51,13 @@ var sessionMiddleware = session({
     resave : false,
     saveUninitialized : false,
     cookie : {
+<<<<<<< HEAD
         maxAge : 60 * 60 * 1000
         //secure : true 本番環境での有効化をする これ分岐によって実現したい
+=======
+        maxAge : 60 * 60 * 1000,　// 60 * 60 * 1000
+        //secure : true 本番環境での有効化をする
+>>>>>>> dev/chatTime
     },
     store : MongoStore.create({
         mongoUrl : "mongodb://localhost:27017/chatAppDB"
@@ -191,38 +196,116 @@ io.on("connection",(socket) => {
     socket.on("message",(message) => {
         var userId = socket.request.session.currentUser._id;
         var username = socket.request.session.currentUser.name.first + "_" + socket.request.session.currentUser.name.last
+        //ルームへの入室
         if(!room){
             var room = message.id;
             socket.join(room);
             console.log(`${userId}は、${message.id}に入室しました。`);
             console.log("ここ"+message.customId);
         }
-        //データベースへの保管
-        Chat.findByIdAndUpdate(message.id,{
-            $push : {messages : {
-                userId : userId,
-                username : username,
-                text : message.text,
-                getTime : {
-                    day : message.day,
-                    time : message.time
-                },
-                customId : message.customId
-            }}
-        }).then(msg => {
-            console.log("成功");
-        }).catch(err=> {
-            console.log(err);
+        //データベースの保管層
+        var newDate = message.day;
+        //ここで判定までしてしまって、dateを送るかどうかを決める　この場合では、dateを新しく作っている時には、dateの放出もするという機構にする
+        var dateEmitter;
+        Chat.findById(message.id)
+        .then(chat => {
+            var latest = chat.chatData.length;
+            if(latest === 0){
+                Chat.update({_id : message.id},{
+                    $push : {
+                        chatData : {
+                            date : message.day,
+                            messages : [{
+                                userId : userId,
+                                username : username,
+                                text : message.text,
+                                time : message.time,
+                                customId : message.customId
+                            }]
+                        }
+                    }
+                }).then(chatData => {
+                    console.log("新しい日付、メッセージの作成に成功しました。");
+                    /* test */
+                    io.to(room).emit("accepter",{
+                        userId : userId,
+                        user : username,
+                        time : message.time,
+                        date : message.day,
+                        text : message.text,
+                        customId : message.customId,
+                    });
+                }).catch(err => {
+                    console.log(err.message);
+                });
+            }else{
+                var latestDate = chat.chatData[latest-1].date;
+                console.log(`latest:${latest}//latestDate:${latestDate}//newDate${newDate}`); //latestDateが2回に一回undefinedとなっている
+                if(newDate!==latestDate){
+                    //ここはOK
+                    Chat.update({_id : message.id},{
+                        $push : {
+                            chatData : {
+                                date : message.day,
+                                messages : [{
+                                    userId : userId,
+                                    username : username,
+                                    text : message.text,
+                                    time : message.time,
+                                    customId : message.customId
+                                }]
+                            }
+                        }
+                    }).then(chatData => {
+                        console.log("新しい日付、メッセージの作成に成功しました。");
+                        io.to(room).emit("accepter",{
+                            userId : userId,
+                            user : username,
+                            time : message.time,
+                            date : message.day,
+                            text : message.text,
+                            customId : message.customId,
+                        });
+                    }).catch(err => {
+                        console.log(err.message);
+                    });
+                }else{
+                    //この部分で、同日のものは同様の配列の中に収納できるようにすればいい
+                    Chat.update(
+                        {_id : message.id,"chatData.date" : latestDate},
+                        {
+                            $push : {
+                                "chatData.$.messages" : {
+                                    userId : userId,
+                                    username : username,
+                                    text : message.text,
+                                    time : message.time,
+                                    customId : message.customId
+                                }
+                            }
+                        }
+                    ).then(chatData => {
+                        console.log("メッセージの作成をしました。");
+                        io.to(room).emit("accepter",{
+                            userId : userId,
+                            user : username,
+                            time : message.time,
+                            text : message.text,
+                            customId : message.customId,
+                        });
+                    }).catch(err => {
+                        console.log(err.message);
+                    });
+                    
+                }
+            }
+        }).catch(err => {
+            console.log(err.message);
         });
 
         //指定のroomへの送出を行う
-        io.to(room).emit("accepter",{
-            userId : userId,
-            user : username,　//
-            time : message.time,
-            text : message.text,
-            customId : message.customId
-        });
+
+
     });
 
     socket.on("update",() => {

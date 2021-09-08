@@ -15,8 +15,8 @@ window.addEventListener("DOMContentLoaded",() => {
         var message = {
             text : document.getElementById("chat-input").value,
             id : window.location.pathname.split("/")[2],
-            customId : customId,
-            day : `${date.getFullYear()}年 ${date.getMonth()+1}月${date.getDate()}日(${dayGetter[date.getDay()]})`,
+            customId : customId, //将来的にはcustomIDのみの運用を考えている
+            day : `${date.getFullYear()}年${date.getMonth()+1}月${date.getDate()}日(${dayGetter[date.getDay()]})`,
             time : `${date.getHours()}:${date.getMinutes()}`
         };
 
@@ -35,7 +35,6 @@ window.addEventListener("DOMContentLoaded",() => {
         display(message); //中身の書き換えを行なっている
     });
 
-
     function display(message){
         var i = document.getElementsByClassName("socket-saving").length - 2;
         document.getElementsByClassName("socketUser")[i].innerHTML = message.user;
@@ -43,6 +42,10 @@ window.addEventListener("DOMContentLoaded",() => {
         document.getElementsByClassName("socketTime")[i].innerHTML = message.time;
         document.getElementsByClassName("socketMsg")[i].innerHTML = message.text;
         document.getElementsByClassName("customId")[i].value = message.customId;
+        //message.dateが送信された場合のみ
+        if(message.date){
+            document.getElementsByClassName("dateEmitter")[0].innerHTML = message.date;
+        }
     }
     
 
