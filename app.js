@@ -51,13 +51,8 @@ var sessionMiddleware = session({
     resave : false,
     saveUninitialized : false,
     cookie : {
-<<<<<<< HEAD
         maxAge : 60 * 60 * 1000
         //secure : true 本番環境での有効化をする これ分岐によって実現したい
-=======
-        maxAge : 60 * 60 * 1000,　// 60 * 60 * 1000
-        //secure : true 本番環境での有効化をする
->>>>>>> dev/chatTime
     },
     store : MongoStore.create({
         mongoUrl : "mongodb://localhost:27017/chatAppDB"
