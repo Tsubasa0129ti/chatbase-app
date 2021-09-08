@@ -144,6 +144,7 @@ module.exports = {
     logout : (req,res) => {
         req.logout();
         req.flash("success","ログアウトしました。");
+        //req.session.destroy();
         res.redirect("/");
     },
     mypageView : (req,res) => {
