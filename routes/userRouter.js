@@ -11,7 +11,7 @@ router.get("/new",userControllers.new);
 router.post("/create",userControllers.create,userControllers.cookie,userControllers.redirectView);
 
 router.get("/login",userControllers.login);
-router.get("/auth",userControllers.authenticate);
+router.get("/auth",userControllers.authenticate,userControllers.regenerateSessionId);
 router.get("/logout",userControllers.logout);
 
 router.get("/mypage",userControllers.loginCheck,userControllers.redirectView,userControllers.mypageView);

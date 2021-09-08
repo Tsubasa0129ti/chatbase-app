@@ -51,7 +51,7 @@ var sessionMiddleware = session({
     resave : false,
     saveUninitialized : false,
     cookie : {
-        maxAge : 60 * 1000,　// 60 * 60 * 1000
+        maxAge : 60 * 60 * 1000
         //secure : true 本番環境での有効化をする
     },
     store : MongoStore.create({

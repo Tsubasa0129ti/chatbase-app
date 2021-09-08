@@ -68,7 +68,7 @@ router.get("/c",(req,res,next) => {
     }
     console.log(sessions);
 
-    req.session.destroy();
+    //dreq.session.destroy();
     req.session.regenerate(function(err){
         if(err){
             console.log(err.message);
@@ -76,8 +76,9 @@ router.get("/c",(req,res,next) => {
         for(var key in sessions){
             req.session[key] = sessions[key];
         }
-    });    
-    res.send(req.session);
+        res.send(req.session);
+    });   
+    
 });
 
 module.exports = router;

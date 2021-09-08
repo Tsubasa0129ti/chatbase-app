@@ -105,30 +105,47 @@ module.exports = {
                     maxAge : 60*60*1000
                 });
                 return res.redirect("/users/login");
+            }else{
+                //ここに記載
+                req.login(user,function(err){
+                    if(err){
+                        req.flash("error","サーバー内でのエラーが発生しました。もう一度お試しください。");
+                        res.locals.redirect = "/users/login";
+                        res.locals.status = 500;
+                        return next(err);
+                    }else{
+                        User.find({email:req.session.passport.user})
+                        .then(user => {
+                            req.flash("success","ログインに成功しました。");
+                            req.session.currentUser = user[0]; //なぜか配列形式になってしまっているため
+                            res.clearCookie("username",{path:"/users/login"});
+                            next();
+                        }).catch(err => {
+                            req.flash("error","サーバー内でエラーが発生しました。もう一度お試しください。");
+                            res.locals.redirect = "/users/login";
+                            res.locals.status = 500;
+                            return next(err);
+                        });
+                    }
+                })
+
             }
-            req.login(user,function(err){
-                if(err){
-                    req.flash("error","サーバー内でエラーが発生しました。もう一度お試しください。");
-                    res.locals.redirect = "/users/login";
-                    res.locals.status = 500;
-                    return next(err);
-                }
-                //sessionに保管する際に、現状だとメールアドレスのみなので,検索をかけてuserそのものをsessionに入れ込むのは？
-                User.find({email:req.session.passport.user})
-                .then(user => {
-                    req.session.currentUser = user[0]; //なぜか配列形式になってしまっているため
-                    res.clearCookie("username",{path:"/users/login"});
-                    req.flash("success","ログイン成功");
-                    return res.redirect("/users/mypage");
-                }).catch(err => {
-                    req.flash("error","サーバー内でエラーが発生しました。もう一度お試しください。");
-                    res.locals.redirect = "/users/login";
-                    res.locals.status = 500;
-                    return next(err);
-                });
-                
-            });
         })(req,res,next);
+    },
+    regenerateSessionId : (req,res,next) => {
+        var sessions = {};
+        for(var key in req.session){
+            sessions[key] = req.session[key];
+        }
+        req.session.regenerate(function(err){
+            if(err){
+                console.log(err.message);
+            }
+            for(var key in sessions){
+                req.session[key] = sessions[key];
+            }
+            res.redirect("/users/mypage");
+        })
     },
     loginCheck : (req,res,next) => {
         if(req.isAuthenticated()){
@@ -141,10 +158,11 @@ module.exports = {
             next(err);
         }
     },
-    logout : (req,res) => {
+    logout : (req,res) => { //delete演算子
         req.logout();
         req.flash("success","ログアウトしました。");
-        //req.session.destroy();
+        delete req.session.passport
+        delete req.session.currentUser
         res.redirect("/");
     },
     mypageView : (req,res) => {
