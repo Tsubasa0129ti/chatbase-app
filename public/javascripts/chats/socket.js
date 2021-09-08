@@ -42,6 +42,10 @@ window.addEventListener("DOMContentLoaded",() => {
         document.getElementsByClassName("socketTime")[i].innerHTML = message.time;
         document.getElementsByClassName("socketMsg")[i].innerHTML = message.text;
         document.getElementsByClassName("customId")[i].value = message.customId;
+        //message.dateが送信された場合のみ
+        if(message.date){
+            document.getElementsByClassName("dateEmitter")[0].innerHTML = message.date;
+        }
     }
     
 

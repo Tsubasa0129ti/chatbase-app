@@ -191,6 +191,8 @@ io.on("connection",(socket) => {
         }
         //データベースの保管層
         var newDate = message.day;
+        //ここで判定までしてしまって、dateを送るかどうかを決める　この場合では、dateを新しく作っている時には、dateの放出もするという機構にする
+        var dateEmitter;
         Chat.findById(message.id)
         .then(chat => {
             var latest = chat.chatData.length;
@@ -210,6 +212,15 @@ io.on("connection",(socket) => {
                     }
                 }).then(chatData => {
                     console.log("新しい日付、メッセージの作成に成功しました。");
+                    /* test */
+                    io.to(room).emit("accepter",{
+                        userId : userId,
+                        user : username,
+                        time : message.time,
+                        date : message.day,
+                        text : message.text,
+                        customId : message.customId,
+                    });
                 }).catch(err => {
                     console.log(err.message);
                 });
@@ -233,6 +244,14 @@ io.on("connection",(socket) => {
                         }
                     }).then(chatData => {
                         console.log("新しい日付、メッセージの作成に成功しました。");
+                        io.to(room).emit("accepter",{
+                            userId : userId,
+                            user : username,
+                            time : message.time,
+                            date : message.day,
+                            text : message.text,
+                            customId : message.customId,
+                        });
                     }).catch(err => {
                         console.log(err.message);
                     });
@@ -253,6 +272,13 @@ io.on("connection",(socket) => {
                         }
                     ).then(chatData => {
                         console.log("メッセージの作成をしました。");
+                        io.to(room).emit("accepter",{
+                            userId : userId,
+                            user : username,
+                            time : message.time,
+                            text : message.text,
+                            customId : message.customId,
+                        });
                     }).catch(err => {
                         console.log(err.message);
                     });
@@ -264,13 +290,8 @@ io.on("connection",(socket) => {
         });
 
         //指定のroomへの送出を行う
-        io.to(room).emit("accepter",{
-            userId : userId,
-            user : username,　//
-            time : message.time,
-            text : message.text,
-            customId : message.customId
-        });
+
+
     });
 
     socket.on("update",() => {
