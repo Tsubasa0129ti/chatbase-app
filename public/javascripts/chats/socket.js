@@ -4,7 +4,7 @@ import {uuid4} from "https://cdn.jsdelivr.net/gh/tracker1/node-uuid4/browser.mjs
 window.addEventListener("DOMContentLoaded",() => {
     const socket = io();
     //現在のログインユーザー
-    var currentUser_id = document.getElementById("chat-id").value; //これの使用は、編集時のみのため、一旦保留（もちろん、これもsessionに変更予定 編集の作成時で可） 最悪比較の方法は変える　（）
+    var currentUser_id = document.getElementById("userId").value;
     
     //submit時の処理
     $("#chat-form").submit(() => {
@@ -48,30 +48,55 @@ window.addEventListener("DOMContentLoaded",() => {
         }
     }
     
+    /* 下記は編集時の動作であり、今後大幅に変更するため、一旦飛ばす */
 
-    /* これかなり簡単に作ってしまっており、拡張性が皆無なため、後で修正する（とりあえず、今は先のが実行可能かを確かめる） */
-    //下記は、カーソルを合わせた時の処理
-    //下記は編集時の動作であり、今後大幅に変更するため、一旦飛ばす
-    $(".message").mouseover(function(){
-        var data = jQuery(":hover")[4];
-        var cursolUser_id = data.children[0].href.split("/")[4];
-        const editPlace = data.children[3].value; //編集場所 これらのデータを編集用などの関数に送る必要がある
-        if(cursolUser_id===currentUser_id){
-            $(".selfMsgResponser").addClass(".show").fadeIn();
+    //chat-savingのmouseイベントハンドラ　かなりコンパクトにまとめたつもり
+    var message = document.querySelectorAll(".message");
+    message.forEach(function(msg){
+        msg.addEventListener("mouseover",function(){
+            if(compare(msg) === true){
+                $(".selfMsgResponser").addClass(".show").fadeIn();
+            }else{
+                $(".msgResponser").addClass(".show").fadeIn();
+            }
+        },false);
+        /* msg.addEventListener("mouseleave",function(){
+            if(compare(msg) === true){
+                $(".selfMsgResponser").fadeOut();
+            }else{
+                $(".msgResponser").fadeOut();
+            }
+        },false); */
+    });
+
+    //socket-savingのmouseイベントハンドラ　
+    var socketMsg = document.querySelectorAll(".socketMsg");
+    socketMsg.forEach(function(msg) {
+        msg.addEventListener("mouseover",function(){
+            if(compare(msg) === true){
+                $(".selfMsgResponser").addClass(".show").fadeIn();
+            }else{
+                $(".msgResponser").addClass(".show").fadeIn();
+            }
+        });
+        /* msg.addEventListener("mouseleave",function(){
+            if(compare(msg) === true){
+                $(".selfMsgResponser").fadeOut();
+            }else{
+                $(".msgResponser").fadeOut();
+            }
+        }); */
+    });
+
+    function compare(msg){
+        var userData = msg.previousElementSibling.previousElementSibling;
+        var userId = userData.href.split("/")[4];
+        if(userId === currentUser_id){
             return true;
         }else{
-            $(".msgResponser").addClass(".show").fadeIn();
             return false;
-        }
-        
-    });
-
-    //カーソルを離した時の処理
-    $(".message").mouseout(function(){
-        $(".msgResponser").fadeOut();
-        $(".selfMsgResponser").fadeOut();
-    });
-
+        }    
+    }
 
     
     //編集時の処理

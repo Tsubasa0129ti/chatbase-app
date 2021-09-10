@@ -98,10 +98,10 @@ passport.deserializeUser(User.deserializeUser());
 app.use((req,res,next) => {
     res.locals.flashMessages = req.flash();
     res.locals.loggedIn = req.isAuthenticated();
-    res.locals.currentUser = req.user;
+    res.locals.currentUser = req.session.currentUser.name.first + "_" + req.session.currentUser.name.last;
+    res.locals.userId = req.session.currentUser._id;
     var url = req.url;
-    pathId = url.split("/"); //これをio内部で行いたい
-    console.log(url);
+    pathId = url.split("/"); //これをio内部で行いたい    
     next();
 });
 

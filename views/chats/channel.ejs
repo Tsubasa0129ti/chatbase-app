@@ -6,14 +6,14 @@
 
 <div class="chat-saving">
     <% for(var i=0;i<channel.chatData.length;i++) { %>
-        <div class="newDate">
+        <div class="chatData">
             <p><%= channel.chatData[i].date %></p>
             <% for(var j=0;j<channel.chatData[i].messages.length;j++) { %>
                 <div class="chat-devider">
                     <a href="/users/<%= channel.chatData[i].messages[j].userId %>"><%= channel.chatData[i].messages[j].username %></a>
                     <p><%= channel.chatData[i].messages[j].time %></p>
                     <p class="message"><%= channel.chatData[i].messages[j].text %></p>
-                    <input class="msgId" type="hidden" value="<%= channel.chatData[i].messages[j]._id %>">
+                    <input class="msgId" type="hidden" value="<%= channel.chatData[i].messages[j]._id %>"> <!-- これの詳細が不明　useridではない -->
                 </div>
             <% } %>
         </div>
@@ -28,25 +28,15 @@
     <div class="socket-saving">
         <a href="#" class="socketUser"></a>
         <p class="socketTime"></p>
-        <p class="socketMsg" onmouseover="mouseover()" onmouseout="mouseout()"></p>
+        <p class="socketMsg"></p>
         <input type="hidden" class="customId" value="">
     </div>
 </div>
 
-<% if(currentUser) { %> 
-    <form id="chat-form">
-        <input id="chat-input" type="text"　placeholder="メッセージ">
-        <input id="chat-id" type="hidden" value="<%= currentUser._id %>">
-        <input type="submit" value="送信" id="click">
-    </form>
-<% } %> <!-- 比較用にchat-idのみ残してあるが、これもsessionに切り替えたら、ifもろとも消す 最終下の-->
-
-<!-- <form id="chat-form">
+<form id="chat-form">
     <input id="chat-input" type="text"　placeholder="メッセージ">
     <input type="submit" value="送信" id="click">
-</form> -->
-
-
+</form>
 
 <!-- 想定　現在のアカウントとカーソルを合わせた要素のアカウントが一致した場合は、その要素の編集を可能とするpopupを出現させる。さもなくば、返信や反応等のpopup -->
 
@@ -78,32 +68,6 @@
 <script type="module" src="https://cdn.jsdelivr.net/gh/tracker1/node-uuid4/browser.mjs"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script type="module" src="/javascripts/chats/socket.js"></script>
-
-<script>
-    /* あくまで仮置き　別ファイルに移したい（socket.js） */
-    var userId = document.getElementById("chat-id").value;
-    function mouseover(){//一応機能はしているけど、不明なエラーが出力されてしまう
-        var data = jQuery(":hover")[4];
-        var pointedId = data.children[0].href.split("/")[4];
-        var customId = data.children[3].value; //これを用いて編集をする場所の指定をする
-
-        if(pointedId===userId){
-            $(".selfMsgResponser").addClass(".show").fadeIn();
-            return true;
-        }else{
-            $(".msgResponser").addClass(".show").fadeIn();
-            return false;
-        }
-    };
-
-    function mouseout(){
-        if(mouseover()){
-            $(".selfMsgResponser").fadeOut();
-        }else{
-            $(".msgResponser").fadeOut();
-        }
-    };
-</script>
 
 <style>
     .msgResponser{

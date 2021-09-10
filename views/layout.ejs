@@ -44,7 +44,8 @@
         </div>
         <div class="user">
             <% if(loggedIn) { %>
-                <p>Logged in as <a href="/users/mypage/show"><%= currentUser.fullName %></a></p>
+                <p>Logged in as <a href="/users/mypage/show"><%= currentUser %></a></p>
+                <input type="hidden" id="userId" value="<%= userId %>">
             <% } %>
         </div>
         <%- body %>
