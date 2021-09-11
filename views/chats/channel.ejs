@@ -12,8 +12,27 @@
                 <div class="chat-devider">
                     <a href="/users/<%= channel.chatData[i].messages[j].userId %>"><%= channel.chatData[i].messages[j].username %></a>
                     <p><%= channel.chatData[i].messages[j].time %></p>
-                    <p class="message"><%= channel.chatData[i].messages[j].text %></p>
+                    <p><%= channel.chatData[i].messages[j].text %></p>
                     <input class="msgId" type="hidden" value="<%= channel.chatData[i].messages[j]._id %>"> <!-- これの詳細が不明　useridではない -->
+
+
+                    <div class="selfMsgResponser">
+                        <div class="response">
+                            <button>👍</button>
+                            <button>👎</button>
+                        </div>
+                        <input type="button" class="replyMsg" value="返信">
+                        <input type="button" class="updateMsg" value="メッセージの編集">
+                        <input type="button" class="deleteMsg" value="送信取消">
+                    </div>
+                    
+                    <div class="msgResponser">
+                        <div class="response">
+                            <button>👍</button>
+                            <button>👎</button>
+                        </div>
+                        <input type="button" class="replyMsg" value="返信">
+                    </div>        
                 </div>
             <% } %>
         </div>
@@ -30,6 +49,23 @@
         <p class="socketTime"></p>
         <p class="socketMsg"></p>
         <input type="hidden" class="customId" value="">
+        <div class="selfMsgResponser">
+            <div class="response">
+                <button>👍</button>
+                <button>👎</button>
+            </div>
+            <input type="button" class="replyMsg" value="返信">
+            <input type="button" class="updateMsg" value="メッセージの編集">
+            <input type="button" class="deleteMsg" value="送信取消">
+        </div>
+        
+        <div class="msgResponser">
+            <div class="response">
+                <button>👍</button>
+                <button>👎</button>
+            </div>
+            <input type="button" class="replyMsg" value="返信">
+        </div>     
     </div>
 </div>
 
@@ -81,9 +117,9 @@
         opacity: 1;
     }
 
-    .toUpdate{
+/*     .toUpdate{
         display: none;
-    }
+    } */
 </style>
 
 <!-- opacityが不満である場合、クラスの削除を検討する -->

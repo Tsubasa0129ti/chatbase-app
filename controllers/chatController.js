@@ -61,15 +61,20 @@ module.exports = {
     talk : (req,res) => {
         var id = req.params.id;
         Chat.findById(id)
-        .then(channel => {
-            res.locals.channel = channel;
-            res.render("chats/channel",channel);
-        }).catch(err => {
-            res.locals.redirect = "/chat";
-            res.locals.status = 500;
-            console.log(err.message);
-            next(err);
+        .populate("chatData.messages")
+        .exec((err,channel) =>{
+            if(err){
+                res.locals.redirect = "/chat";
+                res.locals.status = 500;
+                console.log(err.message);
+                next(err);
+            }else{
+                res.locals.channel = channel;
+                res.render("chats/channel",channel);
+            }
         });
+
+        
     },
     search : (req,res,next) => {
         var q = req.query.search;

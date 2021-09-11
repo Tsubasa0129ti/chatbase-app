@@ -28,26 +28,8 @@ var chatSchema = new Schema(
                 unique : true
             },
             messages : [{
-                userId : {
-                    type : String,
-                    required : true
-                },
-                username : {
-                    type : String,
-                    required : true
-                },
-                text : {
-                    type : String,
-                    required : true
-                },
-                time : {
-                    type : String,
-                    required : true
-                },
-                customId : {
-                    type : String,
-                    required : true
-                }
+                type : Schema.Types.ObjectId,
+                ref : "Message"
             }]
         }]
     },
