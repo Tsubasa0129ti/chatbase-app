@@ -194,9 +194,10 @@ io.on("connection",(socket) => {
     var userId = socket.request.session.currentUser._id;
     var username = socket.request.session.currentUser.name.first + "_" + socket.request.session.currentUser.name.last
 
+    //メッセージの作成処理
     socket.on("message",(message) => {
         //ルームへの入室
-        if(!room){ //これ入室の定義が少し異なっている　文字を打った一瞬のみ入室になっている
+        if(!room){
             var room = message.id;
             socket.join(room);
         }
@@ -211,7 +212,6 @@ io.on("connection",(socket) => {
             customId : message.customId
         });
 
-        //ここのエラー処理は後で
         Chat.findById(message.id)
         .then(chat => {
             var latest = chat.chatData.length;
@@ -232,7 +232,6 @@ io.on("connection",(socket) => {
                         }
                     }).then(() => {
                         console.log("新しい日付、メッセージの作成に成功しました。");
-                        //これは後で分ける
                         io.to(room).emit("accepter",{
                             userId : userId,
                             user : username,
@@ -248,7 +247,6 @@ io.on("connection",(socket) => {
                     console.log(err.message);
                 });
             }else{
-                //この部分で、同日のものは同様の配列の中に収納できるようにすればいい
                 Message.create(newMessage)
                 .then(msg => {
                     Chat.update(
@@ -260,7 +258,6 @@ io.on("connection",(socket) => {
                         }
                     ).then(() => {
                         console.log("メッセージの作成に成功しました。");
-                        //これは後で分ける
                         io.to(room).emit("accepter",{
                             userId : userId,
                             user : username,
@@ -284,30 +281,60 @@ io.on("connection",(socket) => {
     socket.on("update",(message) => {
         //ルームへの入室
         if(!room){
-            var room = message.id;
+            var room = message.chatId;
             socket.join(room);
-            console.log(`${userId}は、${message.id}に入室しました。`);
+            console.log(`${userId}は、${message.chatId}に入室しました。`);
         }
 
-        //ここのエラー処理も後で
-        Message.findByIdAndUpdate(message.msgId,{
-            $set : {
-                text : message.newMsg
-            }
-        }).then((msg) => {
-            console.log(msg);
-            //おそらくここで分岐をする(socketDataの編集かデータベース化されたものの編集かの) socketサーバー内にデータがあるかで判断する
+        if(message.msgId){
+            //databaseからの出力部分の更新
+            Message.findByIdAndUpdate(message.msgId,{
+                $set : {
+                    text : message.newMsg
+                }
+            }).then(msg => {
+                console.log(msg);
+                io.to(room).emit("update",{
+                    text : message.newMsg,
+                    index : message.index
+                });
+            }).catch(err => {
+                console.log(err.message);
+            });
+        }else{
+            //socketからの出力部分の更新
+            Message.findOne({customId : message.customId},function(err,msg) {
+                if(err || msg === null){
+                    console.log(err.message);
+                }
+                console.log(msg)
+                Message.update(
+                    {customId : message.customId},
+                    {
+                        $set : {
+                            text : message.newMsg
+                        }
+                    }
+                ).then(msg => {
+                    io.to(room).emit("update",{
+                        text : message.newMsg,
+                        index : message.index
+                    });
+                    console.log("OK");
+                }).catch(err => {
+                    console.log(err.message);
+                });
+                
+            });
 
-        }).catch((err) => {
-            console.log(err.message);
-        });
+        }   
     });
 
-    //メッセージの削除層　これに関しては、Chatのデータベースの一つの連結の解除も必要（データベース二つに対応）
+    //メッセージの削除処理　これに関しては、Chatのデータベースの一つの連結の解除も必要（データベース二つに対応）
     socket.on("delete",(message) => {
         //ルームへの入室
         if(!room){
-            var room = message.id;
+            var room = message.chatId;
             socket.join(room);
         }
 

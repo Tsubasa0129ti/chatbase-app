@@ -10,11 +10,12 @@
             <p><%= channel.chatData[i].date %></p>
             <% for(var j=0;j<channel.chatData[i].messages.length;j++) { %>
                 <div class="chat-devider">
-                    <a href="/users/<%= channel.chatData[i].messages[j].userId %>"><%= channel.chatData[i].messages[j].username %></a>
-                    <p><%= channel.chatData[i].messages[j].time %></p>
-                    <p><%= channel.chatData[i].messages[j].text %></p>
-                    <input class="msgId" type="hidden" value="<%= channel.chatData[i].messages[j]._id %>"> <!-- これの詳細が不明　useridではない -->
-
+                    <div class="db-message">
+                        <a href="/users/<%= channel.chatData[i].messages[j].userId %>"><%= channel.chatData[i].messages[j].username %></a>
+                        <p><%= channel.chatData[i].messages[j].time %></p>
+                        <p><%= channel.chatData[i].messages[j].text %></p>
+                        <input class="msgId" type="hidden" value="<%= channel.chatData[i].messages[j]._id %>">
+                    </div>
 
                     <div class="selfMsgResponser">
                         <div class="response">
@@ -32,7 +33,12 @@
                             <button>👎</button>
                         </div>
                         <input type="button" class="replyMsg" value="返信">
-                    </div>        
+                    </div> 
+                    <div class="updateForm">
+                        <textarea cols="30" rows="3"></textarea> <!-- valueについては、後になってから設定する -->
+                        <input type="submit" class="" value="キャンセル">
+                        <input type="submit" class="" value="変更を保存する">
+                    </div>       
                 </div>
             <% } %>
         </div>
@@ -45,10 +51,12 @@
         <p class="dateEmitter"></p> <!-- ここに1日一度のみ出力をさせる（リロードしたら消えるように設定する・つまりsocketからの出力） -->
     </div>
     <div class="socket-saving">
-        <a href="#" class="socketUser"></a>
-        <p class="socketTime"></p>
-        <p class="socketMsg"></p>
-        <input type="hidden" class="customId" value="">
+        <div class="socket-message">
+            <a href="#" class="socketUser"></a>
+            <p class="socketTime"></p>
+            <p class="socketMsg"></p>
+            <input type="hidden" class="customId" value="">
+        </div>
         <div class="selfMsgResponser">
             <div class="response">
                 <button>👍</button>
@@ -58,14 +66,18 @@
             <input type="button" class="updateMsg" value="メッセージの編集">
             <input type="button" class="deleteMsg" value="送信取消">
         </div>
-        
         <div class="msgResponser">
             <div class="response">
                 <button>👍</button>
                 <button>👎</button>
             </div>
             <input type="button" class="replyMsg" value="返信">
-        </div>     
+        </div>
+        <div class="updateForm">
+            <textarea id="toUpdate" cols="30" rows="3"></textarea> <!-- valueについては、後になってから設定する -->
+            <input type="submit" class="" value="キャンセル">
+            <input type="submit" class="" value="変更を保存する">
+        </div>
     </div>
 </div>
 
@@ -73,33 +85,6 @@
     <input id="chat-input" type="text"　placeholder="メッセージ">
     <input type="submit" value="送信" id="click">
 </form>
-
-<!-- 想定　現在のアカウントとカーソルを合わせた要素のアカウントが一致した場合は、その要素の編集を可能とするpopupを出現させる。さもなくば、返信や反応等のpopup -->
-
-<div class="selfMsgResponser">
-    <div class="response">
-        <button>👍</button>
-        <button>👎</button>
-    </div>
-    <input type="button" class="replyMsg" value="返信">
-    <!-- 下記二つに関しては、ボタンのクリックで、メッセージの編集もしくは削除のpopup出現 -->
-    <input type="button" class="updateMsg" value="メッセージの編集">
-    <input type="button" class="deleteMsg" value="送信取消">
-</div>
-
-<div class="msgResponser">
-    <div class="response">
-        <button>👍</button>
-        <button>👎</button>
-    </div>
-    <input type="button" class="replyMsg" value="返信">
-</div>
-
-<div class="toUpdate">
-    <input type="text" class="newMsg" value=""><!-- ここに、現在記載されているメッセージを -->
-    <input type="button" class="close-popup" value="キャンセル">
-    <input type="submit" class="update" value="変更を保存する">
-</div>
 
 <script type="module" src="https://cdn.jsdelivr.net/gh/tracker1/node-uuid4/browser.mjs"></script>
 <script src="/socket.io/socket.io.js"></script>
@@ -112,14 +97,11 @@
     .selfMsgResponser{
         display: none;
     }
+    .updateForm {
+        display: none;
+    }
     .show{
         display: flex;
         opacity: 1;
     }
-
-/*     .toUpdate{
-        display: none;
-    } */
 </style>
-
-<!-- opacityが不満である場合、クラスの削除を検討する -->
