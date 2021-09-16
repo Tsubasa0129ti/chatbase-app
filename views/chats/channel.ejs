@@ -14,7 +14,7 @@
                         <a href="/users/<%= channel.chatData[i].messages[j].userId %>"><%= channel.chatData[i].messages[j].username %></a>
                         <p><%= channel.chatData[i].messages[j].time %></p>
                         <p><%= channel.chatData[i].messages[j].text %></p>
-                        <input class="msgId" type="hidden" value="<%= channel.chatData[i].messages[j]._id %>">
+                        <input class="msgId" type="hidden" value="<%= channel.chatData[i].messages[j].customId %>">
                     </div>
 
                     <div class="selfMsgResponser">

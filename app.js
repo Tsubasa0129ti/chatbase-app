@@ -277,7 +277,7 @@ io.on("connection",(socket) => {
         });
     });
 
-    //メッセージの編集処理
+    //メッセージの編集処理 エラー処理については後ほどやる
     socket.on("update",(message) => {
         //ルームへの入室
         if(!room){
@@ -286,48 +286,30 @@ io.on("connection",(socket) => {
             console.log(`${userId}は、${message.chatId}に入室しました。`);
         }
 
-        if(message.msgId){
-            //databaseからの出力部分の更新
-            Message.findByIdAndUpdate(message.msgId,{
-                $set : {
-                    text : message.newMsg
+        Message.findOne({customId : message.customId},function(err,msg) {
+            if(err || msg === null){
+                console.log(err);
+            }
+            console.log(msg)
+            Message.update(
+                {customId : message.customId},
+                {
+                    $set : {
+                        text : message.newMsg
+                    }
                 }
-            }).then(msg => {
-                console.log(msg);
+            ).then(msg => {
                 io.to(room).emit("update",{
                     text : message.newMsg,
                     index : message.index
                 });
+                console.log("OK");
             }).catch(err => {
                 console.log(err.message);
             });
-        }else{
-            //socketからの出力部分の更新
-            Message.findOne({customId : message.customId},function(err,msg) {
-                if(err || msg === null){
-                    console.log(err.message);
-                }
-                console.log(msg)
-                Message.update(
-                    {customId : message.customId},
-                    {
-                        $set : {
-                            text : message.newMsg
-                        }
-                    }
-                ).then(msg => {
-                    io.to(room).emit("update",{
-                        text : message.newMsg,
-                        index : message.index
-                    });
-                    console.log("OK");
-                }).catch(err => {
-                    console.log(err.message);
-                });
-                
-            });
-
-        }   
+            
+        });
+        
     });
 
     //メッセージの削除処理　これに関しては、Chatのデータベースの一つの連結の解除も必要（データベース二つに対応）
