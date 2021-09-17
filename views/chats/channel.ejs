@@ -36,8 +36,8 @@
                     </div> 
                     <div class="updateForm">
                         <textarea cols="30" rows="3"></textarea> <!-- valueについては、後になってから設定する -->
-                        <input type="submit" class="" value="キャンセル">
-                        <input type="submit" class="" value="変更を保存する">
+                        <input type="submit" value="キャンセル">
+                        <input type="submit" value="変更を保存する">
                     </div>       
                 </div>
             <% } %>
@@ -75,11 +75,23 @@
         </div>
         <div class="updateForm">
             <textarea id="toUpdate" cols="30" rows="3"></textarea> <!-- valueについては、後になってから設定する -->
-            <input type="submit" class="" value="キャンセル">
-            <input type="submit" class="" value="変更を保存する">
+            <input type="submit" value="キャンセル">
+            <input type="submit" value="変更を保存する">
         </div>
     </div>
 </div>
+
+<!-- <div id="deleteForm">
+    <h3>メッセージを削除する</h3>
+    <p>このメッセージを本当に削除しますか？削除後は元に戻すことはできません。</p>
+    <div class="deleteData">
+        <a></a>
+        <a></a>
+        <p></p>
+    </div>
+    <input type="submit" value="キャンセル">
+    <input type="submit" value="削除する">
+</div> -->
 
 <form id="chat-form">
     <input id="chat-input" type="text"　placeholder="メッセージ">
