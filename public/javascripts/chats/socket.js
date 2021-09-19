@@ -88,53 +88,62 @@ window.addEventListener("DOMContentLoaded",() => {
     };
 
     //deleteイベント
-    /* var deleteEvent = function() {
+    var deleteEvent = function() {
         //初期定義
         var msg = this.closest(".chat-devider");
         if(!msg){
             msg = this.closest(".socket-saving");
         }
-        var deleteForm = document.getElementById("deleteForm");
+
+        console.log(msg);
+        /* var deleteForm = document.getElementById("deleteForm");
         var deleteData = deleteForm.children[2];
         var toCancel = deleteForm.children[3];
-        var toDelete = deleteForm.children[4];
+        var toDelete = deleteForm.children[4]; */
 
         var userdata = msg.children[0];
-        var username = userdata.children[0].textContent;
-        var createTime = userdata.children[1].textContent;
-        var userMsg = userdata.children[2].textContent;
 
+        var array = [
+            userdata.children[0].textContent,
+            userdata.children[1].textContent,
+            userdata.children[2].textContent,
+            userdata.children[3].value
+        ];
+        console.log(array);
 
         //deleteDataの書き換え
-        deleteData.children[0].textContent = username;
-        deleteData.children[1].textContent = createTime;
-        deleteData.children[2].textContent = userMsg;
+        /* for(var i=0;i<3;i++){
+            deleteData.children[i].textContent = array[i]
+        } */
 
-        //画面全体に対して、popupの出現をさせる
+        /* //画面全体に対して、popupの出現をさせる
         function getPopup(){
 
-        }
+        };
 
         //取得時にデータを得ておき、これを一緒に出現（popup内）
 
         //キャンセルボタンクリック時
         toCancel.addEventListener("click",() => {
-            //そのまま、前の状態に戻る
-        },false);
-        //実行時の処理
-        toDelete.addEventListener("click", () => {
-            var customId = ""
-            var data = {
-                chatId : chatId,
-                customId : customId,
-                index : getNumber(msg)
-            };
-            socket.emit("delete",data);
-
             //UIを戻す
 
         },false);
-    }; */
+        //実行時の処理
+        toDelete.addEventListener("click", () => {
+            
+
+            //UIを戻す
+
+        },false); */
+
+        var data = {
+            chatId : chatId,
+            customId : array[3],
+            index : getNumber(msg)
+        };
+        console.log(data);
+        socket.emit("delete",data);
+    };
     
     /* 下記、チャットの作成処理　javascriptに変更するかも　ただし、画面固定をする */
     $("#chat-form").submit(() => {
@@ -170,6 +179,7 @@ window.addEventListener("DOMContentLoaded",() => {
             var msgResponser = msg.children[2];
             //mouseoverイベント
             msg.addEventListener("mouseenter",() => {
+                console.log("aaa")
                 if(compare(msg) ===true){
                     selfMsgResponser.classList.add("show");
                     var updateMsg = selfMsgResponser.children[2];
@@ -250,7 +260,51 @@ window.addEventListener("DOMContentLoaded",() => {
         }else{
             socketMsg[newIndex].children[0].children[2].innerHTML = message.text;
         }
-
     });
+
+    socket.on("delete",(message) => {　//今回もしデータが一件のみであった場合にはdateの表記も消すべき　これに関しては、一件のみであった時はemitで情報出力して、そのときに対応するdateを見えなくする
+        var index = parseInt(message.index,10);
+        var dbMsg = document.getElementsByClassName("chat-devider");
+        var socketMsg = document.getElementsByClassName("socket-saving");
+
+        var newIndex = index - dbMsg.length;
+        if(newIndex <=-1){
+            dbMsg[index].style.display = "none"; //特定の番号の要素を非表示化する
+        }else{
+            socketMsg[newIndex].style.display = "none";
+        }
+        
+        //日付をsocketで出力している場合のみの処理
+        if(message.confirm){
+            if(newIndex <= -1){
+                //この時データベース内の日付の不可視化を実行する
+                var dateElement = dbMsg[index].previousElementSibling;
+                dateElement.style.display = "none";
+            }else{
+                //socketの日付の削除を行う
+                var dateElement = socketMsg[newIndex].previousElementSibling;
+                dateElement.style.display = "none"
+            }
+        }
+        //updateと統一化する
+        /* if(compareData(message)){
+            dbMsg[index].style.display = "none";
+        }else{
+            socketMsg[newIndex].style.display = "none";
+        } */
+    });
+
+    function compareData(message){
+        var index = parseInt(message.index,10);
+        var dbMsg = document.getElementsByClassName("chat-devider");
+        var socketMsg = document.getElementsByClassName("socket-saving");
+
+        var newIndex = index - dbMsg.length;
+        if(newIndex <=-1){
+            return true;
+        }else{
+            return false;
+        }
+    }
            
 },false);

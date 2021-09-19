@@ -320,7 +320,81 @@ io.on("connection",(socket) => {
             socket.join(room);
         }
 
-        //messageのデータベースからの削除と、そのIDを削除もしくは残して、削除されたことを表記
+        //削除機能　残りは配列の削除の場所のみ
+        Message.findOne({customId : message.customId})
+        .then(msg => {
+            var msgId = msg._id;
+            console.log(`msgId : ${msgId}`);
+            var msgDate = msg.date;
+            Chat.findOne({_id : message.chatId})
+            .then(chat => {
+                console.log(`chat :::::${chat}`);
+                var leng = chat.chatData.length;
+                for(var i=0;i<leng;i++){
+                    if(chat.chatData[i].date === msgDate){
+                        var msgLeng = chat.chatData[i].messages.length;
+                        if(msgLeng <= 1){
+                            //この時配列をそのまま削除する
+                            console.log("結果1件未満");
+                            Chat.updateOne(
+                                {_id : message.chatId},
+                                {
+                                    $pull : {
+                                        chatData : { //ここが消す対象になる
+                                            date : msgDate
+                                        }
+                                    }
+                                }
+                            ).then(chat => {
+                                console.log(`chatResult : ${chat}`);
+                                Message.findByIdAndRemove(msgId,function(err,result){
+                                    if(err){
+                                        console.log(err.message);
+                                    }
+                                    io.to(room).emit("delete",{
+                                        index : message.index, //これは取得してその番号を非表示化する
+                                        confirm : "dateDeleted" //これを取得した際にはdateが消えるように作るためのもの
+                                    });
+                                    console.log("削除に成功");
+                                });
+                            }).catch(err => {
+                                console.log(err.message);
+                            })
+                        }else if(msgLeng >= 2){
+                            //配列の中身のみ削除する
+                            console.log("結果2件以上");
+                            Chat.update(
+                                {_id : message.chatId,"chatData.date" : msgDate},
+                                {
+                                    $pull : {
+                                        "chatData.$.messages" : msgId
+                                    }
+                                }
+                            ).then(chat => {
+                                Message.findByIdAndRemove(msgId,function(err,result){
+                                    if(err){
+                                        console.log(err.message);
+                                    }
+                                    io.to(room).emit("delete",{
+                                        index : message.index //これは取得してその番号を非表示化する
+                                    });
+                                    console.log("削除に成功");
+                                });
+                            }).catch(err => {
+                                console.log(err.message);
+                            });
+                        }else{
+                            //エラー処理
+                        }
+                    }
+                }
+            }).catch(err => {
+                console.log(err.message);
+            });
+        }).catch(err => {
+            console.log(err.message);
+        });
+
     });
 
     //ルームの退出処理が不明瞭　つまり、一つのルームに入った後に他のルームに切断せずに移動することができるのではないかということ　→この場合、　socketが複数のルームへと適用されるかも
@@ -330,5 +404,5 @@ io.on("connection",(socket) => {
     });
 });
 
-//残り　エラールーターを読み込んでも、これがミドルウェアとして常に読み込まれない　ここの要素としてエラーハンドリングを記載し、nextで繋げることはできるが、errorRouterを読み込むだけだとこれがなされない
+//残り　エラールーターを読み込んでも、これがミルウェアとして常に読み込まれない　ここの要素としてエラーハンドリングを記載し、nextで繋げることはできるが、errorRouterを読み込むだけだとこれがなされない
 //結果としては、errorRouterをapp.js内部で読み込むことで、全てのcontrollerからのnext(error)からここに繋げるようにしたい
