@@ -87,7 +87,7 @@ window.addEventListener("DOMContentLoaded",() => {
         }
     };
 
-    //deleteイベント
+    //deleteイベント　修正点　UI cancel層の分離（もう一方作成するので、UIの後） UIの時にpopup出現時に他の要素の半透明化を図る
     var deleteEvent = function() {
         //初期定義
         var msg = this.closest(".chat-devider");
@@ -95,55 +95,58 @@ window.addEventListener("DOMContentLoaded",() => {
             msg = this.closest(".socket-saving");
         }
 
-        console.log(msg);
-        /* var deleteForm = document.getElementById("deleteForm");
-        var deleteData = deleteForm.children[2];
-        var toCancel = deleteForm.children[3];
-        var toDelete = deleteForm.children[4]; */
+        //deletePopupの取得
+        var deletePopup = document.getElementById("deletePopup");
+        //var toCancel = deletePopup.children[1]; //一と４に関しては同様の変数名をつけた
+        var deleteData = deletePopup.children[3];
+        var toCancel = deletePopup.children[4]; //これで上書きされてしまっているだけか
+        var toDelete = deletePopup.children[5];
 
-        var userdata = msg.children[0];
-
-        var array = [
-            userdata.children[0].textContent,
-            userdata.children[1].textContent,
-            userdata.children[2].textContent,
-            userdata.children[3].value
-        ];
-        console.log(array);
-
-        //deleteDataの書き換え
-        /* for(var i=0;i<3;i++){
-            deleteData.children[i].textContent = array[i]
-        } */
-
-        /* //画面全体に対して、popupの出現をさせる
-        function getPopup(){
-
+        //msgからデータを取得する
+        var userData = msg.children[0];
+        var data = [];
+        for(var i=0;i<userData.children.length;i++){
+            data[i] = userData.children[i].textContent;
+            console.log(data[i]);
+            if(!data[i]){ //これに関しては分岐が正しく動作するのかを確認
+                data[i] = userData.children[i].value;
+            }
         };
 
-        //取得時にデータを得ておき、これを一緒に出現（popup内）
+        //そして、これをpopupに移す
+        for(var i=0;i<deleteData.children.length;i++){
+            deleteData.children[i].textContent = data[i];
+        };
 
-        //キャンセルボタンクリック時
-        toCancel.addEventListener("click",() => {
+        //関数軍　UI変更関数　UI戻す関数　
+        var hidePopup = function(){
+            //ここにてpopupの消失する
+            deletePopup.classList.remove("show-popup");
+        };
+
+        //popupの生成
+        deletePopup.classList.add("show-popup");
+        //追加で他の要素のopacityを下げるなどしたい
+
+        //キャンセル等クリック時の処理を作る
+        toCancel.addEventListener("click",hidePopup,false);
+        //削除等クリック時の処理を作る
+        toDelete.addEventListener("click",() => {
+            //データの取得と送信
+            var socketData = {
+                chatId : chatId,
+                customId : data[3],
+                index : getNumber(msg)
+            };
+            console.log(socketData);
+            socket.emit("delete",socketData);
             //UIを戻す
-
+            hidePopup();
         },false);
-        //実行時の処理
-        toDelete.addEventListener("click", () => {
-            
 
-            //UIを戻す
-
-        },false); */
-
-        var data = {
-            chatId : chatId,
-            customId : array[3],
-            index : getNumber(msg)
-        };
-        console.log(data);
-        socket.emit("delete",data);
     };
+
+
     
     /* 下記、チャットの作成処理　javascriptに変更するかも　ただし、画面固定をする */
     $("#chat-form").submit(() => {

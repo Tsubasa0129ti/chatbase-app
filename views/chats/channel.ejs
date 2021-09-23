@@ -81,8 +81,9 @@
     </div>
 </div>
 
-<!-- <div id="deleteForm">
+<div id="deletePopup" class="deletePopup">
     <h3>メッセージを削除する</h3>
+    <input type="submit" value="×">
     <p>このメッセージを本当に削除しますか？削除後は元に戻すことはできません。</p>
     <div class="deleteData">
         <a></a>
@@ -91,7 +92,7 @@
     </div>
     <input type="submit" value="キャンセル">
     <input type="submit" value="削除する">
-</div> -->
+</div>
 
 <form id="chat-form">
     <input id="chat-input" type="text"　placeholder="メッセージ">
@@ -115,5 +116,23 @@
     .show{
         display: flex;
         opacity: 1;
+    }
+    .deletePopup{
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 50%;
+        height: 50%;
+        z-index: 9999;
+        opacity: 0;
+        display: none;
+        transition: .6s;
+    }
+    .deleteData{
+        border-radius: 10px;
+    }
+    .show-popup{
+        opacity: 1;
+        display: block;
     }
 </style>
