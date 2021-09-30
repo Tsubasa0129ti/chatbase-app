@@ -1,3 +1,5 @@
+//現状の扱いはトップページ
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
