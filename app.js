@@ -180,7 +180,7 @@ function Unauthorized(err,req,res,next){
 
 
 /* サーバーの起動 */
-const PORT = 3000;
+const PORT = process.env.PORT || 3001
 const server = http.createServer(app); //こいつの位置に注意
 
 io = require("socket.io")(server);
