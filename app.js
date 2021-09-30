@@ -114,6 +114,9 @@ app.use("/",indexRoutes);
 app.use("/users",userRoutes);
 app.use("/chat",chatRoutes);
 app.use("/users/mypage",profileRoutes);
+app.get("/api",(req,res) => {
+    res.json({ message: "Hello World!" });
+});
 
 /* errorハンドラー　一旦エラーハンドラはこちらで定義して、後に有効化する */
 //app.use(errorRoutes);
