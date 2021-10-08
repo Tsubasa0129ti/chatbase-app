@@ -16,6 +16,8 @@ function getUserParams(body){
     return obj;
 };
 
+//リダイレクトなどのような、ページ変換の際のパスの変更とレンダリングをなくしてデータの送信のみを行う
+
 module.exports = {
     index : (req,res) => {   
         if(req.user){

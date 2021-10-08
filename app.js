@@ -22,10 +22,8 @@ const { decycle, encycle } = require('json-cyclic');
 
 /* rooting */
 const indexRoutes = require("./routes/index");
-const userRoutes = require("./routes/userRouter");
-const errorRoutes = require("./routes/errorRouter");
-const chatRoutes = require("./routes/chatRouter");
-const profileRoutes = require("./routes/profileRouter");
+var apiRoutes = require("./routes/apiRouter");
+//const errorRoutes = require("./routes/errorRouter");
 
 /* appの指定 */
 var app = express();
@@ -111,12 +109,7 @@ app.use((req,res,next) => {
 
 /* routerの読み込み */
 app.use("/",indexRoutes);
-app.use("/users",userRoutes);
-app.use("/chat",chatRoutes);
-app.use("/users/mypage",profileRoutes);
-app.get("/api",(req,res) => {
-    res.json({ message: "Hello World!" });
-});
+app.use("/api",apiRoutes);
 
 /* errorハンドラー　一旦エラーハンドラはこちらで定義して、後に有効化する */
 //app.use(errorRoutes);

@@ -1,10 +1,16 @@
+//これに関しては、expressでのみ出現するようになっているページ
+
 var express = require("express");
 var router = express.Router();
 
 var indexController = require("../controllers/index");
 var sessionModel = require("../models/session");
 
-router.get("/",indexController.index);
+//router.get("/",indexController.index);
+
+router.get("/",(req,res) => {
+    res.json({message : "data emitted"});
+})
 
 router.get("/a",(req,res,next) => {
     var err = new Error();
