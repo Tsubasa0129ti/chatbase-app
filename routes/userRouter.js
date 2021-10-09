@@ -6,8 +6,8 @@ const userControllers = require("../controllers/userController");
 const profileController = require("../controllers/profileController");
 
 //以下routeing処理
-router.get("/",userControllers.index);
-router.get("/new",userControllers.new);
+router.get("/",userControllers.index); //1 ok
+router.get("/new",userControllers.new); //2 ok
 router.post("/create",userControllers.create,userControllers.cookie,userControllers.redirectView);
 
 router.get("/login",userControllers.login);

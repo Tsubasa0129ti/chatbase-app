@@ -20,14 +20,16 @@ function getUserParams(body){
 
 module.exports = {
     index : (req,res) => {   
-        if(req.user){
+        /* if(req.user){
             res.redirect("/users/mypage");
         }else{
             res.render("users/index");
-        }
+        } */
+        res.json({message : "data"})
     },
     new : (req,res) => {
-        res.render("users/new");
+        //res.render("users/new");
+        res.json({message : "this is the user create form"});
     },
     create : (req,res,next) => {
         let newUser = new User(getUserParams(req.body));
