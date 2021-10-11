@@ -23,11 +23,6 @@ var userSchema = new Schema(
             required : [true,"E-mailを記入してください。"],
             unique : true
         },
-        age : {
-            type : Number,
-            min : 15,
-            max : 100
-        },
         profile : {
             type : Schema.Types.ObjectId,
             ref : "Profile"

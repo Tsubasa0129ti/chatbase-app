@@ -5,6 +5,7 @@ const express = require("express"),
     logger = require("morgan"),  
     session = require("express-session"),　
     cookieParser = require("cookie-parser"),
+    bodyParser = require("body-parser"),
     uuid = require("uuid"), 
     layouts = require("express-ejs-layouts"),
     createError = require("http-errors"),
@@ -36,6 +37,10 @@ app.use(logger("dev"));
 app.use(layouts);
 app.use(express.json());　//下記２行
 app.use(express.urlencoded({extended:false}));
+
+app.use(bodyParser.urlencoded({extended: true}))
+app.use(bodyParser.json())
+
 //method-overrideに関しては後で実験 一旦元のやつに似せた
 app.use(
     methodOverride("_method",{
