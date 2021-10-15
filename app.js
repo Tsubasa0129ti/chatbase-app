@@ -170,10 +170,10 @@ function internalServerError(err,req,res,next){
 
 function Unauthorized(err,req,res,next){
     console.log(`error:${err}`);
-    res.status(401);
-    //ここからリダイレクトを行うように設定とか？　ぶっちゃけやらない方がわかりやすいけど
-    var redirectPath = res.locals.redirect;
-    res.redirect(redirectPath);
+    res.json({
+        result : err,
+        redirectPath : "/users/login"
+    });
 };
 
 

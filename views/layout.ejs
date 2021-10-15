@@ -16,38 +16,11 @@
             <a href="/users">Account</a>
             <a href="/chat">Chat</a>
             <a href="/record">Record</a>
-
-            <div class="login-status">
-                <% if(loggedIn) { %>
-                    <a href="/users/logout">Logout</a>
-                <% }else{ %>
-                    <a href="/users/login">Login</a>
-                <% } %>
-            </div>
         </div>
         <div class="clear"></div>
     </header>
     
     <div class="main">
-        <div class="main-top">
-            <% if(flashMessages) { %>
-                <% if(flashMessages.success) { %>　<!-- 発見　フラッシュメッセージの第一引数はここで決めるのか -->
-                    <div class="flash-success">
-                        <%= flashMessages.success %>
-                    </div>
-                <% } else if(flashMessages.error) { %>
-                    <div class="flash-error">
-                        <%= flashMessages.error %>
-                    </div>
-                <% } %>
-            <% } %>
-        </div>
-        <div class="user">
-            <% if(loggedIn) { %>
-                <p>Logged in as <a href="/users/mypage/show"><%= currentUser %></a></p>
-                <input type="hidden" id="userId" value="<%= userId %>">
-            <% } %>
-        </div>
         <%- body %>
     </div>
     

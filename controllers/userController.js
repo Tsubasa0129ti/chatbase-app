@@ -32,28 +32,19 @@ module.exports = {
         res.json({message : "this is the user create form"});
     },
     create : (req,res,next) => {
-        let newUser = new User(getUserParams(req.body));
+        var newUser = new User(req.body);
         User.register(newUser,req.body.password,(err,user) => {
             if(user) {
-                req.flash("success","アカウント作成されました。");
-                res.locals.result = "success";
-                next();
+                res.json({
+                    redirectPath : "/users/login",
+                    result : "success"
+                });
             }else if(err){
-                function getError(errMsg){
-                    req.flash("error",errMsg)
-                    res.locals.user = newUser;
-                    next();
-                };
-                if(err.name === "UserExistsError"){ //その他のを用いる場合は,エラー分岐を追加可能
-                    var errMsg = "このメールアドレスは、すでに使用されています。";
-                    console.log(err);
-                    getError(errMsg);
-                }else{ //想定では、registerを行うことができない
-                    req.flash("error","アカウントの作成に失敗しました。もう一度お試しください。");
-                    res.locals.redirect = "/users/new";
-                    res.locals.status = 500;
-                    next(err);
-                }
+                console.log(err.message);
+                res.json({
+                    redirectPath : "/users/new",
+                    result : err
+                });
             }
         });
     },
@@ -94,47 +85,13 @@ module.exports = {
     login : (req,res) => {
         res.render("users/login");
     },
-    authenticate : (req,res,next) => { //ログイン時のターミナルを参照　セキュアでないかも
-        passport.authenticate("local",{session:true},(err,user,info) => {
-            if(err){
-                req.flash("error","サーバー内でエラーが発生しました。もう一度お試しください。");
-                res.locals.redirect = "/users/login";
-                res.locals.status = 500;
-                return next(err);
-            }
-            if(!user){
-                req.flash("error","ログイン失敗");
-                res.cookie("username",req.query.email,{
-                    path : "/users/login",
-                    maxAge : 60*60*1000
-                });
-                return res.redirect("/users/login");
-            }else{
-                //ここに記載
-                req.login(user,function(err){
-                    if(err){
-                        req.flash("error","サーバー内でのエラーが発生しました。もう一度お試しください。");
-                        res.locals.redirect = "/users/login";
-                        res.locals.status = 500;
-                        return next(err);
-                    }else{
-                        User.find({email:req.session.passport.user})
-                        .then(user => {
-                            req.flash("success","ログインに成功しました。");
-                            req.session.currentUser = user[0]; //なぜか配列形式になってしまっているため
-                            res.clearCookie("username",{path:"/users/login"});
-                            next();
-                        }).catch(err => {
-                            req.flash("error","サーバー内でエラーが発生しました。もう一度お試しください。");
-                            res.locals.redirect = "/users/login";
-                            res.locals.status = 500;
-                            return next(err);
-                        });
-                    }
-                })
-
-            }
-        })(req,res,next);
+    auth : (req,res) => {
+        console.log("pass");
+        res.json({
+            result : "success",
+            redirectPath : "/users/mypage",
+            user : req.user
+        });
     },
     regenerateSessionId : (req,res,next) => {
         var sessions = {};
@@ -155,11 +112,10 @@ module.exports = {
         if(req.isAuthenticated()){
             next();
         }else{
-            req.flash("error","ログインしてください。");
-            res.locals.redirect = "/users/login";
-            res.locals.status = 401; 
-            var err = createError(401,"Please login to view this page.");
-            next(err);
+            res.json({
+                result : "err",
+                redirectPath : "/users/login"
+            });
         }
     },
     logout : (req,res) => { //delete演算子
@@ -170,7 +126,10 @@ module.exports = {
         res.redirect("/");
     },
     mypageView : (req,res) => {
-        res.render("users/mypage");
+        res.json({
+            result : "success",
+            username : req.user.name
+        });
     },
     show : (req,res) => {
         var currentUser = req.user;
@@ -178,38 +137,46 @@ module.exports = {
         .populate("profile")
         .exec((err,user) => {
             if(err){
-                res.locals.redirect = "/users/mypage";
-                res.locals.status = 500;
-                console.log(err.message);
-                next(err);
+                res.json({
+                    result : err,
+                    redirectPath : "/users/mypage"
+                });
             }else{
-                console.log(user);
-                res.render("users/mypage/show",{currentUser:user});
+                res.json({
+                    result : "success",
+                    user : user
+                });
             }
-        })
+        });
     },
     edit : (req,res) => {
-        res.render("users/mypage/edit");
+        var currentUser = req.user;
+        User.findById(currentUser._id)
+        .then(user => {
+            res.json({
+                result : "success",
+                name : user.name
+            });
+        }).catch(err => {
+            res.json({
+                result : err
+            });
+        });
     },
     update : (req,res) => {
-        var newUser = {
-            name : {
-                first : req.body.first,
-                last : req.body.last
-            },
-            age : req.body.age
-        };
         var currentUser = req.user;
         User.findByIdAndUpdate(currentUser._id,{
-            $set : newUser
+            $set : req.body
         }).then(user=> {
-            res.redirect("/users/mypage");
+            res.json({
+                result : "success",
+                redirectPath : "/users/mypage"
+            });
         }).catch(err =>{
-            req.flash("error","アカウント情報の変更に失敗しました。"); //ここもエラー情報の分岐をするかも
-            console.log(err.message);
-            res.locals.redirect = "/users/edit";
-            res.locals.status = 500;
-            next(err);
+            res.json({
+                result : err,
+                redirectPath : "/users/mypage/edit"
+            });
         });
     },
     delete : (req,res,next) => {　　//詳細アカウントの作成をした場合、同時にこちらから消せるように設定する

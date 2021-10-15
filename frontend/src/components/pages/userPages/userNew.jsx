@@ -15,7 +15,7 @@ class UserNew extends React.Component {
         this.handleChange = this.handleChange.bind(this);
     }
 
-    //DOMロード時の処理
+    //DOMロード時の処理(ぶっちゃけこれいらないかも)　レンダリングに関しては、reactのみで作成してしまって、post処理に関してやデータが必要なものに関してのみサーバーを使う
     componentDidMount() {
         fetch('/api/users/new')
         .then((res) => res.json())
@@ -83,7 +83,7 @@ class UserNew extends React.Component {
             </div>
             <div className="">
                 <label htmlFor="email">Email</label> 
-                <input type="text" name="email" required onChange={this.handleChange} />               
+                <input type="email" name="email" required onChange={this.handleChange} />               
             </div>
             <div className="">
                 <label htmlFor="password">Password</label>
