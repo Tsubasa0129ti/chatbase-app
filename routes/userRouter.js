@@ -6,8 +6,8 @@ const userControllers = require("../controllers/userController");
 const profileController = require("../controllers/profileController");
 
 //以下routeing処理
-router.get("/",userControllers.index); //1 これに関しては、いらないかも（もしデータを送るなら必要だが。。。）
-router.get("/new",userControllers.new); //2 ok
+router.get("/",userControllers.index); //これに関しては、いらないかも（もしデータを送るなら必要だが。。。）
+router.get("/new",userControllers.new);
 
 //これに関する不足点　②cookie ③エラー処理 ④バリデーション（フロントとバックの双方）
 router.post("/create",userControllers.create);

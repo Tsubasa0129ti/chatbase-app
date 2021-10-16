@@ -6,22 +6,29 @@ class Mypage extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-            username : ""
+            username : "",
+            error : ""
         }
     }
 
     componentDidMount(){
         fetch(`/api/users/mypage`)
         .then((res) => res.json())
-        .then((data) => {
+        .then((obj) => {
             //リクエストを送ったら、サーバーが勝手にログインIDを判断して、それに基づくuserを返す
-            console.log(data.username);
-            this.setState({
-                username : data.username.first + data.username.last
-            })
+            if(obj.result === "success"){
+                this.setState({
+                    username : obj.username.first + obj.username.last
+                });
+            }else if(obj.result === "Authentication Error"){
+                console.log(obj.result);
+                this.props.history.push(obj.redirectPath);
+            }
         }).catch((err) => {
-            //ただこれに関する問題点　ログインエラー以外の場合もloginに繋いでしまう
-            this.props.history.push("/users/login");
+            //ただこれに関する問題点　万一エラーを取得した場合のエラー処理（これに関しては、リダイレクトも考慮）
+            this.setState({
+                error : err.message
+            })
         })
     }
 
@@ -32,6 +39,7 @@ class Mypage extends React.Component{
                     <h2>My Page</h2>
                     <p>Welcom back {this.state.username}</p>
                 </div>
+                <div className="errorMsg">{this.state.error}</div>
                 <div className="link">
                     <Link to="/users/mypage/show">アカウント管理</Link>
                     <Link to="/users/mypage/edit">アカウントの編集</Link>

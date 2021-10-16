@@ -20,15 +20,18 @@ class Edit extends React.Component{
                 this.setState({
                     first : obj.name.first,
                     last : obj.name.last
-                })
-            }else{
-                //ユーザー検索のエラー renderの分岐をする（エラーが存在する場合には、エラーを出力させる機構）
-                this.setState({
-                    error : obj.err
                 });
+            }else if(obj.result === "Authentication Error"){
+                console.log(obj.result);
+                this.props.history.push("/users/login");
+            }else if(obj.result === "Search Error"){
+                console.log(obj.error); //これの表示はしたい
+                this.props.history.push(obj.redirectPath);
             }
         }).catch((err) => {
-            this.props.history.push("/users/login");
+            this.setState({
+                error : err.message
+            });
         })
     }
 
@@ -64,11 +67,16 @@ class Edit extends React.Component{
         .then((obj) => {
             if(obj.result === "success"){
                 this.props.history.push("/users/mypage");
-            }else{
+            }else if(obj.result === "Authentication Error"){
+                this.props.history.push("/users/login");
+            }else if(obj.result === "Update Error"){
+                console.log(obj.error);
                 this.props.history.push("/users/mypage/edit");
             }
         }).catch((err) => {
-            this.props.history.push("/users/login");
+            this.setState({
+                error : err.message
+            });
         })
     }
     
@@ -93,4 +101,4 @@ class Edit extends React.Component{
 
 export default Edit;
 
-//これに関する不足点　①サーバー全般　②バリデーション機能　③ログインチェック機能
+//これに関する不足点　①サーバー全般　②バリデーション機能　③その他のエラーに関するチェックがまだ

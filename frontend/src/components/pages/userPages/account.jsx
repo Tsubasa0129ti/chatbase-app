@@ -6,7 +6,8 @@ class Account extends React.Component{
         this.state = {
             first : '',
             last : '',
-            email : ''
+            email : '',
+            error : ''
         }
     }
 
@@ -20,12 +21,16 @@ class Account extends React.Component{
                     last : obj.user.name.last,
                     email : obj.user.email
                 });
-            }else{
+            }else if(obj.result === "Authentication Error"){
+                this.props.history.push(obj.redirectPath);
+            }else if(obj.result === "Population Error"){
+                console.log(obj.error);
                 this.props.history.push(obj.redirectPath);
             }
-            
         }).catch((err) => {
-            this.props.history.push("/users/login");
+            this.setState({
+                error : err.message
+            });
         });
     }
 

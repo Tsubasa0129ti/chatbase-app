@@ -3,19 +3,6 @@ const User = require("../models/user"),
     passport = require("passport"),
     createError = require("http-errors");
 
-function getUserParams(body){
-    var obj = new Object();
-    obj = {
-        name : {
-            first : body.first,
-            last : body.last
-        },
-        email : body.email,
-        age : body.age
-    };
-    return obj;
-};
-
 //リダイレクトなどのような、ページ変換の際のパスの変更とレンダリングをなくしてデータの送信のみを行う
 
 module.exports = {
@@ -113,7 +100,7 @@ module.exports = {
             next();
         }else{
             res.json({
-                result : "err",
+                result : "Authentication Error",
                 redirectPath : "/users/login"
             });
         }
@@ -138,7 +125,8 @@ module.exports = {
         .exec((err,user) => {
             if(err){
                 res.json({
-                    result : err,
+                    result : "Population Error",
+                    error : err.message,
                     redirectPath : "/users/mypage"
                 });
             }else{
@@ -159,7 +147,9 @@ module.exports = {
             });
         }).catch(err => {
             res.json({
-                result : err
+                result : "Search Error",
+                error : err.message,
+                redirectPath : "/users/mypage"
             });
         });
     },
@@ -174,8 +164,9 @@ module.exports = {
             });
         }).catch(err =>{
             res.json({
-                result : err,
-                redirectPath : "/users/mypage/edit"
+                result : "Update Error",
+                error : err.message,
+                redirectPath : "/users/mypage/edit",
             });
         });
     },
