@@ -7,16 +7,7 @@ const User = require("../models/user"),
 
 module.exports = {
     index : (req,res) => {   
-        /* if(req.user){
-            res.redirect("/users/mypage");
-        }else{
-            res.render("users/index");
-        } */
         res.json({message : "data"})
-    },
-    new : (req,res) => {
-        //res.render("users/new");
-        res.json({message : "this is the user create form"});
     },
     create : (req,res,next) => {
         var newUser = new User(req.body);
