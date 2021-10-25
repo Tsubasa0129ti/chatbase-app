@@ -125,7 +125,7 @@ module.exports = {
         .exec((err,user) => {
             if(err){
                 res.json({
-                    result : "Population Error",
+                    result : "Error",
                     error : err.message,
                     redirectPath : "/users/mypage"
                 });
@@ -147,7 +147,7 @@ module.exports = {
             });
         }).catch(err => {　//ここにおけるエラーの分岐もする必要があるのではないか（現状は、検索エラーのみを考慮に入れているが他のエラーについては不明）
             res.json({
-                result : "User Search Error",
+                result : "Error",
                 error : err.message,
                 redirectPath : "/users/mypage"
             });

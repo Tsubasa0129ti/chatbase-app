@@ -1,5 +1,4 @@
 import React from "react";
-import {withRouter} from 'react-router-dom'; //ここら辺変更しているけど、詳細は不明
 
 //formの送信はできているけど、POST処理でのログインができない　（おそらく現状ストラテジーに対してデータの送信ができていないのではないか）　ストラテジーの設定についても再度練り直す必要がありそう
 class Login extends React.Component{
@@ -16,7 +15,12 @@ class Login extends React.Component{
 
     componentDidMount(){ //ここで現在のログインステータスの確認を行う
         fetch("/api/users/previousCheck")
-        .then((res) => res.json())
+        .then((res) => {
+            if(!res.ok){
+                console.error("サーバーエラー");
+            }
+            return res.json();
+        })
         .then((obj) => {
             if(obj.result === "Authenticated"){
                 this.props.history.push({
@@ -25,10 +29,10 @@ class Login extends React.Component{
                 });
             }
         }).catch((err) => {
-            console.log(err.message);
+            console.error(err.message);
         });
 
-        if(this.props.location.state){ //これを全てのリダイレクトで有効にする
+        if(this.props.location.state){
             this.setState({
                 error : this.props.location.state.error
             });
@@ -59,16 +63,26 @@ class Login extends React.Component{
                 password : this.state.password
             })
         })
-        .then((res) => res.json())
-        .then((data) => {
+        .then((res) => {
+            if(!res.ok){
+                console.error("サーバーエラー");
+
+                if(res.status === 401){
+                    this.setState({
+                        error : `${res.status} : ユーザー名もしくはパスワードが異なります。`
+                    });
+                }
+            }
+            return res.json();
+        })
+        .then((obj) => {
             //この中に分岐を置く
-            console.log(`data : ${data}`);
-            if(data.result === "success"){
-                console.log(`data : ${data.user}`);
-                this.props.history.push(data.redirectPath);
+            if(obj.result === "success"){
+                console.log(`data : ${obj.user}`);
+                this.props.history.push(obj.redirectPath);
             }
         }).catch((err) => {
-            console.log(`error : ${err.message}`); //このときにエラーの出力をさせる（render内部に）
+            console.error(`error : ${err.message}`); //このときにエラーの出力をさせる（render内部に）
         });
     }
 
@@ -91,4 +105,6 @@ class Login extends React.Component{
     }
 }
 
-export default withRouter(Login);
+export default Login;
+
+//これに関する不足点　エラー処理（①fetchのサーバーエラーのメッセージ②catchによるエラー処理）

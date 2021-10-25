@@ -1,5 +1,4 @@
 import React from "react";
-import {withRouter} from "react-router-dom";
 
 class Edit extends React.Component{
     constructor(props){
@@ -15,27 +14,37 @@ class Edit extends React.Component{
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    componentDidMount(){//データベースの初期値の受け取り
+    componentDidMount(){
         fetch("/api/users/mypage/edit")
-        .then((res) => res.json())
+        .then((res) => {
+            if(!res.ok){
+                console.error('サーバーエラ〜'); //エラーメッセージは変更する
+            }
+            return res.json();
+        })
         .then((obj) => {
             if(obj.result === "success"){
                 this.setState({
                     first : obj.name.first,
                     last : obj.name.last
                 });
-            }else if(obj.result === "Authentication Error"){　//①これに関しては、loginにデータを送る（stateを有効化することができれば完了）
+            }else if(obj.result === "Authentication Error"){
                 this.props.history.push({
                     pathname : '/users/login',
                     state : {error : obj.result}
                 });
-            }else if(obj.result === "User Search Error"){
-                console.log(obj.error);
-                this.props.history.push(obj.redirectPath);　//②mypageに移行する（ログインできていない場合、二段階移行も考えられる）
+            }else if(obj.result === "Error"){
+                console.error(obj.error);
+                this.props.history.push({
+                    pathname : obj.redirectPath,
+                    state : {error : obj.result}
+                });
             }
-        }).catch((err) => { //③これに関しては、さらにページ遷移なども考慮する
-            this.setState({
-                error : err.message　//どんなエラーが出力されるのかが不明なため、一旦放置。分かり次第、これを分岐させ、日本語のエラーに書き換える。
+        }).catch((err) => { //③これは、そもそも初期値の取得ができないということだから、mypageに一旦飛ばすべきかな
+            console.error(err.message);
+            this.props.history.push({
+                pathname : '/users/mypage',
+                state : {error : 'fetch error at /users/mypage/edit'}
             });
         })
     }
@@ -119,22 +128,34 @@ class Edit extends React.Component{
                     }
                 })
             })
-            .then((res) => res.json())
+            .then((res) => {
+                if(!res.ok){
+                    console.error('サーバーエラー');
+                }
+                return res.json();
+            })
             .then((obj) => {
                 if(obj.result === "success"){
                     this.setState({
                         error : ''
                     });
                     this.props.history.push("/users/mypage");
-                }else if(obj.result === "Authentication Error"){ //これはeditのログインエラーと同様にする　①と同様
-                    this.props.history.push("/users/login");
-                }else if(obj.result === "Update Error"){//これに関しては、ここにリダイレクト　＋　エラー情報の出力
-                    console.log(obj.error);
+                }else if(obj.result === "Authentication Error"){
+                    this.props.history.push({
+                        pathname : '/users/login',
+                        state : {error : obj.result}
+                    });
+                }else if(obj.result === "Update Error"){
+                    console.error(obj.error);
+                    this.setState({
+                        error : 'User Edit Error'
+                    });
                     this.props.history.push("/users/mypage/edit");
                 }
-            }).catch((err) => {　//③と同様
-                this.setState({
-                    error : err.message
+            }).catch((err) => {
+                console.error(err.message); //このエラー処理に関しては未定
+                this.props.history.push({
+                    pathname : '/users/mypage/edit'
                 });
             });
         }
@@ -165,6 +186,7 @@ class Edit extends React.Component{
     }
 }
 
-export default withRouter(Edit);
+export default Edit;
 
 //これに関する不足点　①サーバー全般　②バリデーション機能(フロント部分は完了)　③その他のエラーに関するチェックがまだ
+//追記　①fetchのサーバー側のエラーメッセージ　②promiseのエラー処理に関して

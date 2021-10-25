@@ -13,27 +13,34 @@ class Account extends React.Component{
 
     componentDidMount(){
         fetch('/api/users/mypage/show')
-        .then((res) => res.json())
-        .then((obj) => {
+        .then((res) => {
+            if(!res.ok){
+                //ここにもエラー処理を追加する必要がある。これについてはサーバー内のエラーを出力するため
+                console.error("サーバーエラー");//エラーの出力方法は変えるが、とりあえずこれを行う
+            }
+            return res.json()
+        })
+        .then((obj) => {    
             if(obj.result === "success"){
                 this.setState({
                     first : obj.user.name.first,
                     last : obj.user.name.last,
                     email : obj.user.email
                 });
-            }else if(obj.result === "Authentication Error"){ //このページ内でのstateへの反映は必要はない
+            }else if(obj.result === "Authentication Error"){
                 this.props.history.push({
                     pathname : obj.redirectPath,
                     state : {error : obj.result}
                 });
-            }else if(obj.result === "Population Error"){
-                console.log(obj.error);
-                this.props.history.push(obj.redirectPath);
+            }else if(obj.result === "Error"){
+                console.error(obj.error);
+                this.props.history.push({
+                    pathname : obj.redirectPath,
+                    state : {error : obj.result}
+                });
             }
-        }).catch((err) => {
-            this.setState({
-                error : err.message
-            });
+        }).catch((err) => {　//このcatchのエラーに関してはPromise rejectの場合に処理される
+            console.error(err.message);
         });
     }
 
@@ -57,3 +64,4 @@ class Account extends React.Component{
 export default Account;
 
 //ここについての残り、UIとprofile作成後に手をつける（profileの有無による分岐を必要とする）
+//追記　10/25 fetchのサーバーエラーの出力をサーバーから受け取れるようにするかも（これに関しては、他のページも同様）

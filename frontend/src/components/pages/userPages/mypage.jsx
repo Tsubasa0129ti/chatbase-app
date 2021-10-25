@@ -13,7 +13,12 @@ class Mypage extends React.Component{
 
     componentDidMount(){
         fetch(`/api/users/mypage`)
-        .then((res) => res.json())
+        .then((res) => {
+            if(!res.ok){
+                console.error('サーバーエラー');
+            }
+            return res.json();
+        })
         .then((obj) => {
             //リクエストを送ったら、サーバーが勝手にログインIDを判断して、それに基づくuserを返す
             if(obj.result === "success"){
@@ -27,10 +32,7 @@ class Mypage extends React.Component{
                 });
             }
         }).catch((err) => {
-            //ただこれに関する問題点　万一エラーを取得した場合のエラー処理（これに関しては、リダイレクトも考慮）
-            this.setState({
-                error : err.message
-            })
+            console.error(err.message);
         })
 
         if(this.props.location.state){
@@ -63,7 +65,7 @@ class Mypage extends React.Component{
 export default Mypage;
 
 //このページに関する詳細。ログイン後にリダイレクトされる場所　全体画面　リンクなどがある予定　そのほかのuserに関する情報を入れるページにする予定　そのため、fetchでuserデータを受け取る必要がある
-//ログインチェックに関しては全てサーバーで担えば良くないか。。。？　だとすれば、ここでは必要なのは、userの必要な情報を受け取るのみか
 
 
-//ここでやらなければならないこと　①ログイン状態による分岐（サーバーだけでは足りないかも）②サーバーでログイン状態などの判断をするので、サーバーでログインアカウントの判断　③profileの有無の分岐
+//ここでやらなければならないこと　profileの有無の分岐
+//追記　fetchの２パターンのエラー処理の作成

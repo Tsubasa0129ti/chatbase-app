@@ -22,7 +22,12 @@ class UserNew extends React.Component {　//一旦これで実行するが、sta
 
     componentDidMount(){
         fetch("/api/users/previousCheck")
-        .then((res) => res.json())
+        .then((res) => {
+            if(!res.ok){
+                console.error('サーバーエラー');
+            }
+            return res.json();
+        })
         .then((obj) => {
             if(obj.result === "Authenticated"){
                 this.props.history.push({
@@ -31,7 +36,7 @@ class UserNew extends React.Component {　//一旦これで実行するが、sta
                 });
             }
         }).catch((err) => {
-            console.log(err.message);
+            console.error(err.message);
         });
     }
 
@@ -201,18 +206,23 @@ class UserNew extends React.Component {　//一旦これで実行するが、sta
                     password : this.state.password
                 })
             })
-            .then(res => res.json())
-            .then(data => {
+            .then(res => {
+                if(!res.ok){
+                    console.error('サーバーエラー');
+                }
+                return res.json();
+            })
+            .then(obj => {
                 //このとき送信formの初期化 いやこの時もエラーの時はある。エラー情報の取得など
-                if(data.result === "success"){
-                    this.props.history.push(data.redirectPath); //空白化処理必要ないかも
+                if(obj.result === "success"){
+                    this.props.history.push(obj.redirectPath); //空白化処理必要ないかも
                 }else{
-                    console.log(data.result);
+                    console.error(obj.result);
                     //ここはユーザー作成エラー（validationなども含まれるはず）
                 }
 
             }).catch(err => {
-                console.log(err.message);
+                console.error(err.message);
                 //form情報の保持（自動かも）
             });
         }        
@@ -259,3 +269,4 @@ class UserNew extends React.Component {　//一旦これで実行するが、sta
 export default UserNew;
 
 //この後やること　①validation(サーバーのみ)　②cookie ③エラー処理　④メッセージ機能
+//fetchのエラー分岐について
