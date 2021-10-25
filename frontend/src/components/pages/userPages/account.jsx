@@ -12,7 +12,7 @@ class Account extends React.Component{
     }
 
     componentDidMount(){
-        fetch('/api/users/mypage/show') //これデータ送ってもらうだけなら統一可能かもしれない
+        fetch('/api/users/mypage/show')
         .then((res) => res.json())
         .then((obj) => {
             if(obj.result === "success"){
@@ -21,8 +21,11 @@ class Account extends React.Component{
                     last : obj.user.name.last,
                     email : obj.user.email
                 });
-            }else if(obj.result === "Authentication Error"){
-                this.props.history.push(obj.redirectPath);
+            }else if(obj.result === "Authentication Error"){ //このページ内でのstateへの反映は必要はない
+                this.props.history.push({
+                    pathname : obj.redirectPath,
+                    state : {error : obj.result}
+                });
             }else if(obj.result === "Population Error"){
                 console.log(obj.error);
                 this.props.history.push(obj.redirectPath);

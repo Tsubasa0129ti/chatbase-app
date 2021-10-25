@@ -6,9 +6,6 @@ const User = require("../models/user"),
 //リダイレクトなどのような、ページ変換の際のパスの変更とレンダリングをなくしてデータの送信のみを行う
 
 module.exports = {
-    index : (req,res) => {   
-        res.json({message : "data"})
-    },
     create : (req,res,next) => {
         var newUser = new User(req.body);
         User.register(newUser,req.body.password,(err,user) => {
@@ -96,6 +93,18 @@ module.exports = {
             });
         }
     },
+    preLoginCheck : (req,res) => {
+        if(req.isAuthenticated()){
+            res.json({
+                result : "Authenticated",
+                redirectPath : "/users/mypage"
+            });
+        }else{
+            res.json({
+                result : "success"
+            });
+        }
+    },
     logout : (req,res) => { //delete演算子
         req.logout();
         req.flash("success","ログアウトしました。");
@@ -136,9 +145,9 @@ module.exports = {
                 result : "success",
                 name : user.name
             });
-        }).catch(err => {
+        }).catch(err => {　//ここにおけるエラーの分岐もする必要があるのではないか（現状は、検索エラーのみを考慮に入れているが他のエラーについては不明）
             res.json({
-                result : "Search Error",
+                result : "User Search Error",
                 error : err.message,
                 redirectPath : "/users/mypage"
             });

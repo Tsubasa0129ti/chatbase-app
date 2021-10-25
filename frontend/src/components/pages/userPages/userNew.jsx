@@ -20,6 +20,21 @@ class UserNew extends React.Component {　//一旦これで実行するが、sta
         this.handleChange = this.handleChange.bind(this);
     }
 
+    componentDidMount(){
+        fetch("/api/users/previousCheck")
+        .then((res) => res.json())
+        .then((obj) => {
+            if(obj.result === "Authenticated"){
+                this.props.history.push({
+                    pathname : "/users/mypage",
+                    state : {error : "You are already authenticated"}
+                });
+            }
+        }).catch((err) => {
+            console.log(err.message);
+        });
+    }
+
     //formのステートの設定
     handleChange(e){
         const target = e.target;

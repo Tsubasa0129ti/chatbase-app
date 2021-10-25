@@ -1,4 +1,5 @@
 import React from "react";
+import {withRouter} from "react-router-dom";
 
 class Edit extends React.Component{
     constructor(props){
@@ -14,7 +15,7 @@ class Edit extends React.Component{
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    componentDidMount(){
+    componentDidMount(){//データベースの初期値の受け取り
         fetch("/api/users/mypage/edit")
         .then((res) => res.json())
         .then((obj) => {
@@ -23,16 +24,18 @@ class Edit extends React.Component{
                     first : obj.name.first,
                     last : obj.name.last
                 });
-            }else if(obj.result === "Authentication Error"){
-                console.log(obj.result);
-                this.props.history.push("/users/login");
-            }else if(obj.result === "Search Error"){
-                console.log(obj.error); //これの表示はしたい
-                this.props.history.push(obj.redirectPath);
+            }else if(obj.result === "Authentication Error"){　//①これに関しては、loginにデータを送る（stateを有効化することができれば完了）
+                this.props.history.push({
+                    pathname : '/users/login',
+                    state : {error : obj.result}
+                });
+            }else if(obj.result === "User Search Error"){
+                console.log(obj.error);
+                this.props.history.push(obj.redirectPath);　//②mypageに移行する（ログインできていない場合、二段階移行も考えられる）
             }
-        }).catch((err) => {
+        }).catch((err) => { //③これに関しては、さらにページ遷移なども考慮する
             this.setState({
-                error : err.message
+                error : err.message　//どんなエラーが出力されるのかが不明なため、一旦放置。分かり次第、これを分岐させ、日本語のエラーに書き換える。
             });
         })
     }
@@ -123,13 +126,13 @@ class Edit extends React.Component{
                         error : ''
                     });
                     this.props.history.push("/users/mypage");
-                }else if(obj.result === "Authentication Error"){
+                }else if(obj.result === "Authentication Error"){ //これはeditのログインエラーと同様にする　①と同様
                     this.props.history.push("/users/login");
-                }else if(obj.result === "Update Error"){
+                }else if(obj.result === "Update Error"){//これに関しては、ここにリダイレクト　＋　エラー情報の出力
                     console.log(obj.error);
                     this.props.history.push("/users/mypage/edit");
                 }
-            }).catch((err) => {
+            }).catch((err) => {　//③と同様
                 this.setState({
                     error : err.message
                 });
@@ -162,6 +165,6 @@ class Edit extends React.Component{
     }
 }
 
-export default Edit;
+export default withRouter(Edit);
 
 //これに関する不足点　①サーバー全般　②バリデーション機能(フロント部分は完了)　③その他のエラーに関するチェックがまだ

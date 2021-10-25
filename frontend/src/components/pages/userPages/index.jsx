@@ -12,15 +12,15 @@ import Edit from "./edit";
 function Users(props) {
     return(
         <Switch>   
-        <Route path={props.url} exact component={UserIndex} />
-        {/* <Route path={`${props.url}/:id`} exact component={} /> 不要かも*/}
-        <Route path={`${props.url}/new`} exact component={UserNew} />
-        <Route path={`${props.url}/login`} exact component={Login} />
-        {/* <Route path={`${url}/logout`} exact component={} />  これに関しては不要かも*/} 
-        <Route path={`${props.url}/mypage`} exact component={Mypage} />
-        <Route path={`${props.url}/mypage/show`} exact component={Account} />
-        <Route path={`${props.url}/mypage/edit`} exact component={Edit} />
-        {/* <Route path={`${url}/mypage/delete`} exact component={} 　不要かも/> */}
+        <Route path={props.url} exact={true} component={UserIndex} />
+        {/* <Route path={`${props.url}/:id`} exact={true} component={} /> 不要かも*/}
+        <Route path={`${props.url}/new`} exact={true} component={UserNew} />
+        <Route path={`${props.url}/login`} exact={true} component={Login} />
+        {/* <Route path={`${url}/logout`} exact={true} component={} />  これに関しては不要かも*/} 
+        <Route path={`${props.url}/mypage`} exact={true} component={Mypage} />
+        <Route path={`${props.url}/mypage/show`} exact={true} component={Account} />
+        <Route path={`${props.url}/mypage/edit`} exact={true} component={Edit} />
+        {/* <Route path={`${url}/mypage/delete`} exact={true} component={} 　不要かも/> */}
         {/* ここにもnotFound必要かも */}
       </Switch>
     )

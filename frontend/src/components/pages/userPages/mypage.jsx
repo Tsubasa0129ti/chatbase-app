@@ -21,8 +21,10 @@ class Mypage extends React.Component{
                     username : obj.username.first + obj.username.last
                 });
             }else if(obj.result === "Authentication Error"){
-                console.log(obj.result);
-                this.props.history.push(obj.redirectPath);
+                this.props.history.push({
+                    pathname : obj.redirectPath,
+                    state : {error : obj.result}
+                });
             }
         }).catch((err) => {
             //ただこれに関する問題点　万一エラーを取得した場合のエラー処理（これに関しては、リダイレクトも考慮）
@@ -30,6 +32,12 @@ class Mypage extends React.Component{
                 error : err.message
             })
         })
+
+        if(this.props.location.state){
+            this.setState({
+                error : this.props.location.state.error
+            });
+        }
     }
 
     render(){

@@ -1,16 +1,8 @@
-import {useState,useEffect} from "react";
-
+//これに関しては、fetchをなくす。その代わり、UIをまともに作り替える。
 function UserIndex(){
-    const [message,setMessage] = useState('');
-    useEffect(() => {
-        fetch('/api/users')
-        .then((res) => res.json())
-        .then((data) => setMessage(data.message))
-    });
     return(
-        <div className="userIndex">
-            <h1>User</h1>
-            <h2>{message}</h2>
+        <div>
+            <h3>User Main Page</h3>
         </div>
     )
 }
