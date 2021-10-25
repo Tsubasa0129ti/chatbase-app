@@ -1,9 +1,17 @@
-function NotFound() {
-    return(
-        <div className="notFound">
-            <h1>Page not found!</h1>
-        </div>
-    )
+import React from 'react';
+
+class NotFound extends React.Component{
+    constructor(props){
+        super(props);
+    }
+
+    render(){
+        return(
+            <div>
+                <p>Sorry, 404 Not Found</p>
+            </div>
+        )
+    }
 }
 
 export default NotFound;
