@@ -17,12 +17,10 @@ function Users(props) {
         {/* <Route path={`${props.url}/:id`} exact={true} component={} /> 不要かも*/}
         <Route path={`${props.url}/new`} exact={true} component={UserNew} />
         <Route path={`${props.url}/login`} exact={true} component={Login} />
-        {/* <Route path={`${url}/logout`} exact={true} component={} />  これに関しては不要かも*/} 
         <Route path={`${props.url}/mypage`} exact={true} component={Mypage} />
         <Route path={`${props.url}/mypage/show`} exact={true} component={Account} />
         <Route path={`${props.url}/mypage/edit`} exact={true} component={Edit} />
         {/* <Route path={`${url}/mypage/delete`} exact={true} component={} 　不要かも/> */}
-        {/* ここにもnotFound必要かも */}
         <Route component={NotFound} />
       </Switch>
     )
@@ -30,3 +28,5 @@ function Users(props) {
 
 
 export default Users;
+
+//ログアウトについて作成し、これを一旦mypageで読み込んでいるが、これは孫コンポーネントとして利用するため、後で親コンポーネント（header）を作成する。

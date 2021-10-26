@@ -1,18 +1,29 @@
-import {useState,useEffect} from "react";
+import React from 'react';
 
-function Home() {
-    const [message,setMessage] = useState('');
-    useEffect(() => {
-        fetch('/api')
-        .then((res) => res.json())
-        .then((data) => setMessage(data.message));
-    },[])
-    return (
-        <div className="Home">
-            <h1>Home</h1>
-            <p>{message}</p>
-        </div>
-    );
+class Home extends React.Component{
+    constructor(props){
+        super(props);
+        this.state = {
+            msg : ''
+        };
+    }
+
+    componentDidMount(){
+        if(this.props.location.state){
+            this.setState({
+                msg : this.props.location.state.msg
+            });
+        }
+    }
+
+    render(){
+        return(
+            <div>
+                <h2>Page</h2>
+                <p>{this.state.msg}</p>
+            </div>
+        )
+    }
 }
 
 export default Home;

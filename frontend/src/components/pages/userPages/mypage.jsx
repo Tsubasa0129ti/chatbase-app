@@ -1,5 +1,6 @@
 import React from "react";
 import {Link} from "react-router-dom";
+import Logout from "../../header/logout";
 
 //最初に基本的にログインしているかどうかの分岐を加える　ログインの有無に関する分岐をもっとうまくやりたい
 class Mypage extends React.Component{
@@ -45,6 +46,7 @@ class Mypage extends React.Component{
     render(){
         return(
             <div>
+                <Logout />
                 <div className="header">
                     <h2>My Page</h2>
                     <p>Welcom back {this.state.username}</p>
@@ -77,5 +79,5 @@ export default Mypage;
     後に入れる候補としては
     ①写真（プロフ画、）
     ②後は、投稿系統（ブログなど）を作成した場合にそれに付随したもの
-    
+
 */

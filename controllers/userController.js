@@ -107,10 +107,12 @@ module.exports = {
     },
     logout : (req,res) => { //delete演算子
         req.logout();
-        req.flash("success","ログアウトしました。");
         delete req.session.passport
         delete req.session.currentUser
-        res.redirect("/");
+        res.json({
+            redirectPath : '/',
+            result : "success"
+        });
     },
     mypageView : (req,res) => {
         res.json({
