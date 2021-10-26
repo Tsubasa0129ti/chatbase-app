@@ -9,6 +9,8 @@ import Account from './account';
 import Edit from './edit';
 import NotFound from '../errorPages/notFound';
 
+import Delete from '../../components/module/delete';
+
 //exportする中継地点のRouteの関数の設置
 function Users(props) {
     return(
@@ -20,7 +22,7 @@ function Users(props) {
         <Route path={`${props.url}/mypage`} exact={true} component={Mypage} />
         <Route path={`${props.url}/mypage/show`} exact={true} component={Account} />
         <Route path={`${props.url}/mypage/edit`} exact={true} component={Edit} />
-        {/* <Route path={`${url}/mypage/delete`} exact={true} component={} 　不要かも/> */}
+        <Route path={`${props.url}/mypage/delete`} exact={true} component={Delete}/>
         <Route component={NotFound} />
       </Switch>
     )

@@ -178,23 +178,27 @@ module.exports = {
         .then(() => {
             next();
         }).catch(err => {
-            res.locals.redirect = "/users/mypage";
-            res.locals.status = 500;
-            console.log(err.message);
-            next(err);
+            res.json({
+                result : error,
+                error : err,
+                redirectpath : '/users/mypage'
+            })
         });
     },
     profileDelete : (req,res) => {
         var profileId = req.user.profile;
         Profile.findByIdAndDelete(profileId)
         .then(() => {
-            req.flash("success","アカウントの消去が完了しました。");
-            res.redirect("/users");
+            res.json({
+                result : 'success',
+                redirectPath : '/'
+            });
         }).catch(err => {
-            res.locals.redirect = "/users/mypage";
-            res.locals.status = 500;
-            console.log(err.message);
-            next(err);
+            res.json({
+                result : error,
+                error : err,
+                redirectpath : '/users/mypage'
+            });
         });
     }
 }

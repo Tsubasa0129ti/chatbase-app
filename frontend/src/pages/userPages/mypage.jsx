@@ -1,6 +1,6 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
-import Logout from '../../components/atoms/logout';
+import Logout from '../../components/module/logout';
 
 //最初に基本的にログインしているかどうかの分岐を加える　ログインの有無に関する分岐をもっとうまくやりたい
 class Mypage extends React.Component{
