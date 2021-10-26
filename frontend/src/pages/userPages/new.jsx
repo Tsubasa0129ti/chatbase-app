@@ -1,6 +1,6 @@
 import React from 'react'
 
-class UserNew extends React.Component {　//一旦これで実行するが、stateが多いのでそこについて後で変更を加えるかも
+class New extends React.Component {　//一旦これで実行するが、stateが多いのでそこについて後で変更を加えるかも
     constructor(props){
         super(props);
         this.state = {
@@ -266,7 +266,7 @@ class UserNew extends React.Component {　//一旦これで実行するが、sta
     }
 }
 
-export default UserNew;
+export default New;
 
 //この後やること　①validation(サーバーのみ)　②cookie ③エラー処理　④メッセージ機能
 //fetchのエラー分岐について

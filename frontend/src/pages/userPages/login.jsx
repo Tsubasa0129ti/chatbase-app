@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 //formの送信はできているけど、POST処理でのログインができない　（おそらく現状ストラテジーに対してデータの送信ができていないのではないか）　ストラテジーの設定についても再度練り直す必要がありそう
 class Login extends React.Component{

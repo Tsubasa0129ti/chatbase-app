@@ -1,5 +1,5 @@
 //これに関しては、fetchをなくす。その代わり、UIをまともに作り替える。
-function UserIndex(){
+function Index(){
     return(
         <div>
             <h3>User Main Page</h3>
@@ -7,4 +7,4 @@ function UserIndex(){
     )
 }
 
-export default UserIndex;
+export default Index;
