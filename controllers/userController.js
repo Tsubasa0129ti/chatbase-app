@@ -95,9 +95,12 @@ module.exports = {
     },
     preLoginCheck : (req,res) => {
         if(req.isAuthenticated()){
+            var user = req.user;
+            var username = user.name.first + ' ' +  user.name.last
             res.json({
                 result : "Authenticated",
-                redirectPath : "/users/mypage"
+                redirectPath : "/users/mypage",
+                username : username
             });
         }else{
             res.json({

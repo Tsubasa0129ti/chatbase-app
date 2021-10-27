@@ -1,5 +1,7 @@
 import React from 'react';
 
+import Header from '../../components/block/header';
+
 //formの送信はできているけど、POST処理でのログインができない　（おそらく現状ストラテジーに対してデータの送信ができていないのではないか）　ストラテジーの設定についても再度練り直す必要がありそう
 class Login extends React.Component{
     constructor(props){
@@ -7,7 +9,8 @@ class Login extends React.Component{
         this.state = {
             email : '',
             password : '',
-            error : ''
+            error : '', //これを消すことも可能
+            message : ''
         }
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -32,9 +35,10 @@ class Login extends React.Component{
             console.error(err.message);
         });
 
-        if(this.props.location.state){
+        if(this.props.location.state){ //これのエラーに関しては、headerに
+            console.log(`parent : ${this.props.location.state.error}`);
             this.setState({
-                error : this.props.location.state.error
+                message : this.props.location.state.error
             });
         }
     }
@@ -67,9 +71,9 @@ class Login extends React.Component{
             if(!res.ok){
                 console.error("サーバーエラー");
 
-                if(res.status === 401){
+                if(res.status === 401){ //ここはログインの内部？
                     this.setState({
-                        error : `${res.status} : ユーザー名もしくはパスワードが異なります。`
+                        message : `${res.status} : ユーザー名もしくはパスワードが異なります。`
                     });
                 }
             }
@@ -88,19 +92,22 @@ class Login extends React.Component{
 
     render(){
         return(
-            <form method="POST" onSubmit={this.handleSubmit}>
-                <p>Login Page</p>
-                <div className="error">{this.state.error}</div>
-                <div className="">
-                    <label htmlFor="email">Email</label>
-                    <input type="email" name="email" onChange={this.handleChange} />
-                </div>
-                <div className="">
-                    <label htmlFor="password">Password</label>
-                    <input type="password" name="password" onChange={this.handleChange} />
-                </div>
-                <input type="submit" value="ログイン" />
-            </form>
+            <div>
+                <Header message={this.state.message} />
+                <form method="POST" onSubmit={this.handleSubmit}>
+                    <p>Login Page</p>
+                    <div className="error">{this.state.error}</div>
+                    <div className="">
+                        <label htmlFor="email">Email</label>
+                        <input type="email" name="email" onChange={this.handleChange} />
+                    </div>
+                    <div className="">
+                        <label htmlFor="password">Password</label>
+                        <input type="password" name="password" onChange={this.handleChange} />
+                    </div>
+                    <input type="submit" value="ログイン" />
+                </form>
+            </div>
         )
     }
 }
