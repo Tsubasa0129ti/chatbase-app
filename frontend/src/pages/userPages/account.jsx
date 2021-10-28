@@ -1,4 +1,5 @@
-import React from "react";
+import React from 'react';
+import Header from '../../components/block/header';
 
 class Account extends React.Component{
     constructor(props){
@@ -7,7 +8,7 @@ class Account extends React.Component{
             first : '',
             last : '',
             email : '',
-            error : ''
+            message : ''
         }
     }
 
@@ -15,28 +16,28 @@ class Account extends React.Component{
         fetch('/api/users/mypage/show')
         .then((res) => {
             if(!res.ok){
-                //ここにもエラー処理を追加する必要がある。これについてはサーバー内のエラーを出力するため
-                console.error("サーバーエラー");//エラーの出力方法は変えるが、とりあえずこれを行う
+                //ここはサーバー内のエラーを受け取る
+                console.error('サーバーエラー');
             }
             return res.json()
         })
         .then((obj) => {    
-            if(obj.result === "success"){
+            if(obj.result === 'success'){
                 this.setState({
                     first : obj.user.name.first,
                     last : obj.user.name.last,
                     email : obj.user.email
                 });
-            }else if(obj.result === "Authentication Error"){
+            }else if(obj.result === 'Authentication Error'){
                 this.props.history.push({
                     pathname : obj.redirectPath,
-                    state : {error : obj.result}
+                    state : {message : obj.result}
                 });
-            }else if(obj.result === "Error"){
+            }else if(obj.result === 'Error'){
                 console.error(obj.error);
                 this.props.history.push({
                     pathname : obj.redirectPath,
-                    state : {error : obj.result}
+                    state : {message : obj.result}
                 });
             }
         }).catch((err) => {　//このcatchのエラーに関してはPromise rejectの場合に処理される
@@ -47,13 +48,14 @@ class Account extends React.Component{
     render(){
         return(
             <div>
+                <Header message={this.state.message} />
                 <h3>User Data</h3>
                 <div>
-                    <label htmlFor="name">Name</label>
-                    <p>{this.state.first + " " + this.state.last}</p>
+                    <label htmlFor='name'>Name</label>
+                    <p>{this.state.first + ' ' + this.state.last}</p>
                 </div>
                 <div>
-                    <label htmlFor="email">Email</label>
+                    <label htmlFor='email'>Email</label>
                     <p>{this.state.email}</p>
                 </div>
             </div>
@@ -65,3 +67,4 @@ export default Account;
 
 //ここについての残り、UIとprofile作成後に手をつける（profileの有無による分岐を必要とする）
 //追記　10/25 fetchのサーバーエラーの出力をサーバーから受け取れるようにするかも（これに関しては、他のページも同様）
+//追記　10/28　一応headerにmessageの送信をしているけど、エラーなどのメッセージを出力する予定がなければ消しても良い

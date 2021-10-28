@@ -49,7 +49,7 @@ class Header extends React.Component{
             if(obj.result === "success"){
                 this.props.history.push({
                     pathname : obj.redirectPath,
-                    state : {msg : 'ログアウトしました。'}
+                    state : {message : 'ログアウトしました。'}
                 });
             }
         }).catch((err) => {

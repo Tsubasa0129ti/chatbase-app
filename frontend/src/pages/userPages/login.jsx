@@ -1,44 +1,40 @@
 import React from 'react';
-
 import Header from '../../components/block/header';
 
-//formの送信はできているけど、POST処理でのログインができない　（おそらく現状ストラテジーに対してデータの送信ができていないのではないか）　ストラテジーの設定についても再度練り直す必要がありそう
 class Login extends React.Component{
     constructor(props){
         super(props);
         this.state = {
             email : '',
             password : '',
-            error : '', //これを消すことも可能
             message : ''
         }
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    componentDidMount(){ //ここで現在のログインステータスの確認を行う
-        fetch("/api/users/previousCheck")
+    componentDidMount(){
+        fetch('/api/users/previousCheck')
         .then((res) => {
             if(!res.ok){
-                console.error("サーバーエラー");
+                console.error('サーバーエラー');
             }
             return res.json();
         })
         .then((obj) => {
-            if(obj.result === "Authenticated"){
+            if(obj.result === 'Authenticated'){
                 this.props.history.push({
-                    pathname : "/users/mypage",
-                    state : {error : "You are already authenticated"}
+                    pathname : '/users/mypage',
+                    state : {message : 'You are already authenticated'}
                 });
             }
         }).catch((err) => {
             console.error(err.message);
         });
 
-        if(this.props.location.state){ //これのエラーに関しては、headerに
-            console.log(`parent : ${this.props.location.state.error}`);
+        if(this.props.location.state){ //他のページからもらったエラーを取得
             this.setState({
-                message : this.props.location.state.error
+                message : this.props.location.state.message
             });
         }
     }
@@ -57,7 +53,7 @@ class Login extends React.Component{
         e.preventDefault();
 
         fetch('/api/users/auth',{
-            method : "POST",
+            method : 'POST',
             headers : {
                 'Accept': 'application/json,text/plain, */*',
                 'Content-Type': 'application/json'
@@ -69,9 +65,12 @@ class Login extends React.Component{
         })
         .then((res) => {
             if(!res.ok){
-                console.error("サーバーエラー");
-
-                if(res.status === 401){ //ここはログインの内部？
+                console.error('サーバーエラー');
+                if(res.status === 400){
+                    this.setState({
+                        message : `${res.status} : ユーザー名もしくはパスワードを記入してください。`
+                    })
+                }else if(res.status === 401){
                     this.setState({
                         message : `${res.status} : ユーザー名もしくはパスワードが異なります。`
                     });
@@ -80,13 +79,12 @@ class Login extends React.Component{
             return res.json();
         })
         .then((obj) => {
-            //この中に分岐を置く
-            if(obj.result === "success"){
+            if(obj.result === 'success'){
                 console.log(`data : ${obj.user}`);
                 this.props.history.push(obj.redirectPath);
             }
         }).catch((err) => {
-            console.error(`error : ${err.message}`); //このときにエラーの出力をさせる（render内部に）
+            console.error(`error : ${err.message}`);
         });
     }
 
@@ -94,18 +92,17 @@ class Login extends React.Component{
         return(
             <div>
                 <Header message={this.state.message} />
-                <form method="POST" onSubmit={this.handleSubmit}>
+                <form method='POST' onSubmit={this.handleSubmit}>
                     <p>Login Page</p>
-                    <div className="error">{this.state.error}</div>
-                    <div className="">
-                        <label htmlFor="email">Email</label>
-                        <input type="email" name="email" onChange={this.handleChange} />
+                    <div>
+                        <label htmlFor='email'>Email</label>
+                        <input type='email' name='email' onChange={this.handleChange} />
                     </div>
-                    <div className="">
-                        <label htmlFor="password">Password</label>
-                        <input type="password" name="password" onChange={this.handleChange} />
+                    <div>
+                        <label htmlFor='password'>Password</label>
+                        <input type='password' name='password' onChange={this.handleChange} />
                     </div>
-                    <input type="submit" value="ログイン" />
+                    <input type='submit' value='ログイン' />
                 </form>
             </div>
         )

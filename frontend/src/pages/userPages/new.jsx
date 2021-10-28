@@ -1,6 +1,7 @@
 import React from 'react'
+import Header from '../../components/block/header';
 
-class New extends React.Component {　//一旦これで実行するが、stateが多いのでそこについて後で変更を加えるかも
+class New extends React.Component {
     constructor(props){
         super(props);
         this.state = {
@@ -9,19 +10,19 @@ class New extends React.Component {　//一旦これで実行するが、state�
             email : '',
             password : '',
             passCheck : '',
-            error : '',
+            message : '',
             first_error : '',
             last_error : '',
             email_error : '',
             password_error : '',
             passCheck_error : ''
         }
-        this.handleSubmit = this.handleSubmit.bind(this); //bindについてはよく理解していない　おそらく、コンストラクタで読み込んでいるので、これは最初に読み込まれるものの中に、これらの関数を入れている。純粋に関数をここで読み込んでいるみたいなことでは？
+        this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
     }
 
     componentDidMount(){
-        fetch("/api/users/previousCheck")
+        fetch('/api/users/previousCheck')
         .then((res) => {
             if(!res.ok){
                 console.error('サーバーエラー');
@@ -29,10 +30,10 @@ class New extends React.Component {　//一旦これで実行するが、state�
             return res.json();
         })
         .then((obj) => {
-            if(obj.result === "Authenticated"){
+            if(obj.result === 'Authenticated'){
                 this.props.history.push({
-                    pathname : "/users/mypage",
-                    state : {error : "You are already authenticated"}
+                    pathname : '/users/mypage',
+                    state : {message : 'You are already authenticated'}
                 });
             }
         }).catch((err) => {
@@ -51,7 +52,6 @@ class New extends React.Component {　//一旦これで実行するが、state�
         /* バリデーションの設定 */
         //first_errorの出力
         if(name === 'first'){
-            //firstのエラー作成
             if(nameChecker(value)){
                 this.setState({
                     first_error : 'First Name : 1文字目は、大文字で設定してください。'
@@ -59,7 +59,7 @@ class New extends React.Component {　//一旦これで実行するが、state�
             }else{
                 if(value.length <= 3 || value.length >= 8){
                     this.setState({
-                        first_error : "First Name : 名前は4~7文字で記入してください"
+                        first_error : 'First Name : 名前は4~7文字で記入してください'
                     });
                 }else{
                     this.setState({
@@ -71,7 +71,6 @@ class New extends React.Component {　//一旦これで実行するが、state�
 
         //lastのエラー作成
         if(name === 'last'){
-            //lastのエラー作成
             if(nameChecker(value)){
                 this.setState({
                     last_error : 'Last Name : 1文字目は、大文字で設定してください。'
@@ -183,16 +182,16 @@ class New extends React.Component {　//一旦これで実行するが、state�
 
         if(pass !== passCheck){
             this.setState({
-                error : 'エラーの修正をしてください。',
+                message : 'エラーの修正をしてください。',
                 passCheck_error : 'Password Confirm : 確認の値が異なっています。'
             });
         }else if(this.state.first_error || this.state.last_error || this.state.email_error || this.state.password_error){
             this.setState({
-                error : 'エラーの修正をしてください。'
+                message : 'エラーの修正をしてください。'
             });
         }else{
             fetch('/api/users/create',{
-                method : "POST",
+                method : 'POST',
                 headers : {
                     'Accept': 'application/json,text/plain, */*',
                     'Content-Type': 'application/json'
@@ -214,11 +213,13 @@ class New extends React.Component {　//一旦これで実行するが、state�
             })
             .then(obj => {
                 //このとき送信formの初期化 いやこの時もエラーの時はある。エラー情報の取得など
-                if(obj.result === "success"){
-                    this.props.history.push(obj.redirectPath); //空白化処理必要ないかも
+                if(obj.result === 'success'){
+                    this.props.history.push({
+                        pathname : obj.redirectPath,
+                        state : {message : 'ユーザーの作成に成功しました。'}
+                    });
                 }else{
                     console.error(obj.result);
-                    //ここはユーザー作成エラー（validationなども含まれるはず）
                 }
 
             }).catch(err => {
@@ -230,38 +231,40 @@ class New extends React.Component {　//一旦これで実行するが、state�
 
     render(){
         return(
-            <form　onSubmit={this.handleSubmit} method="POST">
-                <h3>ユーザー作成ページ</h3>
-                <div className="errorMsg">
-                    <h3>{this.state.error}</h3>
-                    <p>{this.state.first_error}</p>
-                    <p>{this.state.last_error}</p>
-                    <p>{this.state.email_error}</p>
-                    <p>{this.state.password_error}</p>
-                    <p>{this.state.passCheck_error}</p>
-                </div>
-                <div className="">
-                    <label htmlFor="firstName">First Name</label>
-                    <input type="text" name="first" required onChange={this.handleChange} />
-                </div>
-                <div className="">
-                    <label htmlFor="lastName">Last Name</label>
-                    <input type="text" name="last" required onChange={this.handleChange} />
-                </div>
-                <div className="">
-                    <label htmlFor="email">Email</label> 
-                    <input type="email" name="email" required onChange={this.handleChange} />               
-                </div>
-                <div className="">
-                    <label htmlFor="password">Password</label>
-                    <input type="password" name="password" required onChange={this.handleChange} />
-                </div>
-                <div className="">
-                    <label htmlFor="passCheck">Password Confirm</label>
-                    <input type="password" name="passCheck" onChange={this.handleChange} />
-                </div>
-                <input type="submit" value="送信" />
-            </form> 
+            <div>
+                <Header message={this.state.message} />
+                <form　onSubmit={this.handleSubmit} method='POST'>
+                    <h3>ユーザー作成ページ</h3>
+                    <div className='errorMsg'>
+                        <p>{this.state.first_error}</p>
+                        <p>{this.state.last_error}</p>
+                        <p>{this.state.email_error}</p>
+                        <p>{this.state.password_error}</p>
+                        <p>{this.state.passCheck_error}</p>
+                    </div>
+                    <div>
+                        <label htmlFor='firstName'>First Name</label>
+                        <input type='text' name='first' required onChange={this.handleChange} />
+                    </div>
+                    <div>
+                        <label htmlFor='lastName'>Last Name</label>
+                        <input type='text' name='last' required onChange={this.handleChange} />
+                    </div>
+                    <div>
+                        <label htmlFor='email'>Email</label> 
+                        <input type='email' name='email' required onChange={this.handleChange} />               
+                    </div>
+                    <div>
+                        <label htmlFor='password'>Password</label>
+                        <input type='password' name='password' required onChange={this.handleChange} />
+                    </div>
+                    <div>
+                        <label htmlFor='passCheck'>Password Confirm</label>
+                        <input type='password' name='passCheck' onChange={this.handleChange} />
+                    </div>
+                    <input type='submit' value='送信' />
+                </form>
+            </div>
         )
     }
 }

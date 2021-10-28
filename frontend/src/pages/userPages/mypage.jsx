@@ -1,19 +1,18 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
-import Logout from '../../components/module/logout';
+import Header from '../../components/block/header';
 
-//最初に基本的にログインしているかどうかの分岐を加える　ログインの有無に関する分岐をもっとうまくやりたい
 class Mypage extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-            username : "",
-            error : ""
+            username : '',
+            message : ''
         }
     }
 
     componentDidMount(){
-        fetch(`/api/users/mypage`)
+        fetch('/api/users/mypage')
         .then((res) => {
             if(!res.ok){
                 console.error('サーバーエラー');
@@ -21,15 +20,14 @@ class Mypage extends React.Component{
             return res.json();
         })
         .then((obj) => {
-            //リクエストを送ったら、サーバーが勝手にログインIDを判断して、それに基づくuserを返す
-            if(obj.result === "success"){
+            if(obj.result === 'success'){
                 this.setState({
                     username : obj.username.first + obj.username.last
                 });
-            }else if(obj.result === "Authentication Error"){
+            }else if(obj.result === 'Authentication Error'){
                 this.props.history.push({
                     pathname : obj.redirectPath,
-                    state : {error : obj.result}
+                    state : {message : obj.result}
                 });
             }
         }).catch((err) => {
@@ -38,7 +36,7 @@ class Mypage extends React.Component{
 
         if(this.props.location.state){
             this.setState({
-                error : this.props.location.state.error
+                message : this.props.location.state.message
             });
         }
     }
@@ -46,15 +44,14 @@ class Mypage extends React.Component{
     render(){
         return(
             <div>
-                <Logout />
-                <div className="header">
+                <Header message={this.state.message} />
+                <div>
                     <h2>My Page</h2>
                     <p>Welcom back {this.state.username}</p>
                 </div>
-                <div className="errorMsg">{this.state.error}</div>
-                <div className="link">
-                    <Link to="/users/mypage/show">アカウント管理</Link>
-                    <Link to="/users/mypage/edit">アカウントの編集</Link>
+                <div className='link'>
+                    <Link to='/users/mypage/show'>アカウント管理</Link>
+                    <Link to='/users/mypage/edit'>アカウントの編集</Link>
                 
                 </div>
                 <div>

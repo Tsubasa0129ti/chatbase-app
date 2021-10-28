@@ -1,17 +1,18 @@
 import React from 'react';
+import Header from '../../components/block/header';
 
 class Home extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-            msg : ''
+            message : ''
         };
     }
 
     componentDidMount(){
         if(this.props.location.state){
             this.setState({
-                msg : this.props.location.state.msg
+                message : this.props.location.state.message
             });
         }
     }
@@ -19,8 +20,10 @@ class Home extends React.Component{
     render(){
         return(
             <div>
-                <h2>Page</h2>
-                <p>{this.state.msg}</p>
+                <Header message={this.state.message} />
+                <div>
+                    <h2>Page</h2>
+                </div>
             </div>
         )
     }
