@@ -49,7 +49,7 @@ module.exports = {
         }
         next();
     },
-    redirectView : (req,res,next) => {
+    redirectView : (req,res,next) => { //これ消せるかも（profile無くしたら）
         var redirectPath = res.locals.redirect;
         if(redirectPath) {
             res.redirect(redirectPath);
@@ -57,11 +57,7 @@ module.exports = {
             next();
         }
     },
-    login : (req,res) => {
-        res.render("users/login");
-    },
     auth : (req,res) => {
-        console.log("pass");
         res.json({
             result : "success",
             redirectPath : "/users/mypage",
