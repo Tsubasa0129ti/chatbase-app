@@ -17,7 +17,6 @@ function Users(props) {
     return(
         <Switch>   
         <Route path={props.url} exact={true} component={Index} />
-        {/* <Route path={`${props.url}/:id`} exact={true} component={} /> 不要かも*/}
         <Route path={`${props.url}/new`} exact={true} component={New} />
         <Route path={`${props.url}/login`} exact={true} component={Login} />
         <Route path={`${props.url}/mypage`} exact={true} component={Mypage} />

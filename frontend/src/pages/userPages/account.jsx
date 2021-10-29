@@ -5,9 +5,14 @@ class Account extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-            first : '',
-            last : '',
+            profileExist : false,
+            username : '',
             email : '',
+            intro : '',
+            prefecture : '',
+            address : '',
+            birthday : '',
+            belongings : '',
             message : ''
         }
     }
@@ -22,44 +27,88 @@ class Account extends React.Component{
             return res.json()
         })
         .then((obj) => {    
-            if(obj.result === 'success'){
+            if(obj.profileExist){
                 this.setState({
-                    first : obj.user.name.first,
-                    last : obj.user.name.last,
+                    profileExist : true,
+                    username : obj.user.name.first + ' ' + obj.user.name.last,
+                    email : obj.user.email,
+                    intro : obj.user.profile.intro,
+                    prefecture : obj.user.profile.prefecture,
+                    address : obj.user.profile.address,
+                    birthday : obj.user.profile.birthday,
+                    belongings : obj.user.profile.belongins
+                });
+            }else{
+                this.setState({
+                    username : obj.user.name.first + ' ' + obj.user.name.last,
                     email : obj.user.email
-                });
-            }else if(obj.result === 'Authentication Error'){
-                this.props.history.push({
-                    pathname : obj.redirectPath,
-                    state : {message : obj.result}
-                });
-            }else if(obj.result === 'Error'){
-                console.error(obj.error);
-                this.props.history.push({
-                    pathname : obj.redirectPath,
-                    state : {message : obj.result}
                 });
             }
         }).catch((err) => {　//このcatchのエラーに関してはPromise rejectの場合に処理される
             console.error(err.message);
         });
+
+        if(this.props.location.state){
+            this.setState({
+                message : this.props.location.state.message
+            });
+        }
     }
 
     render(){
-        return(
-            <div>
-                <Header message={this.state.message} />
+        if(this.state.profileExist){
+            return(
+                <div>
+                    <Header message={this.state.message} />
+                    <h3>User Data</h3>
+                    <div>
+                        <label htmlFor='username'>Username</label>
+                        <p>{this.state.username}</p>
+                    </div>
+                    <div>
+                        <label htmlFor='email'>Email</label>
+                        <p>{this.state.email}</p>
+                    </div>
+
+                    <h5>your profile</h5>
+                    <div>
+                        <label htmlFor="intro">Intro</label>
+                        <p>{this.state.intro}</p>
+                    </div>
+                    <div>
+                        <label htmlFor="prefecture">Prefecture</label>
+                        <p>{this.state.prefecture}</p>
+                    </div>
+                    <div>
+                        <label htmlFor="address">Address</label>
+                        <p>{this.state.address}</p>
+                    </div>
+                    <div>
+                        <label htmlFor="birthday">Birthday</label>
+                        <p>{this.state.birthday}</p>
+                    </div>
+                    <div>
+                        <label htmlFor="belongings">Belongings</label>
+                        <p>{this.state.belongings}</p>
+                    </div>
+                </div>
+            )
+        }else{
+            return(
+                <div>
+                    <Header message={this.state.message} />
                 <h3>User Data</h3>
                 <div>
                     <label htmlFor='name'>Name</label>
-                    <p>{this.state.first + ' ' + this.state.last}</p>
+                    <p>{this.state.username}</p>
                 </div>
                 <div>
                     <label htmlFor='email'>Email</label>
                     <p>{this.state.email}</p>
                 </div>
-            </div>
-        )
+                </div>
+            )
+        }
     }
 }
 

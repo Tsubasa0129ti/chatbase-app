@@ -12,94 +12,91 @@ function getProfile(body) {
 };
 
 module.exports = {
-    index : (req,res) => {
-        res.render("profile/index");
+    profileCheck : (req,res,next) => {
+        var user = req.user;
+        res.locals.username = user.name.first + ' ' + user.name.last;
+        if(user.profile === undefined){
+            next();
+        }else{
+            res.json({
+                result : 'Profile Exist',
+                redirectPath : '/users/mypage/show'
+            });
+        }
     },
-    create : (req,res,next) => {　//一応短く分離することは可能ではあるものの、必要性を感じない（別に可読性が上がるわけではないと思う）ため、一旦保留
-        if(req.isAuthenticated()){
-            var currentUser = req.user;
-            if(currentUser.profile===undefined){
-                let profileParams = getProfile(req.body);
-                Profile.create(profileParams)
-                .then(profile => { 
-                    var userId = currentUser._id;
-                    User.findByIdAndUpdate(userId,{
-                        $addToSet : {
-                            profile : profile._id
-                        }
-                    })
-                    .then(() => {
-                        res.locals.redirect = "/users/mypage";
-                        next();
-                    })
-                    .catch((err) => {
-                        //user編集をする際のエラー
-                        res.locals.redirect = "/users/mypage/profile";
-                        res.locals.status = 500;
-                        console.log(err.message);
-                        next(err);
-                    });
-                })
-                .catch(err => {
-                    //profile作成のエラー
-                    res.locals.redirect = "/users/mypage/profile";
-                    res.locals.status = 500;
-                    console.log(err.message);
-                    next(err);
+    new : (req,res) => {
+        var username = res.locals.username;
+        res.json({
+            result : 'success',
+            username : username
+        });
+    },
+    create : (req,res) => {
+        const user = req.user;
+        var profileParams = getProfile(req.body);
+        Profile.create(profileParams)
+        .then(profile => { 
+            var userId = user._id;
+            User.findByIdAndUpdate(userId,{
+                $addToSet : {
+                    profile : profile._id
+                }
+            })
+            .then(() => {
+                res.json({
+                    result : 'success',
+                    redirectPath : '/users/mypage'
                 });
-            }else{
-                req.flash("error","You have already created your profile. if you wanted to renew yours, go to edit page");
-                res.locals.redirect = "/users/mypage";
-                next();
-            }
-        }else{
-            res.locals.redirect = "/users/login";
-            next();
-        }
-    },
-    redirectView : (req,res,next) => {
-        var redirectPath = res.locals.redirect;
-        if(redirectPath) {
-            res.redirect(redirectPath);
-        }else{
-            next();
-        }
-    },
-    profile : (req,res) => {
-        var userId = req.params.id;
-        User.findById(userId)
-        .populate("profile")
-        .exec(function(err,user){
-            if(err){
-                res.locals.redirect = "/users/mypage";
+            })
+            .catch((err) => { //下記二つのエラー処理は一旦飛ばす。最終的には、ステータスコードをもとに!res.ok内部でのエラー処理に移植する
+                //user編集をする際のエラー
+                res.locals.redirect = "/users/mypage/profile";
                 res.locals.status = 500;
-                console.log(err.message)
+                console.log(err.message);
                 next(err);
-            }else{
-                res.render("profile/show",{User:user});
-            }
-        });   
+            });
+        })
+        .catch(err => {
+            //profile作成のエラー
+            res.locals.redirect = "/users/mypage/profile";
+            res.locals.status = 500;
+            console.log(err.message);
+            next(err);
+        });
+        
+    },
+    getProfile : (req,res,next) => {
+        var user = req.user;
+        if(user.profile !== undefined){
+            next();
+        }else{
+            res.json({
+                result : 'Profile Not Exist',
+                redirectPath : '/profile/new'
+            });
+        }
     },
     edit : (req,res) => {
         var currentUser = req.user;
-        if(currentUser.profile){
-            User.findById(currentUser._id)
-            .populate("profile")
-            .exec(function(err,user){
-                if(err){
-                    res.locals.redirect = "/users/mypage";
-                    res.locals.status = 500;
-                    console.log(err.message)
-                    next(err);
-                }else{
-                    res.render("profile/edit",{currentUser:user});
-                }
+        User.findById(currentUser._id)
+        .populate("profile")
+        .exec(function(err,user){
+            if(err){ //ここのエラー処理は未完
+                res.json({
+                    result : 'error',
+                    redirectPath : '/profile/edit'
+                });
+            }
+            const username = user.name.first + ' ' + user.name.last;
+            const profile = user.profile
+            console.log(profile);
+            res.json({
+                result : 'success',
+                username : username,
+                profile : profile
             });
-        }else{
-            req.flash("error","profileを作成してください。");
-            res.locals.redirect = "/users/mypage/profile";
-            next();
-        }
+            
+        });
     },
     update : (req,res,next) => {
         let profileParams = getProfile(req.body);
@@ -107,14 +104,29 @@ module.exports = {
         Profile.findByIdAndUpdate(id,{
             $set : profileParams
         }).then(profile => {
-            req.flash("success","プロフィールの更新に成功しました。");
-            res.locals.redirect = "/users/mypage";
-            next();
+            res.json({
+                result : 'success',
+                redirectPath : '/users/mypage'
+            });
         }).catch(err => {
-            res.locals.redirect = "/users/mypage/edit";
-            res.locals.status = 500;
-            console.log(err);
-            next();
+            res.json({
+                result : 'error',
+                redirectPath : '/profile/edit'
+            });
         });
+    },
+    id : (req,res,next) => {
+        var userId = req.params.id;
+        User.findById(userId)
+        .populate('profile')
+        .exec(function(err,user) {
+            if(err){
+                console.error(err.message);
+            }
+            res.json({
+                result : 'success',
+                user : user
+            });
+        })
     }
 }

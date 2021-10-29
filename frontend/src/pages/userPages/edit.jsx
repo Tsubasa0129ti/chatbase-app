@@ -29,7 +29,7 @@ class Edit extends React.Component{
                     first : obj.name.first,
                     last : obj.name.last
                 });
-            }else if(obj.result === 'Authentication Error'){
+            }else if(obj.result === 'Authentication Error'){ //これredirectPathは？
                 this.props.history.push({
                     pathname : '/users/login',
                     state : {message : obj.result}
@@ -62,7 +62,7 @@ class Edit extends React.Component{
         const name = target.name;
 
         //first_errorの出力
-        if(target.name === 'first'){
+        if(name === 'first'){
             if(nameChecker(value)){
                 this.setState({
                     first_error : 'First Name : 1文字目は、大文字で設定してください。'
@@ -81,7 +81,7 @@ class Edit extends React.Component{
         }
 
         //last_errorの出力
-        if(target.name === 'last'){
+        if(name === 'last'){
             if(nameChecker(value)){
                 this.setState({
                     last_error : 'Last Name : 1文字目は、大文字で設定してください。'

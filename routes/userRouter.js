@@ -22,6 +22,4 @@ router.put("/mypage/update",userControllers.loginCheck,userControllers.update);
 
 router.delete("/mypage/delete",userControllers.delete,userControllers.profileDelete);
 
-router.get("/:id",profileController.profile);
-
 module.exports = router;

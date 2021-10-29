@@ -16,14 +16,13 @@ module.exports = {
                 });
             }else if(err){
                 console.log(err.message);
-                res.json({
-                    redirectPath : "/users/new",
-                    result : err
-                });
+
+                //多分ここでのエラーが出力されるのだが、正確にはエラー形式にしていないため、これをサーバー内のエラーとして認識していない。例えば、サーバー内でのエラーにしてしまう
+                next(err);
             }
         });
     },
-    cookie : (req,res,next) => {
+    cookie : (req,res,next) => { //現時点で未使用
         var success = res.locals.result;
         if(success){
             //cookieの削除 複数の削除の方法は不明
@@ -64,7 +63,7 @@ module.exports = {
             user : req.user
         });
     },
-    regenerateSessionId : (req,res,next) => {
+    regenerateSessionId : (req,res,next) => {//現時点で未使用
         var sessions = {};
         for(var key in req.session){
             sessions[key] = req.session[key];
@@ -120,23 +119,39 @@ module.exports = {
         });
     },
     show : (req,res) => {
-        var currentUser = req.user;
-        User.findById(currentUser._id)
-        .populate("profile")
-        .exec((err,user) => {
-            if(err){
+        var user = req.user;
+        if(user.profile === undefined){
+            User.findById(user._id)
+            .then((user) => {
                 res.json({
-                    result : "Error",
-                    error : err.message,
-                    redirectPath : "/users/mypage"
-                });
-            }else{
-                res.json({
-                    result : "success",
+                    profileExist : false,
                     user : user
                 });
-            }
-        });
+            }).catch((err) => {
+                //ここは後で作る
+                res.json({
+                    result : 'Error',
+                    redirectPath : '/users/mypage'
+                });
+            });
+        }else{
+            User.findById(user._id)
+            .populate("profile")
+            .exec((err,user) => {
+                if(err){
+                    res.json({
+                        result : "Error",
+                        error : err.message,
+                        redirectPath : "/users/mypage"
+                    });
+                }else{
+                    res.json({
+                        profileExist : true,
+                        user : user
+                    });
+                }
+            });
+        }
     },
     edit : (req,res) => {
         var currentUser = req.user;

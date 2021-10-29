@@ -5,9 +5,12 @@ const userController = require("../controllers/userController"); //LOGINCHAECK�
 const profileController = require("../controllers/profileController");
 
 //以下routing
-router.get("/profile",userController.loginCheck,userController.redirectView,profileController.index);
-router.post("/profile/create",userController.loginCheck,userController.redirectView,profileController.create,profileController.redirectView);
-router.get("/profile/edit",userController.loginCheck,userController.redirectView,profileController.edit,profileController.redirectView);
-router.put("/profile/update",userController.loginCheck,userController.redirectView,profileController.update,profileController.redirectView);
+router.get('/new',userController.loginCheck,profileController.profileCheck,profileController.new);
+router.post('/create',userController.loginCheck,profileController.profileCheck,profileController.create);
+
+router.get('/edit',userController.loginCheck,profileController.getProfile,profileController.edit);
+router.put('/update',userController.loginCheck,profileController.update);
+
+router.get('/:id',userController.loginCheck,profileController.getProfile,profileController.id);
 
 module.exports = router;

@@ -208,6 +208,8 @@ class New extends React.Component {
             .then(res => {
                 if(!res.ok){
                     console.error('サーバーエラー');
+
+                    //サーバー内のエラーはここでの受け取りに変更する。
                 }
                 return res.json();
             })

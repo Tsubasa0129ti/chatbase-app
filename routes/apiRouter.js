@@ -13,7 +13,7 @@ router.get("/",(req,res) => {
 
 router.use("/error",errorRoutes); //パスありか不明
 router.use("/users",userRoutes);
-router.use("/users/mypage",profileRoutes);
+router.use("/profile",profileRoutes);
 router.use("/chat",chatRoutes);
 
 module.exports = router;
