@@ -6,6 +6,9 @@ var profileSchema = new Schema(
         intro : {
             type : String,
         },
+        age : {
+            type: String
+        },
         prefecture : {
             type : String,
         },

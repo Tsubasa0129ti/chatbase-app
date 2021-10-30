@@ -6,10 +6,11 @@ class Id extends React.Component{
         super(props);
         this.state = {
             username : '',
-            intro : '',
-            prefecture : '',
-            birthday : '',
-            belongings : '',
+            intro : '未設定',
+            age : '未設定',
+            prefecture : '未設定',
+            birthday : '未設定',
+            belongings : '未設定',
             message : ''
         } 
     }
@@ -17,7 +18,8 @@ class Id extends React.Component{
     componentDidMount(){
         //ここではログインチェックは必要？一応他のユーザーへ向けた公開を想定している。
         const pathname = this.props.location.pathname;
-        var id = pathname.split('/')[2];
+        var id = pathname.split('/')[3];
+        console.log(id);
 
         fetch(`/api/profile/${id}`)
         .then((res) => {
@@ -31,6 +33,7 @@ class Id extends React.Component{
                 this.setState({
                     username : obj.user.name.first + ' ' + obj.user.name.last,
                     intro : obj.user.profile.intro,
+                    age : obj.user.profile.age,
                     prefecture : obj.user.profile.prefecture,
                     birthday : obj.user.profile.birthday,
                     belongings : obj.user.profile.belongings
@@ -39,6 +42,10 @@ class Id extends React.Component{
                 this.props.history.push({
                     pathname : obj.redirectPath,
                     state : {message : obj.result}
+                });
+            }else if(obj.result === 'Profile Not Exist'){
+                this.setState({
+                    username : obj.username
                 });
             }
         }).catch((err) => {
@@ -62,6 +69,10 @@ class Id extends React.Component{
                     <div className='intro'>
                         <label htmlFor='intro'>ひとこと</label>
                         <p>{this.state.intro}</p>
+                    </div>
+                    <div>
+                        <label htmlFor="age">年齢</label>
+                        <p>{this.state.age}</p>
                     </div>
                     <div className='prefecture'>
                         <label htmlFor='prefecture'>都道府県</label>

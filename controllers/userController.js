@@ -48,7 +48,7 @@ module.exports = {
         }
         next();
     },
-    redirectView : (req,res,next) => { //これ消せるかも（profile無くしたら）
+    redirectView : (req,res,next) => { //これ消せるかも（Chat無くしたら）
         var redirectPath = res.locals.redirect;
         if(redirectPath) {
             res.redirect(redirectPath);

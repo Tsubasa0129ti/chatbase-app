@@ -7,12 +7,14 @@ class Edit extends React.Component{
         this.state = {
             username : '',
             intro : '',
+            age : '',
             prefecture : '',
             address : '',
             birthday : '',
             belongings : '',
             message : '',
             intro_error : '',
+            age_error : '',
             address_error : ''
         }
         this.handleChange = this.handleChange.bind(this);
@@ -33,6 +35,7 @@ class Edit extends React.Component{
                 this.setState({
                     username : obj.username,
                     intro : obj.profile.intro,
+                    age : obj.profile.age,
                     prefecture : obj.profile.prefecture,
                     address : obj.profile.address,
                     birthday : obj.profile.birthday,
@@ -71,6 +74,18 @@ class Edit extends React.Component{
             }
         }
 
+        if(name === 'age'){
+            if(value < 0 || value > 120){
+                this.setState({
+                    age_error : '正しい年齢を記載してください。'
+                });
+            }else{
+                this.setState({
+                    age_error : ''
+                });
+            }
+        }
+
         if(name === 'address'){
             if(addressChecker(value)){
                 this.setState({
@@ -102,7 +117,7 @@ class Edit extends React.Component{
     handleSubmit(e){
         e.preventDefault();
 
-        if(this.state.intro_error || this.state.address_error){
+        if(this.state.intro_error || this.state.address_error || this.state.age_error){
             this.setState({
                 message : 'エラーの修正をしてください。'
             });
@@ -115,6 +130,7 @@ class Edit extends React.Component{
                 },
                 body : JSON.stringify({
                     intro : this.state.intro,
+                    age : this.state.age,
                     prefecture : this.state.prefecture,
                     address : this.state.address,
                     birthday : this.state.birthday,
@@ -154,10 +170,15 @@ class Edit extends React.Component{
                     <div className='errorMsg'>
                         <p>{this.state.intro_error}</p>
                         <p>{this.state.address_error}</p>
+                        <p>{this.state.age_error}</p>
                     </div>
                     <div className='intro'>
                         <label htmlFor='intro'>ひとこと</label>
                         <textarea name='intro' cols='40' rows='3' maxLength='100' defaultValue={this.state.intro} onChange={this.handleChange} />
+                    </div>
+                    <div className='age'>
+                        <label htmlFor="age">年齢</label>
+                        <input type="number" name='age' defaultValue={this.state.age} onChange={this.handleChange} />
                     </div>
                     <div>
                         <label htmlFor='prefecture'>都道府県</label>

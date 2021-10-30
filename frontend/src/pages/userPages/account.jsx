@@ -9,6 +9,7 @@ class Account extends React.Component{
             username : '',
             email : '',
             intro : '',
+            age : '',
             prefecture : '',
             address : '',
             birthday : '',
@@ -33,6 +34,7 @@ class Account extends React.Component{
                     username : obj.user.name.first + ' ' + obj.user.name.last,
                     email : obj.user.email,
                     intro : obj.user.profile.intro,
+                    age : obj.user.profile.age,
                     prefecture : obj.user.profile.prefecture,
                     address : obj.user.profile.address,
                     birthday : obj.user.profile.birthday,
@@ -76,6 +78,10 @@ class Account extends React.Component{
                         <p>{this.state.intro}</p>
                     </div>
                     <div>
+                        <label htmlFor="age">Age</label>
+                        <p>{this.state.age}</p>
+                    </div>
+                    <div>
                         <label htmlFor="prefecture">Prefecture</label>
                         <p>{this.state.prefecture}</p>
                     </div>
@@ -114,6 +120,7 @@ class Account extends React.Component{
 
 export default Account;
 
-//ここについての残り、UIとprofile作成後に手をつける（profileの有無による分岐を必要とする）
+//ここについての残り、UI
 //追記　10/25 fetchのサーバーエラーの出力をサーバーから受け取れるようにするかも（これに関しては、他のページも同様）
 //追記　10/28　一応headerにmessageの送信をしているけど、エラーなどのメッセージを出力する予定がなければ消しても良い
+//追記　10/30 profileの有無による分岐は完了、ついでにageの追加をした

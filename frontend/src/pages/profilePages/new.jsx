@@ -7,12 +7,14 @@ class New extends React.Component{
         this.state = {
             username : '',
             intro : '',
+            age : '',
             prefecture : '',
             address : '',
             birthday : '',
             belongings : '',
             message : '',
             intro_error : '',
+            age_error : '',
             address_error : ''
         }
         this.handleChange = this.handleChange.bind(this);
@@ -75,6 +77,18 @@ class New extends React.Component{
             }
         }
 
+        if(name === 'age'){
+            if(value < 0 || value > 120){
+                this.setState({
+                    age_error : '正しい年齢を記載してください。'
+                });
+            }else{
+                this.setState({
+                    age_error : ''
+                });
+            }
+        }
+
         if(name === 'address'){
             if(addressChecker(value)){
                 this.setState({
@@ -105,7 +119,7 @@ class New extends React.Component{
     handleSubmit(e){
         e.preventDefault();
 
-        if(this.state.intro_error || this.state.address_error){
+        if(this.state.intro_error || this.state.address_error || this.state.age_error){
             this.setState({
                 message : 'エラーを修正してください。'
             });
@@ -118,6 +132,7 @@ class New extends React.Component{
                 },
                 body : JSON.stringify({
                     intro : this.state.intro,
+                    age : this.state.age,
                     prefecture : this.state.prefecture,
                     address : this.state.address,
                     birthday : this.state.birthday,
@@ -164,14 +179,19 @@ class New extends React.Component{
                     <div className='errorMsg'>
                         <p>{this.state.intro_error}</p>
                         <p>{this.state.address_error}</p>
+                        <p>{this.state.age_error}</p>
                     </div>
                     <div>
                         <label htmlFor='intro'>ひとこと</label>
-                        <textarea name='intro' className='intro' cols='40' rows='3' maxLength='60' onChange={this.handleChange} />
+                        <textarea name='intro' cols='40' rows='3' maxLength='60' onChange={this.handleChange} />
+                    </div>
+                    <div>
+                        <label htmlFor="age">年齢</label>
+                        <input type="number" name='age' onChange={this.handleChange} />
                     </div>
                     <div>
                         <label htmlFor='prefecture'>都道府県</label>
-                        <select name='prefecture' className='prefecture' onChange={this.handleChange}>
+                        <select name='prefecture' onChange={this.handleChange}>
                             <option value='' defaultValue>都道府県</option>
                             <option value='北海道'>北海道</option>
                             <option value='青森県'>青森県</option>
@@ -224,26 +244,26 @@ class New extends React.Component{
                     </div>
                     <div>
                         <label htmlFor='address'>住所</label>
-                        <input type='text' name='address' className='address' onChange={this.handleChange} />
+                        <input type='text' name='address' onChange={this.handleChange} />
                     </div>
                     <div>
                         <label htmlFor='birthday'>生年月日</label>
-                        <input type='date' name='birthday'  className='birthday' onChange={this.handleChange} />
+                        <input type='date' name='birthday' onChange={this.handleChange} />
                     </div>
                     <div>
                         <label htmlFor='belongings'>所属</label>
-                        <input type='radio' name='belongings' className='belongings' value='会社員' onChange={this.handleChange} />会社員
-                        <input type='radio' name='belongings' className='belongings' value='公務員' onChange={this.handleChange} />公務員
-                        <input type='radio' name='belongings' className='belongings' value='自営業' onChange={this.handleChange} />自営業
-                        <input type='radio' name='belongings' className='belongings' value='会社役員' onChange={this.handleChange} />会社役員
-                        <input type='radio' name='belongings' className='belongings' value='自由業' onChange={this.handleChange} />自由業
-                        <input type='radio' name='belongings' className='belongings' value='専業主婦' onChange={this.handleChange} />専業主婦
-                        <input type='radio' name='belongings' className='belongings' value='学生' onChange={this.handleChange} />学生
-                        <input type='radio' name='belongings' className='belongings' value='パート・アルバイト' onChange={this.handleChange} />パート・アルバイト
-                        <input type='radio' name='belongings' className='belongings' value='無職' onChange={this.handleChange} />無職
-                        <input type='radio' name='belongings' className='belongings' value='その他' onChange={this.handleChange} />その他
+                        <input type='radio' name='belongings' value='会社員' onChange={this.handleChange} />会社員
+                        <input type='radio' name='belongings' value='公務員' onChange={this.handleChange} />公務員
+                        <input type='radio' name='belongings' value='自営業' onChange={this.handleChange} />自営業
+                        <input type='radio' name='belongings' value='会社役員' onChange={this.handleChange} />会社役員
+                        <input type='radio' name='belongings' value='自由業' onChange={this.handleChange} />自由業
+                        <input type='radio' name='belongings' value='専業主婦' onChange={this.handleChange} />専業主婦
+                        <input type='radio' name='belongings' value='学生' onChange={this.handleChange} />学生
+                        <input type='radio' name='belongings' value='パート・アルバイト' onChange={this.handleChange} />パート・アルバイト
+                        <input type='radio' name='belongings' value='無職' onChange={this.handleChange} />無職
+                        <input type='radio' name='belongings' value='その他' onChange={this.handleChange} />その他
                     </div>
-                    <input type='submit' className='submit' value='送信' />
+                    <input type='submit' value='送信' />
                 </form>
             </div>
         )

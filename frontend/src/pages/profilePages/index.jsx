@@ -11,7 +11,7 @@ import NotFound from '../errorPages/notFound';
 function Profile(props) {
     return(
         <Switch>
-            <Route path={`${props.url}/:id`} exact={true} component={Id} />
+            <Route path={`${props.url}/account/:id`} exact={true} component={Id} />
             <Route path={`${props.url}/new`} exact={true} component={New} />
             <Route path={`${props.url}/edit`} exact={true} component={Edit} />
             <Route component={NotFound} />

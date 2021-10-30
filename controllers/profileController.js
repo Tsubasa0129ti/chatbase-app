@@ -4,6 +4,7 @@ var Profile = require("../models/profile");
 function getProfile(body) {
     return {
         intro : body.intro,
+        age : body.age,
         prefecture : body.prefecture,
         address : body.address,
         birthday : body.birthday,
@@ -118,15 +119,28 @@ module.exports = {
     id : (req,res,next) => {
         var userId = req.params.id;
         User.findById(userId)
-        .populate('profile')
-        .exec(function(err,user) {
-            if(err){
-                console.error(err.message);
+        .then((user) => {
+            if(user.profile){
+                User.findById(userId)
+                .populate('profile')
+                .exec((err,user) => {
+                    if(err){
+                        console.error(err.message);
+                    }
+                    res.json({
+                        result : 'success',
+                        user : user
+                    });
+                });
+            }else{
+                const username = user.name.first + ' ' + user.name.last;
+                res.json({
+                    result : 'Profile Not Exist',
+                    username : username
+                });
             }
-            res.json({
-                result : 'success',
-                user : user
-            });
+        }).catch((err) => {
+            console.error(err.message);
         })
     }
 }
