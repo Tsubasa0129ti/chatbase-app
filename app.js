@@ -7,19 +7,15 @@ const express = require("express"),
     cookieParser = require("cookie-parser"),
     bodyParser = require("body-parser"),
     uuid = require("uuid"), 
-    layouts = require("express-ejs-layouts"),
     createError = require("http-errors"),
     httpStatus = require("http-status-codes"),
     methodOverride = require("method-override"),
-    connectFlash = require("connect-flash"),
     passport = require("passport"),
     mongoose = require("mongoose"),
     MongoStore = require("connect-mongo");
     User = require("./models/user"),
     Chat = require("./models/chat"),
     Message = require("./models/message");
-
-const { decycle, encycle } = require('json-cyclic');
 
 /* rooting */
 const indexRoutes = require("./routes/index");
@@ -34,7 +30,6 @@ app.set("view engine","ejs");
 app.set(express.static(path.join(__dirname,"views")));
 
 app.use(logger("dev"));
-app.use(layouts);
 app.use(express.json());　//下記２行
 app.use(express.urlencoded({extended:false}));
 
@@ -88,8 +83,6 @@ const db = mongoose.connection;
 db.once("open",() => {
     console.log("DB接続完了！");
 });
-/* connect-flashの設定 */
-app.use(connectFlash());
 
 /* passportの設定 */
 app.use(passport.initialize());
@@ -100,7 +93,6 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use((req,res,next) => {
-    res.locals.flashMessages = req.flash();
     res.locals.loggedIn = req.isAuthenticated();
     
     var url = req.url;
@@ -121,7 +113,7 @@ app.use("/api",apiRoutes);
 
 app.use(function notFoundError(req,res,next){
     var url = req.url;
-    res.status(404).render("errors/404",{url:url});
+    res.status(404);
 });
 
 app.use(function(err,req,res,next){

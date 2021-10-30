@@ -28,18 +28,15 @@ module.exports = {
                 Chat.findOne({channelName:channelName})
                 .then(channel =>{
                     var id = channel._id;
-                    req.flash("success","チャンネル作成に成功しました。");
                     res.locals.redirect = `/chat/${id}`;
                     next();
                 }).catch(err => {
-                    req.flash("error","チャンネル作成に失敗しました。");
                     res.locals.status = 500;
                     res.locals.redirect = "/chat";
                     next(err);
                 });
             }else if(err){
                 if(err.name==="MongoError"){
-                    req.flash("error","このチャンネル名はすでに存在します。");
                     res.locals.redirect = "/chat";
                     next();
                 }
