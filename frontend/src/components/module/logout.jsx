@@ -12,23 +12,32 @@ class Logout extends React.Component{
 
     handleClick(e){
         e.preventDefault();
+        const error = new Error();
 
         fetch('/api/users/logout')
         .then((res) => {
             if(!res.ok){
-                console.log("サーバーエラー");
+                console.error('res.ok:',res.ok);
+                console.error('res.status:',res.status);
+                console.error('res.statusText:',res.statusText);
+
+                error.status = res.status;
+                error.message = res.statusText;
+                throw error;
             }
             return res.json();
         })
         .then((obj) => {
-            if(obj.result === "success"){
-                this.props.history.push({
-                    pathname : obj.redirectPath,
-                    state : {msg : 'ログアウトしました。'}
-                });
-            }
+            this.props.history.push({
+                pathname : obj.redirectPath,
+                state : {msg : 'ログアウトしました。'}
+            });
         }).catch((err) => {
-            console.error(err.message);
+            if(err.status >= 500){
+
+            }else{
+
+            }
         })
     }
 

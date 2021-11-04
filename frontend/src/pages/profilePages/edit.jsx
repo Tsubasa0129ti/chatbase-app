@@ -22,16 +22,28 @@ class Edit extends React.Component{
     }
 
     componentDidMount(){
-        //ここでやりたいことは、ログインチェックとプロフィールの有無の確認と、初期値の取得
+        const error = new Error();
+
         fetch('/api/profile/edit')
         .then((res) => {
             if(!res.ok){
-                console.error('server error');
+                console.error('res.ok:',res.ok);
+                console.error('res.status:',res.status);
+                console.error('res.statusText:',res.statusText);
+
+                error.status = res.status;
+                error.message = res.statusText;
+                throw error;
             }
             return res.json();
         })
         .then((obj) => {
-            if(obj.result === 'success'){
+            if(obj.notExist){
+                this.props.history.push({
+                    pathname : obj.redirectPath,
+                    state : {message : obj.result}
+                });
+            }else{
                 this.setState({
                     username : obj.username,
                     intro : obj.profile.intro,
@@ -41,19 +53,24 @@ class Edit extends React.Component{
                     birthday : obj.profile.birthday,
                     belongings : obj.profile.belongings
                 });
-            }else if(obj.result === 'Authentication Error'){
-                this.props.history.push({
-                    pathname : obj.redirectPath,
-                    state : {message : obj.result}
-                });
-            }else if(obj.result === 'Profile Not Exist'){
-                this.props.history.push({
-                    pathname : obj.redirectPath,
-                    state : {message : obj.result}
-                });
             }
         }).catch((err) => {
-            console.error(err.message);
+            if(err.status === 401){
+                this.props.history.push({
+                    pathname : '/users/login',
+                    state : {message : `${err.status} : ログインしてください。`}
+                });
+            }else if(err.status >= 500){
+                this.props.history.push({
+                    pathname : '/users/mypage',
+                    state : {message : `${err.status} : ${err.message}`}
+                });
+            }else{
+                this.props.history.push({
+                    pathname : '/users',
+                    state : {message : err.message}
+                });
+            }
         });
     }
 
@@ -122,6 +139,8 @@ class Edit extends React.Component{
                 message : 'エラーの修正をしてください。'
             });
         }else{
+            const error = new Error();
+
             fetch('/api/profile/update',{
                 method : 'PUT',
                 headers : {
@@ -139,24 +158,37 @@ class Edit extends React.Component{
             })
             .then((res) => {
                 if(!res.ok){
-                    console.error('server error');
+                    console.error('res.ok:',res.ok);
+                    console.error('res.status',res.status);
+                    console.error('res.statusText:',res.statusText);
+
+                    error.status = res.status;
+                    error.message = res.statusText;
+                    throw error;
                 }
                 return res.json();
             })
             .then((obj) => {
-                if(obj.result === 'success'){
+                this.props.history.push({
+                    pathname : obj.redirectPath,
+                    state : {message : 'プロフィールの更新に成功しました。'}
+                });
+            }).catch((err) => {
+                if(err.status === 401){
                     this.props.history.push({
-                        pathname : obj.redirectPath,
-                        state : {message : 'プロフィールの更新に成功しました。'}
+                        pathname : '/users/login',
+                        state : {message : `${err.status} : ログインしてください。`}
                     });
-                }else if(obj.result === 'Authentication Error'){
+                }else if(err.status >= 500){
+                    this.setState({
+                        message : `${err.status} : ${err.message}`
+                    });
+                }else{
                     this.props.history.push({
-                        pathname : obj.redirectPath,
-                        state : {message : obj.result}
+                        pathname : '/users/mypage',
+                        stete : {message : err.message}
                     });
                 }
-            }).catch((err) => {
-                console.error(err.message);
             });
         }
     }

@@ -14,22 +14,40 @@ class Login extends React.Component{
     }
 
     componentDidMount(){
+        const error = new Error();
+
         fetch('/api/users/previousCheck')
         .then((res) => {
             if(!res.ok){
-                console.error('サーバーエラー');
+                console.error('res.ok:',res.ok);
+                console.error('res. status:',res.status);
+                console.error('res.statusText:',res.statusText);
+
+                error.status = res.status;
+                error.message = res.statusText;
+                throw error;
             }
             return res.json();
         })
         .then((obj) => {
             if(obj.result === 'Authenticated'){
                 this.props.history.push({
-                    pathname : '/users/mypage',
+                    pathname : obj.redirectPath,
                     state : {message : 'You are already authenticated'}
                 });
             }
         }).catch((err) => {
-            console.error(err.message);
+            if(err.status){
+                this.props.history.push({
+                    pathname : '/users',
+                    state : {message : `${err.status} : ${err.message}`}
+                });
+            }else{
+                this.props.history.push({
+                    pathname : '/users',
+                    state : {message : err.message}
+                });
+            }
         });
 
         if(this.props.location.state){ //他のページからもらったエラーを取得
@@ -52,6 +70,8 @@ class Login extends React.Component{
     handleSubmit(e){
         e.preventDefault();
 
+        const error = new Error();
+
         fetch('/api/users/auth',{
             method : 'POST',
             headers : {
@@ -65,26 +85,40 @@ class Login extends React.Component{
         })
         .then((res) => {
             if(!res.ok){
-                console.error('サーバーエラー');
-                if(res.status === 400){
-                    this.setState({
-                        message : `${res.status} : ユーザー名もしくはパスワードを記入してください。`
-                    })
-                }else if(res.status === 401){
-                    this.setState({
-                        message : `${res.status} : ユーザー名もしくはパスワードが異なります。`
-                    });
-                }
+                console.error('res.ok:',res.ok);
+                console.error('res.status:',res.status);
+                console.error('res.statusText:',res.statusText);
+
+                error.status = res.status;
+                error.message = res.statusText;
+                throw error;
             }
             return res.json();
         })
         .then((obj) => {
-            if(obj.result === 'success'){
-                console.log(`data : ${obj.user}`);
-                this.props.history.push(obj.redirectPath);
-            }
+            this.props.history.push({
+                pathname : obj.redirectPath,
+                state : {message : 'ログイン成功しました。'}
+            });  
         }).catch((err) => {
-            console.error(`error : ${err.message}`);
+            if(err.status === 400){
+                this.setState({
+                    message : `${err.status} : ユーザー名もしくはパスワードを記入してください。`
+                });
+            }else if(err.status === 401){
+                this.setState({
+                    message : `${err.status} : ユーザー名もしくはパスワードが異なります。`
+                });
+            }else if(err.status >= 500){
+                this.setState({
+                    message : `${err.status} : ${err.message}`
+                });
+            }else{
+                this.props.history.push({
+                    pathname : '/users',
+                    state : {message : err.message}
+                });
+            }
         });
     }
 
@@ -110,5 +144,3 @@ class Login extends React.Component{
 }
 
 export default Login;
-
-//これに関する不足点　エラー処理（①fetchのサーバーエラーのメッセージ②catchによるエラー処理）

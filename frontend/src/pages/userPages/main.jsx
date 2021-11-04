@@ -10,6 +10,14 @@ class Index extends React.Component{
         }
     }
 
+    componentDidMount(){
+        if(this.props.location.state){ //他のページからもらったエラーを取得
+            this.setState({
+                message : this.props.location.state.message
+            });
+        }
+    }
+
     render(){
         return(
             <div>

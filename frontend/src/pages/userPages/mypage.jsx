@@ -12,27 +12,43 @@ class Mypage extends React.Component{
     }
 
     componentDidMount(){
+        const error = new Error(); //前もってエラーを呼び出す
+
         fetch('/api/users/mypage')
         .then((res) => {
             if(!res.ok){
-                console.error('サーバーエラー');
+                console.error('res.ok:',res.ok);
+                console.error('res.status:',res.status);
+                console.error('res.statusText:',res.statusText);
+
+                error.message = res.statusText;
+                error.status = res.status;
+                throw error;
             }
             return res.json();
         })
         .then((obj) => {
-            if(obj.result === 'success'){
-                this.setState({
-                    username : obj.username.first + obj.username.last
-                });
-            }else if(obj.result === 'Authentication Error'){
+            this.setState({
+                username : obj.username.first + obj.username.last
+            });
+        }).catch((err) => {//全てのエラーをここで受け取る　ただエラーメッセージが少し微妙そうなのでそこについて考える（もしくは自身で定義する）
+            if(err.status === 401){
                 this.props.history.push({
-                    pathname : obj.redirectPath,
-                    state : {message : obj.result}
+                    pathname : '/users/login',
+                    state : {message : `${err.status} : ログインしてください。`}
+                });
+            }else if(err.status >= 500){
+                this.props.history.push({
+                    pathname : '/users',
+                    state : {message : `${err.status} : ${err.message}`}
+                });
+            }else{
+                this.props.history.push({
+                    pathname : '/users',
+                    state : {message : err.message}
                 });
             }
-        }).catch((err) => {
-            console.error(err.message);
-        })
+        });
 
         if(this.props.location.state){
             this.setState({

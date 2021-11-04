@@ -19,11 +19,18 @@ class Account extends React.Component{
     }
 
     componentDidMount(){
+        const error = new Error();
+
         fetch('/api/users/mypage/show')
         .then((res) => {
             if(!res.ok){
-                //ここはサーバー内のエラーを受け取る
-                console.error('サーバーエラー');
+                console.error('res.ok:',res.ok);
+                console.error('res.status:',res.status);
+                console.error('res.statusText:',res.statusText);
+
+                error.status = res.status;
+                error.message = res.statusText;
+                throw error;
             }
             return res.json()
         })
@@ -38,7 +45,7 @@ class Account extends React.Component{
                     prefecture : obj.user.profile.prefecture,
                     address : obj.user.profile.address,
                     birthday : obj.user.profile.birthday,
-                    belongings : obj.user.profile.belongins
+                    belongings : obj.user.profile.belongings
                 });
             }else{
                 this.setState({
@@ -47,7 +54,22 @@ class Account extends React.Component{
                 });
             }
         }).catch((err) => {　//このcatchのエラーに関してはPromise rejectの場合に処理される
-            console.error(err.message);
+            if(err.status === 401){
+                this.props.history.push({
+                    pathname : '/users/login',
+                    state : {message : `${err.status} : ログインしてください。`}
+                });
+            }else if(err.status >= 500){
+                this.props.history.push({
+                    pathname : '/users/mypage',
+                    state : {message : `${err.status} : ${err.message}`}
+                });
+            }else{
+                this.props.history.push({
+                    pathname : '/users',
+                    state : {message : err.message}
+                });
+            }
         });
 
         if(this.props.location.state){
@@ -121,6 +143,3 @@ class Account extends React.Component{
 export default Account;
 
 //ここについての残り、UI
-//追記　10/25 fetchのサーバーエラーの出力をサーバーから受け取れるようにするかも（これに関しては、他のページも同様）
-//追記　10/28　一応headerにmessageの送信をしているけど、エラーなどのメッセージを出力する予定がなければ消しても良い
-//追記　10/30 profileの有無による分岐は完了、ついでにageの追加をした

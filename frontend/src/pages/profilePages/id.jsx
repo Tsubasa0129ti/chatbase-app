@@ -19,17 +19,28 @@ class Id extends React.Component{
         //ここではログインチェックは必要？一応他のユーザーへ向けた公開を想定している。
         const pathname = this.props.location.pathname;
         var id = pathname.split('/')[3];
-        console.log(id);
+
+        const error = new Error();
 
         fetch(`/api/profile/${id}`)
         .then((res) => {
             if(!res.ok){
-                console.error('server error');
+                console.error('res.ok:',res.ok);
+                console.error('res.status',res.status);
+                console.error('res.statusText:',res.statusText);
+
+                error.status = res.status;
+                error.message = res.statusText;
+                throw error;
             }
             return res.json();
         })
         .then((obj) => {
-            if(obj.result === 'success'){
+            if(obj.notExist){
+                this.setState({
+                    username : obj.username
+                });
+            }else{
                 this.setState({
                     username : obj.user.name.first + ' ' + obj.user.name.last,
                     intro : obj.user.profile.intro,
@@ -38,18 +49,24 @@ class Id extends React.Component{
                     birthday : obj.user.profile.birthday,
                     belongings : obj.user.profile.belongings
                 });
-            }else if(obj.result === 'Authentication Error'){
-                this.props.history.push({
-                    pathname : obj.redirectPath,
-                    state : {message : obj.result}
-                });
-            }else if(obj.result === 'Profile Not Exist'){
-                this.setState({
-                    username : obj.username
-                });
             }
         }).catch((err) => {
-            console.error(err.message);
+            if(err.status === 401){
+                this.props.history.push({
+                    pathname : '/users/login',
+                    state : {message : `${err.status} : ログインしてください。`}
+                });
+            }else if(err.status >= 500){
+                this.props.history.push({
+                    pathname : '/users/mypage',
+                    state : {message : `${err.status} : ${err.message}`}
+                })
+            }else{
+                this.props.history.push({
+                    pathname : '/users',
+                    stete : {message : err.message}
+                });
+            }
         });
     }
 

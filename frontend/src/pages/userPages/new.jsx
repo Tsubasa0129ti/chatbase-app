@@ -22,22 +22,40 @@ class New extends React.Component {
     }
 
     componentDidMount(){
+        const error = new Error();
+
         fetch('/api/users/previousCheck')
         .then((res) => {
             if(!res.ok){
-                console.error('サーバーエラー');
+                console.error('res.ok:',res.ok);
+                console.error('res. status:',res.status);
+                console.error('res.statusText:',res.statusText);
+
+                error.status = res.status;
+                error.message = res.statusText;
+                throw error;
             }
             return res.json();
         })
         .then((obj) => {
             if(obj.result === 'Authenticated'){
                 this.props.history.push({
-                    pathname : '/users/mypage',
+                    pathname : obj.redirectPath,
                     state : {message : 'You are already authenticated'}
                 });
             }
         }).catch((err) => {
-            console.error(err.message);
+            if(err.status){
+                this.props.history.push({
+                    pathname : '/users',
+                    state : {message : `${err.status} : ${err.message}`}
+                });
+            }else{
+                this.props.history.push({
+                    pathname : '/users',
+                    state : {message : err.message}
+                });
+            }
         });
     }
 
@@ -190,6 +208,8 @@ class New extends React.Component {
                 message : 'エラーの修正をしてください。'
             });
         }else{
+            const error = new Error();
+
             fetch('/api/users/create',{
                 method : 'POST',
                 headers : {
@@ -207,26 +227,32 @@ class New extends React.Component {
             })
             .then(res => {
                 if(!res.ok){
-                    console.error('サーバーエラー');
+                    console.error('res.ok:',res.ok);
+                    console.error('res.status:',res.status);
+                    console.error('res.statusText:',res.statusText);
 
-                    //サーバー内のエラーはここでの受け取りに変更する。
+                    error.status = res.status;
+                    error.message = res.statusText;
+                    throw new Error();
                 }
                 return res.json();
             })
             .then(obj => {
-                //このとき送信formの初期化 いやこの時もエラーの時はある。エラー情報の取得など
-                if(obj.result === 'success'){
-                    this.props.history.push({
-                        pathname : obj.redirectPath,
-                        state : {message : 'ユーザーの作成に成功しました。'}
+                this.props.history.push({
+                    pathname : obj.redirectPath,
+                    state : {message : 'ユーザーの作成に成功しました。'}
+                });
+            }).catch(err => {
+                if(err.status >= 500){
+                    this.setState({
+                        message : `${err.status} : ユーザーの作成に失敗しました。`
                     });
                 }else{
-                    console.error(obj.result);
+                    this.props.history.push({
+                        pathname : '/users',
+                        state : {message : err.message}
+                    });
                 }
-
-            }).catch(err => {
-                console.error(err.message);
-                //form情報の保持（自動かも）
             });
         }        
     }
@@ -273,5 +299,4 @@ class New extends React.Component {
 
 export default New;
 
-//この後やること　①validation(サーバーのみ)　②cookie ③エラー処理　④メッセージ機能
-//fetchのエラー分岐について
+//この後やること　①validation(サーバーのみ)　②cookie

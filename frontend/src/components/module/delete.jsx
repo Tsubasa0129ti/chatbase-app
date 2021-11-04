@@ -26,6 +26,8 @@ class Delete extends React.Component{
     }
 
     delete(){
+        const error = new Error();
+
         fetch(`/api/users/mypage/delete`,{
             method : 'DELETE',
             headers : {
@@ -35,25 +37,33 @@ class Delete extends React.Component{
         })
         .then((res) => {
             if(!res.ok){
-                console.log('サーバーエラー');
+                console.error('res.ok:',res.ok);
+                console.error('res.status:',res.status);
+                console.error('res.statusText:',res.statusText);
+
+                error.status = res.status;
+                error.message = res.statusText;
+                throw error;
             }
             return res.json();
         })
         .then((obj) => {
-            if(obj.result === 'success'){
+            this.props.history.push({
+                pathname : obj.redirectPath,
+                state : {message : 'アカウントの削除に成功しました。'}
+            });
+        }).catch((err) => {
+            if(err.status >= 500){
                 this.props.history.push({
-                    pathname : obj.redirectPath,
-                    msg : 'アカウントの削除が完了しました。'
+                    pathname : '/users/mypage',
+                    state : {message : `${err.status} : ${err.message}`}
                 });
-            }else if(obj.result === "error"){
-                console.error(obj.error);
+            }else{
                 this.props.history.push({
-                    pathname : obj.redirectPath,
-                    msg : obj.result
+                    pathname : '/users/mypage',
+                    state : {message : err.message}
                 });
             }
-        }).catch((err) => {
-            console.error(err.message);
         });
     }
 
@@ -63,11 +73,8 @@ class Delete extends React.Component{
                 <button　onClick={this.handleClick}>アカウントの削除</button>
                 <Modal show={this.state.show} clickButton={this.cancel.bind(this)} onEventCallback={this.delete.bind(this)} />
             </div>
-            
         )
     }
 }
 
 export default withRouter(Delete);
-
-//overrayも忘れないように

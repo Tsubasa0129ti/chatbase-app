@@ -13,14 +13,23 @@ class Header extends React.Component{
         this.state = {
             isLoggedIn : false,
             username : '',
+            message : ''
         }
     }
 
     componentDidMount(){
+        const error = new Error();
+
         fetch('/api/users/previousCheck')
         .then((res) => {
             if(!res.ok){
-                console.error('サーバーエラー');
+                console.error('res.ok:',res.ok);
+                console.error('res.status:',res.status);
+                console.error('res.statusText:',res.statusText);
+
+                error.status = res.status;
+                error.message = res.statusText;
+                throw error;
             }
             return res.json();
         })
@@ -32,28 +41,57 @@ class Header extends React.Component{
                 });
             }
         }).catch((err) => {
-            console.error(err.message);
+            if(err.status >= 500){
+                this.setState({
+                    message : `${err.status} : ${err.message}`
+                });
+            }else{
+                this.setState({
+                    message : err.message
+                });
+            }
         });
     }
 
+    componentDidUpdate(prevProps){ //これが読み込まれるタイミングは、propsを受け取ったタイミング。つまり初回からpropsをもっている
+        if(prevProps.message !== this.props.message){ //propsとstateの変化時に読み込まれてしまうため、条件を設けている
+            this.setState({
+                message : this.props.message
+            });
+        }  
+    }
+
     logout(){
-        console.log("loaded");
+        const error = new Error();
+
         fetch('/api/users/logout')
         .then((res) => {
             if(!res.ok){
-                console.error('サーバー内エラー');
+                console.error('res.ok:',res.ok);
+                console.error('res.status:',res.status);
+                console.error('res.statusText:',res.statusText);
+
+                error.status = res.status;
+                error.message = res.statusText;
+                throw error;
             }
             return res.json();
         })
         .then((obj) => {
-            if(obj.result === "success"){
-                this.props.history.push({
-                    pathname : obj.redirectPath,
-                    state : {message : 'ログアウトしました。'}
+            this.props.history.push({
+                pathname : obj.redirectPath,
+                state : {message : 'ログアウトしました。'}
+            });
+        }).catch((err) => {
+            if(err.status >= 500){
+                this.setState({
+                    message : `${err.status} : ${err.message}`
+                });
+            }else{
+                this.setState({
+                    message : err.message
                 });
             }
-        }).catch((err) => {
-            console.error(err.message);
         });
     }
 
@@ -84,7 +122,7 @@ class Header extends React.Component{
                         />
                     </div>
                     <div className='message'>
-                        <Message message={this.props.message}　/>
+                        <Message message={this.state.message}　/>
                     </div>
                 </div>
             </div>

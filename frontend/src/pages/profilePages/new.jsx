@@ -22,35 +22,49 @@ class New extends React.Component{
     }
 
     componentDidMount(){
-        //すでに作成されている場合には、detailへとリダイレクト
+        const error = new Error();
+
         fetch('/api/profile/new')
         .then((res) => {
             if(!res.ok){
-                console.error('server error');
+                console.error('res.ok:',res.ok);
+                console.error('res.status:',res.status);
+                console.error('res.statusText:',res.statusText);
+
+                error.status = res.status;
+                error.message = res.statusText;
+                throw error;
             }
             return res.json();
         })
         .then((obj) => {
-            if(obj.result === 'success'){
-                //ページの続行
+            if(obj.exist){
+                this.props.history.push({
+                    pathname : obj.redirectPath,
+                    state : {message : 'Profileは作成済みです。'}
+                });
+            }else{
                 this.setState({
                     username : obj.username
                 });
-            }else if(obj.result === 'Authentication Error'){
-                this.props.history.push({
-                    pathname : obj.redirectPath,
-                    state : {message : obj.result}
-                });
-            }else if(obj.result === 'Profile Exist'){
-                this.props.history.push({
-                    pathname : obj.redirectPath,
-                    state : {message : obj.result}
-                });
-            }else{
-                //ここにエラー処理を追加するかも（多分来ないけど）
             }
         }).catch((err) => {
-            console.error(err.message);
+            if(err.status === 401){
+                this.props.history.push({
+                    pathname : '/users/login',
+                    state : {message : `${err.status} : ログインしてください。`}
+                });
+            }else if(err.status >= 500){
+                this.props.history.push({
+                    pathname : '/users/mypage',
+                    state : {message : `${err.status} : ${err.message}`}
+                });
+            }else{
+                this.props.history.push({
+                    pathname : '/users/mypage',
+                    state : {message : err.message}
+                });
+            }
         });
 
         if(this.props.location.state){
@@ -124,6 +138,8 @@ class New extends React.Component{
                 message : 'エラーを修正してください。'
             });
         }else{
+            const error = new Error();
+
             fetch('/api/profile/create',{
                 method : 'POST',
                 headers : {
@@ -141,33 +157,46 @@ class New extends React.Component{
             })
             .then((res) => {
                 if(!res.ok){
-                    console.error('server error'); //サーバー側のエラーに関してはここに流される
+                    console.error('res.ok:',res.ok);
+                    console.error('res.status:',res.status);
+                    console.error('res.statusText:',res.statusText);
+
+                    error.status = res.status;
+                    error.message = res.statusText;
+                    throw error;
                 }
                 return res.json();
             })
-            .then((obj) => {//ここでのエラーは定義したエラーに関してのはず
-                if(obj.result === 'success'){
+            .then((obj) => {
+                if(obj.exist){
+                    this.props.history.push({
+                        pathname : obj.redirectPath,
+                        state : {message : 'Profileは作成済みです。'}
+                    });
+                }else{
                     this.props.history.push({
                         pathname : obj.redirectPath,
                         state : {message : 'プロフィールの作成に成功しました。'}
                     });
-                }else if(obj.result === 'Authentication Error'){
-                    this.props.history.push({
-                        pathname : obj.redirectPath,
-                        state : {message : obj.result}
-                    });
-                }else if(obj.result === 'Profile Create Error'){//これに関しては、res.okでの受け取りかもしれない
-                    this.props.history.push({
-                        pathname : obj.redirectPath,
-                        state : {message : obj.result}
-                    });
                 }
             }).catch((err) => {
-                console.error(err.message);
+                if(err.status === 401){
+                    this.props.history.push({
+                        pathname : '/users/login',
+                        state : {message : `${err.status} : ログインしてください。`}
+                    });
+                }else if(err.status >= 500){
+                    this.setState({
+                        message : `${err.status} : ${err.message}`
+                    });
+                }else{
+                    this.props.history.push({
+                        pathname : '/users/mypage',
+                        state : {message : err.message}
+                    });
+                }
             });
         }
-
-        
     }
 
     render(){

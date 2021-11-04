@@ -16,37 +16,43 @@ class Edit extends React.Component{
     }
 
     componentDidMount(){
+        const error = new Error();
+
         fetch('/api/users/mypage/edit')
         .then((res) => {
             if(!res.ok){
-                console.error('サーバーエラ〜');
+                console.error('res.ok:',res.ok);
+                console.error('res.status:',res.status);
+                console.error('res.statusText:',res.statusText);
+
+                error.status = res.status;
+                error.message = res.statusText;
+                throw error;
             }
             return res.json();
         })
         .then((obj) => {
-            if(obj.result === 'success'){
-                this.setState({
-                    first : obj.name.first,
-                    last : obj.name.last
-                });
-            }else if(obj.result === 'Authentication Error'){ //これredirectPathは？
+            this.setState({
+                first : obj.name.first,
+                last : obj.name.last
+            });
+        }).catch((err) => {
+            if(err.status === 401){
                 this.props.history.push({
                     pathname : '/users/login',
-                    state : {message : obj.result}
+                    state : {message : `${err.status} : ログインしてください。`}
                 });
-            }else if(obj.result === 'Error'){
-                console.error(obj.error);
+            }else if(err.status >= 500){
                 this.props.history.push({
-                    pathname : obj.redirectPath,
-                    state : {message : obj.result}
+                    pathname : '/users/mypage',
+                    state : {message : `${err.status} : ${err.message}`}
+                });
+            }else{
+                this.props.history.push({
+                    pathname : '/users',
+                    state : {message : err.message}
                 });
             }
-        }).catch((err) => {
-            console.error(err.message);
-            this.props.history.push({
-                pathname : '/users/mypage',
-                state : {message : 'fetch error at /users/mypage/edit'}
-            });
         });
 
         if(this.props.location.state){
@@ -118,6 +124,8 @@ class Edit extends React.Component{
                 message : 'エラーの修正をしてください。'
             })
         }else{
+            const error = new Error();
+
             fetch('/api/users/mypage/update',{　
                 method : 'PUT',
                 headers : {
@@ -133,41 +141,42 @@ class Edit extends React.Component{
             })
             .then((res) => {
                 if(!res.ok){
-                    console.error('サーバーエラー');
+                    console.error('res.ok:',res.ok);
+                    console.error('res.status:',res.status);
+                    console.error('res.statusText:',res.statusText);
+
+                    error.message = res.statusText;
+                    error.status = res.status;
+                    throw error;
                 }
                 return res.json();
             })
             .then((obj) => {
-                if(obj.result === 'success'){
-                    this.setState({
-                        message : ''
-                    });
-                    this.props.history.push({
-                        pathname : '/users/mypage',
-                        state : {message : 'アカウントの変更をしました。'}
-                    });
-                }else if(obj.result === 'Authentication Error'){
+                this.setState({
+                    message : ''
+                });
+                this.props.history.push({
+                    pathname : obj.redirectPath,
+                    state : {message : 'アカウントの変更をしました。'}
+                });
+            }).catch((err) => {
+                if(err.status === 401){
                     this.props.history.push({
                         pathname : '/users/login',
-                        state : {message : obj.result}
+                        state : {message : `${err.status} : ログインしてください。`}
                     });
-                }else if(obj.result === 'Update Error'){
-                    console.error(obj.error);
+                }else if(err.status >= 500){
+                    this.setState({
+                        message : `${err.status} : ${err.message}`
+                    });
+                }else{
                     this.props.history.push({
-                        pathname : '/users/mypage/edit',
-                        state : {message : 'User Update Error'}
+                        pathname : '/users/mypage',
+                        state : {message : err.message}
                     });
                 }
-            }).catch((err) => {
-                console.error(err.message); //このエラー処理に関しては未定
-                this.props.history.push({
-                    pathname : '/users/mypage/edit',
-                    state : {message : 'Error'}
-                });
             });
         }
-
-        
     }
     
     render(){
@@ -197,5 +206,4 @@ class Edit extends React.Component{
 
 export default Edit;
 
-//これに関する不足点　①サーバー全般　②バリデーション機能(フロント部分は完了)　③その他のエラーに関するチェックがまだ
-//追記　①fetch関係のエラー処理
+//これに関する不足点　①サーバー全般　②バリデーション機能(フロント部分は完了)
