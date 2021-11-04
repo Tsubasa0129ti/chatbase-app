@@ -8,7 +8,6 @@ const express = require("express"),
     bodyParser = require("body-parser"),
     uuid = require("uuid"), 
     createError = require("http-errors"),
-    httpStatus = require("http-status-codes"),
     methodOverride = require("method-override"),
     passport = require("passport"),
     mongoose = require("mongoose"),
@@ -112,62 +111,16 @@ app.use("/api",apiRoutes);
 //app.use(errorRoutes);
 
 app.use(function notFoundError(req,res,next){
-    var url = req.url;
     res.status(404);
 });
 
-app.use(function(err,req,res,next){
+app.use(function errorHandler(err,req,res,next){
     console.log(err.stack);
-    next(err);
-});
-
-app.use(function customError(err,req,res,next) {
-    var statusCode = res.locals.status;
-    
-    if(!statusCode){
-        internalServerError(err,req,res,next);
-    }else{
-        switch(statusCode){
-            case 400 :
-                createError(400,"送信されたデータが無効です。");
-                break;
-            case 401 :
-                Unauthorized(err,req,res,next);
-                break;
-            case 403 : 
-                Forbidden(err,req,res,next);
-                break;
-
-            case 500 || undefined :
-                internalServerError(err,req,res,next);
-                break;
-        }
-    }
-});
-
-function internalServerError(err,req,res,next){
-    console.log(`internalServerError:${err}`);
-    var redirectPath = res.locals.redirect;
-    if(!redirectPath){
-        res.status(500).send(err);
-        //ここに関しては、500.ejsに繋げる　そして、そこで元に戻る画面と、エラー詳細の記載などをつける
-        /* res.status(500).render("errors/500",{
-            err : err,
-            status : 500
-        }); */
-    }else{
-        res.status(500).redirect(redirectPath);
-    }
-};
-
-function Unauthorized(err,req,res,next){
-    console.log(`error:${err}`);
-    res.json({
-        result : err,
-        redirectPath : "/users/login"
+    res.status(err.status||500).json({
+        status : err.status,
+        error : err
     });
-};
-
+});
 
 /* サーバーの起動 */
 const PORT = process.env.PORT || 3001

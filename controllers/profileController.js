@@ -20,7 +20,7 @@ module.exports = {
             next();
         }else{
             res.json({
-                result : 'Profile Exist',
+                exist : true,
                 redirectPath : '/users/mypage/show'
             });
         }
@@ -28,7 +28,6 @@ module.exports = {
     new : (req,res) => {
         var username = res.locals.username;
         res.json({
-            result : 'success',
             username : username
         });
     },
@@ -45,23 +44,14 @@ module.exports = {
             })
             .then(() => {
                 res.json({
-                    result : 'success',
                     redirectPath : '/users/mypage'
                 });
             })
-            .catch((err) => { //下記二つのエラー処理は一旦飛ばす。最終的には、ステータスコードをもとに!res.ok内部でのエラー処理に移植する
-                //user編集をする際のエラー
-                res.locals.redirect = "/users/mypage/profile";
-                res.locals.status = 500;
-                console.log(err.message);
+            .catch((err) => {
                 next(err);
             });
         })
         .catch(err => {
-            //profile作成のエラー
-            res.locals.redirect = "/users/mypage/profile";
-            res.locals.status = 500;
-            console.log(err.message);
             next(err);
         });
         
@@ -72,7 +62,7 @@ module.exports = {
             next();
         }else{
             res.json({
-                result : 'Profile Not Exist',
+                notExist : true,
                 redirectPath : '/profile/new'
             });
         }
@@ -82,17 +72,12 @@ module.exports = {
         User.findById(currentUser._id)
         .populate("profile")
         .exec(function(err,user){
-            if(err){ //ここのエラー処理は未完
-                res.json({
-                    result : 'error',
-                    redirectPath : '/profile/edit'
-                });
+            if(err){
+                next(err);
             }
             const username = user.name.first + ' ' + user.name.last;
             const profile = user.profile
-            console.log(profile);
             res.json({
-                result : 'success',
                 username : username,
                 profile : profile
             });
@@ -106,14 +91,10 @@ module.exports = {
             $set : profileParams
         }).then(profile => {
             res.json({
-                result : 'success',
                 redirectPath : '/users/mypage'
             });
         }).catch(err => {
-            res.json({
-                result : 'error',
-                redirectPath : '/profile/edit'
-            });
+            next(err);
         });
     },
     id : (req,res,next) => {
@@ -125,22 +106,21 @@ module.exports = {
                 .populate('profile')
                 .exec((err,user) => {
                     if(err){
-                        console.error(err.message);
+                        next(err);
                     }
                     res.json({
-                        result : 'success',
                         user : user
                     });
                 });
             }else{
                 const username = user.name.first + ' ' + user.name.last;
                 res.json({
-                    result : 'Profile Not Exist',
+                    notExist : true,
                     username : username
                 });
             }
         }).catch((err) => {
-            console.error(err.message);
+            next(err);
         })
     }
 }

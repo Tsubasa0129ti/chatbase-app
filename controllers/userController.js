@@ -6,20 +6,124 @@ const User = require("../models/user"),
 //リダイレクトなどのような、ページ変換の際のパスの変更とレンダリングをなくしてデータの送信のみを行う
 
 module.exports = {
+    preLoginCheck : (req,res) => {
+        if(req.isAuthenticated()){//ただのリダイレクトで十分
+            var user = req.user;
+            const username = user.name.first + ' ' + user.name.last;
+            res.json({
+                result : "Authenticated",
+                username : username,
+                redirectPath : "/users/mypage",
+            });
+        }else{
+           res.json('success'); 
+        }  
+    },
     create : (req,res,next) => {
         var newUser = new User(req.body);
         User.register(newUser,req.body.password,(err,user) => {
-            if(user) {
+            if(err){
+                return next(err);
+            }else if(user){
                 res.json({
-                    redirectPath : "/users/login",
-                    result : "success"
+                    redirectPath : '/users/login'
                 });
-            }else if(err){
-                console.log(err.message);
-
-                //多分ここでのエラーが出力されるのだが、正確にはエラー形式にしていないため、これをサーバー内のエラーとして認識していない。例えば、サーバー内でのエラーにしてしまう
-                next(err);
-            }
+            } 
+        });
+    },
+    auth : (req,res) => {
+        res.json({
+            redirectPath : "/users/mypage",
+        });
+    },
+    logout : (req,res) => { //delete演算子
+        req.logout();
+        delete req.session.passport
+        delete req.session.currentUser
+        res.json({
+            redirectPath : '/',
+        });
+    },
+    loginCheck : (req,res,next) => {
+        if(req.isAuthenticated()){
+            next();
+        }else{
+            var err = new createError.Unauthorized('please login to view this pages');
+            next(err);
+        }
+    },
+    mypageView : (req,res) => {
+        res.json({
+            username : req.user.name
+        });
+    },
+    show : (req,res) => {
+        var user = req.user;
+        if(user.profile === undefined){
+            User.findById(user._id)
+            .then((user) => {
+                res.json({
+                    profileExist : false,
+                    user : user
+                });
+            }).catch((err) => {
+                return next(err);
+            });
+        }else{
+            User.findById(user._id)
+            .populate("profile")
+            .exec((err,user) => {
+                if(err){
+                    return next(err);
+                }
+                res.json({
+                    profileExist : true,
+                    user : user
+                });
+            });
+        }
+    },
+    edit : (req,res) => {
+        var currentUser = req.user;
+        User.findById(currentUser._id)
+        .then(user => {
+            res.json({
+                name : user.name
+            });
+        }).catch(err => {
+            next(err);
+        });
+    },
+    update : (req,res) => {
+        var currentUser = req.user;
+        User.findByIdAndUpdate(currentUser._id,{
+            $set : req.body
+        }).then(user=> {
+            res.json({
+                redirectPath : "/users/mypage"
+            });
+        }).catch(err =>{
+            next(err)
+        });
+    },
+    delete : (req,res,next) => {
+        var userId = req.user._id;     
+        User.findByIdAndDelete(userId)
+        .then(() => {
+            next();
+        }).catch(err => {
+            next(err);
+        });
+    },
+    profileDelete : (req,res) => {
+        var profileId = req.user.profile;
+        Profile.findByIdAndDelete(profileId)
+        .then(() => {
+            res.json({
+                redirectPath : '/'
+            });
+        }).catch(err => {
+            next(err);
         });
     },
     cookie : (req,res,next) => { //現時点で未使用
@@ -48,21 +152,6 @@ module.exports = {
         }
         next();
     },
-    redirectView : (req,res,next) => { //これ消せるかも（Chat無くしたら）
-        var redirectPath = res.locals.redirect;
-        if(redirectPath) {
-            res.redirect(redirectPath);
-        }else{
-            next();
-        }
-    },
-    auth : (req,res) => {
-        res.json({
-            result : "success",
-            redirectPath : "/users/mypage",
-            user : req.user
-        });
-    },
     regenerateSessionId : (req,res,next) => {//現時点で未使用
         var sessions = {};
         for(var key in req.session){
@@ -78,141 +167,12 @@ module.exports = {
             res.redirect("/users/mypage");
         })
     },
-    loginCheck : (req,res,next) => {
-        if(req.isAuthenticated()){
+    redirectView : (req,res,next) => { //これ消せるかも（Chat無くしたら）
+        var redirectPath = res.locals.redirect;
+        if(redirectPath) {
+            res.redirect(redirectPath);
+        }else{
             next();
-        }else{
-            res.json({
-                result : "Authentication Error",
-                redirectPath : "/users/login"
-            });
         }
     },
-    preLoginCheck : (req,res) => {
-        if(req.isAuthenticated()){
-            var user = req.user;
-            var username = user.name.first + ' ' +  user.name.last
-            res.json({
-                result : "Authenticated",
-                redirectPath : "/users/mypage",
-                username : username
-            });
-        }else{
-            res.json({
-                result : "success"
-            });
-        }
-    },
-    logout : (req,res) => { //delete演算子
-        req.logout();
-        delete req.session.passport
-        delete req.session.currentUser
-        res.json({
-            redirectPath : '/',
-            result : "success"
-        });
-    },
-    mypageView : (req,res) => {
-        res.json({
-            result : "success",
-            username : req.user.name
-        });
-    },
-    show : (req,res) => {
-        var user = req.user;
-        if(user.profile === undefined){
-            User.findById(user._id)
-            .then((user) => {
-                res.json({
-                    profileExist : false,
-                    user : user
-                });
-            }).catch((err) => {
-                //ここは後で作る
-                res.json({
-                    result : 'Error',
-                    redirectPath : '/users/mypage'
-                });
-            });
-        }else{
-            User.findById(user._id)
-            .populate("profile")
-            .exec((err,user) => {
-                if(err){
-                    res.json({
-                        result : "Error",
-                        error : err.message,
-                        redirectPath : "/users/mypage"
-                    });
-                }else{
-                    res.json({
-                        profileExist : true,
-                        user : user
-                    });
-                }
-            });
-        }
-    },
-    edit : (req,res) => {
-        var currentUser = req.user;
-        User.findById(currentUser._id)
-        .then(user => {
-            res.json({
-                result : "success",
-                name : user.name
-            });
-        }).catch(err => {　//ここにおけるエラーの分岐もする必要があるのではないか（現状は、検索エラーのみを考慮に入れているが他のエラーについては不明）
-            res.json({
-                result : "Error",
-                error : err.message,
-                redirectPath : "/users/mypage"
-            });
-        });
-    },
-    update : (req,res) => {
-        var currentUser = req.user;
-        User.findByIdAndUpdate(currentUser._id,{
-            $set : req.body
-        }).then(user=> {
-            res.json({
-                result : "success",
-                redirectPath : "/users/mypage"
-            });
-        }).catch(err =>{
-            res.json({
-                result : "Update Error",
-                error : err.message,
-                redirectPath : "/users/mypage/edit",
-            });
-        });
-    },
-    delete : (req,res,next) => {　　//詳細アカウントの作成をした場合、同時にこちらから消せるように設定する
-        var userId = req.user._id;     
-        User.findByIdAndDelete(userId)
-        .then(() => {
-            next();
-        }).catch(err => {
-            res.json({
-                result : error,
-                error : err,
-                redirectpath : '/users/mypage'
-            })
-        });
-    },
-    profileDelete : (req,res) => {
-        var profileId = req.user.profile;
-        Profile.findByIdAndDelete(profileId)
-        .then(() => {
-            res.json({
-                result : 'success',
-                redirectPath : '/'
-            });
-        }).catch(err => {
-            res.json({
-                result : error,
-                error : err,
-                redirectpath : '/users/mypage'
-            });
-        });
-    }
 }
