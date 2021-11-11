@@ -1,6 +1,7 @@
 /* モジュールの読み込み */
 const express = require("express"),
     http = require("http"),
+    helmet = require("helmet"),
     path = require("path"),
     logger = require("morgan"),  
     session = require("express-session"),　
@@ -23,6 +24,7 @@ var apiRoutes = require("./routes/apiRouter");
 
 /* appの指定 */
 var app = express();
+app.use(helmet());
 
 /* モジュールの使用 */
 app.set("view engine","ejs");
@@ -48,10 +50,13 @@ var sessionMiddleware = session({
     secret : "keyboard cat",
     resave : false,
     saveUninitialized : false,
+    rolling : false,
     cookie : {
-        maxAge : 60 * 60 * 1000
+        maxAge : 60 * 60 * 1000,
         //secure : true 本番環境での有効化をする これ分岐によって実現したい
+        //expires : new Date(Date.now() + 30 * 1000)
     },
+    name : '__session',
     store : MongoStore.create({
         mongoUrl : "mongodb://localhost:27017/chatAppDB"
     }),

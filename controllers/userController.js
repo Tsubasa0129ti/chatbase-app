@@ -3,11 +3,9 @@ const User = require("../models/user"),
     passport = require("passport"),
     createError = require("http-errors");
 
-//リダイレクトなどのような、ページ変換の際のパスの変更とレンダリングをなくしてデータの送信のみを行う
-
 module.exports = {
     preLoginCheck : (req,res) => {
-        if(req.isAuthenticated()){//ただのリダイレクトで十分
+        if(req.isAuthenticated()){
             var user = req.user;
             const username = user.name.first + ' ' + user.name.last;
             res.json({
@@ -31,15 +29,36 @@ module.exports = {
             } 
         });
     },
-    auth : (req,res) => {
-        res.json({
-            redirectPath : "/users/mypage",
+    auth : (req,res,next) => {
+        next();
+    },
+    regenerateSessionId : (req,res,next) => {
+        var sessions = {};
+        for(var key in req.session){
+            sessions[key] = req.session[key];
+        }
+        req.session.regenerate(function(err){
+            if(err){
+                next(err);
+            }
+            for(var key in sessions){
+                req.session[key] = sessions[key];
+            }
+            
+            User.findOne({email : req.session.passport.user})
+            .then((user) => {
+                req.session.currentUser = user;
+                res.json({
+                    redirectPath : '/users/mypage'
+                });
+            }).catch((err) => {
+                next(err);
+            })
         });
     },
-    logout : (req,res) => { //delete演算子
+    logout : (req,res) => {
         req.logout();
-        delete req.session.passport
-        delete req.session.currentUser
+        req.session.destroy();
         res.json({
             redirectPath : '/',
         });
@@ -125,47 +144,6 @@ module.exports = {
         }).catch(err => {
             next(err);
         });
-    },
-    cookie : (req,res,next) => { //現時点で未使用
-        var success = res.locals.result;
-        if(success){
-            //cookieの削除 複数の削除の方法は不明
-            res.clearCookie("first",{path:"/users/new"});
-            /* res.clearCookie("last",{path:"/users/new"});
-            res.clearCookie("email",{path:"/users/new"});
-            res.clearCookie("age",{path:"/users/new"});
-            res.redirect("/users",{path:"/users/new"}); */
-            res.locals.redirect = "/users";
-        }else{
-            //cookieの作成 arrayに関してはオブジェクトからの変換をどうにかしたい
-            var newUser = res.locals.user;
-            var array = [
-                ["first",`${newUser.name.first}`],["last",`${newUser.name.last}`],["email",`${newUser.email}`],["age",`${newUser.age}`]
-            ];
-            for(var i=0;i<array.length;i++){
-                res.cookie(`${array[i][0]}`,array[i][1],{
-                    path  : "/users/new",
-                    maxAge : 60*60*1000
-                });
-            }
-            res.locals.redirect = "/users/new";
-        }
-        next();
-    },
-    regenerateSessionId : (req,res,next) => {//現時点で未使用
-        var sessions = {};
-        for(var key in req.session){
-            sessions[key] = req.session[key];
-        }
-        req.session.regenerate(function(err){
-            if(err){
-                console.log(err.message);
-            }
-            for(var key in sessions){
-                req.session[key] = sessions[key];
-            }
-            res.redirect("/users/mypage");
-        })
     },
     redirectView : (req,res,next) => { //これ消せるかも（Chat無くしたら）
         var redirectPath = res.locals.redirect;
