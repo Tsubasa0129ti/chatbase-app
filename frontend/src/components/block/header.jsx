@@ -6,7 +6,6 @@ import Navigation from '../atoms/navigation';
 import Title from '../atoms/title';
 import Status from '../atoms/status';
 import Message from '../atoms/message';
-import Session from '../atoms/session';
 
 class Header extends React.Component{
     constructor(props){
@@ -14,7 +13,7 @@ class Header extends React.Component{
         this.state = {
             isLoggedIn : false,
             username : '',
-            message : ''
+            message : '',
         }
     }
 
@@ -96,49 +95,6 @@ class Header extends React.Component{
         });
     }
 
-    extend(){
-        console.log("延長");
-        const error = new Error();
-
-        fetch('/api/users/session')
-        .then((res) => {
-            if(!res.ok){
-                console.error('res.ok:',res.ok);
-                console.error('res.status:',res.status);
-                console.error('res.statusText:',res.statusText);
-
-                error.status = res.status;
-                error.message = res.statusText;
-                throw error;
-            }
-        })
-        .then((obj) => {
-            //同時にcookieの延長ができない？　ここもしくは、サーバー内で実行する
-        
-
-
-            console.log(obj.session);
-            this.setState({
-                message : 'セッションの延長に成功しました。'
-            });
-        }).catch((err) => {
-            if(err.status === 401){
-                this.props.history.push({
-                    pathname : '/users/login',
-                    state : {message : `${err.status} : ログインしてください。`}
-                });
-            }else if(err.status >= 500){
-                this.setState({
-                    message : `${err.status} : ${err.message}`
-                });
-            }else{
-                this.setState({
-                    message : `${err.status} : ${err.message}`
-                });
-            }
-        });
-    }
-
     render(){
         return(
             <div className='header'>
@@ -163,13 +119,6 @@ class Header extends React.Component{
                         <Status 
                             isLoggedIn={this.state.isLoggedIn} 
                             username={this.state.username} 
-                        />
-                    </div>
-                    <div className='session'>
-                        <Session 
-                            isLoggedIn ={this.state.isLoggedIn}
-                            expires={this.state.expires}
-                            extend={this.extend.bind(this)}
                         />
                     </div>
                     <div className='message'>

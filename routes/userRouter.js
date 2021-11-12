@@ -22,17 +22,4 @@ router.put("/mypage/update",userControllers.loginCheck,userControllers.update);
 
 router.delete("/mypage/delete",userControllers.delete,userControllers.profileDelete);
 
-router.get('/session',(req,res,next) => {
-    /* req.session.touch();
-    console.log(`expires3 : ${req.session.cookie.expires}`); */
-
-    var time = 30*1000
-    req.session.cookie.maxAge = time;
-
-    res.json({
-        session : req.session
-    });
-    
-})
-
 module.exports = router;
