@@ -2,6 +2,8 @@ import React from 'react';
 import {Link} from 'react-router-dom';
 import Header from '../../components/block/header';
 
+import '../../styles/layouts/users/mypage.scss';
+
 class Mypage extends React.Component{
     constructor(props){
         super(props);
