@@ -1,6 +1,6 @@
 function Title(){
     return(
-        <h2>Chat App</h2>
+        <h2>React Chat</h2>
     )
 }
 

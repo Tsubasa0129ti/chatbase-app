@@ -1,6 +1,8 @@
 import React from 'react'
 import Header from '../../components/block/header';
 
+import '../../styles/layouts/users/new.scss';
+
 class New extends React.Component {
     constructor(props){
         super(props);
@@ -261,7 +263,7 @@ class New extends React.Component {
         return(
             <div>
                 <Header message={this.state.message} />
-                <form　onSubmit={this.handleSubmit} method='POST'>
+                <form　className='create_form' onSubmit={this.handleSubmit} method='POST'>
                     <h3>ユーザー作成ページ</h3>
                     <div className='errorMsg'>
                         <p>{this.state.first_error}</p>
@@ -270,27 +272,27 @@ class New extends React.Component {
                         <p>{this.state.password_error}</p>
                         <p>{this.state.passCheck_error}</p>
                     </div>
-                    <div>
+                    <div className='firstName'>
                         <label htmlFor='firstName'>First Name</label>
                         <input type='text' name='first' required onChange={this.handleChange} />
                     </div>
-                    <div>
+                    <div className='lastName'>
                         <label htmlFor='lastName'>Last Name</label>
                         <input type='text' name='last' required onChange={this.handleChange} />
                     </div>
-                    <div>
+                    <div className='email'>
                         <label htmlFor='email'>Email</label> 
                         <input type='email' name='email' required onChange={this.handleChange} />               
                     </div>
-                    <div>
+                    <div className='password'>
                         <label htmlFor='password'>Password</label>
                         <input type='password' name='password' required onChange={this.handleChange} />
                     </div>
-                    <div>
+                    <div className='passCheck'>
                         <label htmlFor='passCheck'>Password Confirm</label>
                         <input type='password' name='passCheck' onChange={this.handleChange} />
                     </div>
-                    <input type='submit' value='送信' />
+                    <input type='submit' className='submit' value='送信' />
                 </form>
             </div>
         )
@@ -299,4 +301,4 @@ class New extends React.Component {
 
 export default New;
 
-//この後やること　①validation(サーバーのみ)　②cookie
+//この後やること　①validation(サーバーのみ)

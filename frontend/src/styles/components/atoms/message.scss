@@ -1,0 +1,17 @@
+
+
+.message_box {
+    position: fixed;
+    border: 1px solid black;
+    width: 60%;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    margin: 0 20%;
+
+   .message {
+       font-weight: bolder;
+       color: red;
+       margin: 0 auto;
+   }
+}

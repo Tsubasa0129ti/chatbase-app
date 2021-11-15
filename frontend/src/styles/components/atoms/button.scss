@@ -1,0 +1,21 @@
+.button {
+    //ここに関してはボタンの一般的な設定を盛り込む
+    border-radius: 30px;
+}
+
+.log_button {
+    //ここには、ログインボタン特有の設定を入れる
+    height: 30px;
+    width: 130px;
+    margin: 10px 20px 0 20px;
+
+    color: black;
+    background-color: rgb(164,216,215);
+    text-decoration: none;
+
+
+    &:hover {
+        transition-duration: .3s;
+        opacity: 0.7;
+    }
+}

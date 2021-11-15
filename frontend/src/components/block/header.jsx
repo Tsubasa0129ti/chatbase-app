@@ -7,6 +7,8 @@ import Title from '../atoms/title';
 import Status from '../atoms/status';
 import Message from '../atoms/message';
 
+import '../../styles/components/block/header.scss';
+
 class Header extends React.Component{
     constructor(props){
         super(props);
@@ -98,33 +100,37 @@ class Header extends React.Component{
     render(){
         return(
             <div className='header'>
-                <div className='header-top'>
-                    <div className='title'><Title /></div>
-                    <div className='navigation'>
-                        <Navigation to='/' name='Home' />
-                        <Navigation to='/users' name='Account' />
-                        <Navigation to='/profile' name='Profile' />
-                        <Navigation to='/chat' name='Chat' />
+                <div className='in_header box'>
+                    <div className='header-top'>
+                        <div className='header-left'>
+                            <Title />
+                        </div>
+                        <div className='header-right'>
+                            <div className='navigation'>
+                                <Navigation to='/' name='Home' />
+                                <Navigation to='/users' name='Account' />
+                                <Navigation to='/profile' name='Profile' />
+                                <Navigation to='/chat' name='Chat' />
+                            </div>
+                            <div className='log'>
+                                <Log 
+                                    isLoggedIn={this.state.isLoggedIn} 
+                                    login={() => {this.props.history.push('/users/login')}} 
+                                    logout={this.logout.bind(this)} 
+                                />
+                            </div>
+                        </div>
+                        <div className='clear'></div>
                     </div>
-                    <div className='log'>
-                        <Log 
-                            isLoggedIn={this.state.isLoggedIn} 
-                            login={() => {this.props.history.push('/users/login')}} 
-                            logout={this.logout.bind(this)} 
-                        />
-                    </div>
-                </div>
-                <div className='header-buttom'>
-                    <div className='login-status'>
+                    <div className='middle-border box'></div>
+                    <div className='header-buttom login-status'>    
                         <Status 
                             isLoggedIn={this.state.isLoggedIn} 
                             username={this.state.username} 
-                        />
-                    </div>
-                    <div className='message'>
-                        <Message message={this.state.message}　/>
+                        />     
                     </div>
                 </div>
+                <Message message={this.state.message}　/> 
             </div>
         )
     }

@@ -1,6 +1,8 @@
 import React from 'react';
 import Header from '../../components/block/header';
 
+import '../../styles/layouts/users/login.scss';
+
 class Login extends React.Component{
     constructor(props){
         super(props);
@@ -126,7 +128,7 @@ class Login extends React.Component{
         return(
             <div>
                 <Header message={this.state.message} />
-                <form method='POST' onSubmit={this.handleSubmit}>
+                <form className='login_form' method='POST' onSubmit={this.handleSubmit}>
                     <p>Login Page</p>
                     <div>
                         <label htmlFor='email'>Email</label>

@@ -1,8 +1,11 @@
+import '../../styles/components/atoms/message.scss';
+
 function Message(props){
     if(props.message){
-
         return(
-            <p>{props.message}</p>
+            <div className='message_box'>
+                <p className='message'>{props.message}</p>
+            </div>
         )
     }else{
         return null;
@@ -10,3 +13,5 @@ function Message(props){
 }
 
 export default Message;
+
+//同様に、pageのスタート位置（heightのmargin）を変更する必要がある。

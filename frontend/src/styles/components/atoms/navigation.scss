@@ -1,0 +1,28 @@
+.navigation_link {
+    padding: 0 40px;
+    //margin: 0 5px; 設定すると間の感覚が変わってしまう
+    font-size: 18px;
+    color: black;
+    font-family: 'Courier New', Courier, monospace;
+    text-decoration: none;
+    display: inline-block; //()
+
+    border-left: solid 1px black;
+    border-right: solid 1px black;
+
+    &:hover {
+        opacity: 0.7;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    +.navigation_link {
+        border-left: 0;
+        border-right: solid 1px black;
+    }
+}
+
+//入れたい機能　
+/* 
+    hover 区切り線　color サイズ　筆記法　justify-content cursol position 
+*/
