@@ -1,7 +1,7 @@
 import React from 'react';
 import queryString from 'query-string';
 
-/* import ChatHeader from '../../components/block/chatHeader'; */
+import ChatHeader from '../../components/block/chatHeader';
 import AddChannel from '../../components/module/addChannel';
 
 class ChatPage extends React.Component{
@@ -39,8 +39,6 @@ class ChatPage extends React.Component{
             }
             return res.json();
         }).then((obj) => {
-            //チャンネルが存在するかどうかでまず分岐 一応チャンネルを全件送りこれをページごとに表示を想定している。ただ、件数が増える可能性があるため、ページ更新ごとに、サーバーへのアクセスがベスト
-            console.log(obj);
             this.setState({
                 isLoggedIn : obj.isLoggedIn,
                 username : obj.username,
@@ -84,7 +82,7 @@ class ChatPage extends React.Component{
             if(this.state.count === 0){
                 return(
                     <div>
-                        {/* <ChatHeader isLoggedIn={this.state.isLoggedIn} username={this.state.username} /> */}
+                        <ChatHeader isLoggedIn={this.state.isLoggedIn} username={this.state.username} />
                         <p>チャンネルが存在しません。</p>
                         <p>作成ページより、チャンネルの作成をしてください。</p>
                         {/* <Guide />
@@ -107,7 +105,7 @@ class ChatPage extends React.Component{
 
                 return(
                     <div>
-                        {/* <ChatHeader isLoggedIn={this.state.isLoggedIn} username={this.state.username} /> */}
+                        <ChatHeader isLoggedIn={this.state.isLoggedIn} username={this.state.username} />
                         <div className='new_channel'>
                             <p>チャンネル件数　：　{this.state.count}件</p>
                             {items}

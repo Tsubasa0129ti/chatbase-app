@@ -1,10 +1,14 @@
 import React from 'react';
 import queryString from 'query-string';
 
+import ChatHeader from '../../components/block/chatHeader';
+
 class Search extends React.Component {
     constructor(props){
         super(props);
         this.state = {
+            isLoggedIn : false,
+            username : '',
             count : '',
             channel : [],
             message : ''
@@ -12,10 +16,10 @@ class Search extends React.Component {
     }
 
     componentDidMount(){
+        console.log('MountOK')
         //ここで検索を実行する
         var search = this.props.location.search
         var query = queryString.parse(search);
-        console.log(query);
 
         const error = new Error();
 
@@ -33,6 +37,8 @@ class Search extends React.Component {
             return res.json();
         }).then((obj) => {  
             this.setState({
+                isLoggedIn : obj.isLoggedIn,
+                username : obj.username,
                 count : obj.count,
                 channel : obj.channel
             });
@@ -53,14 +59,13 @@ class Search extends React.Component {
 
     render(){
         const {channel} = this.state;
-
         if(!channel){
             return null;
         }else{
             if(this.state.count === 0){
                 return(
                     <div>
-                        {/* <ChatHeader /> */}
+                        <ChatHeader isLoggedIn={this.state.isLoggedIn} username={this.state.username} />
                         <p>検索結果　：　 {this.state.count}件</p>
                         <p>チャンネルが見つかりません。</p>
                         <p>検索し直してください。</p>
@@ -84,7 +89,7 @@ class Search extends React.Component {
 
                 return(
                     <div>
-                        {/* <ChatHeader /> */}
+                        <ChatHeader isLoggedIn={this.state.isLoggedIn} username={this.state.username} />
                         <div className='new_channel'>
                             <p>チャンネル件数　：　{this.state.count}件</p>
                             {items}

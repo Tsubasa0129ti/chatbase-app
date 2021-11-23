@@ -1,4 +1,5 @@
 import React from 'react';
+import {withRouter} from 'react-router-dom';
 
 import Navigation from '../../components/atoms/navigation2';
 import Log from '../../components/atoms/log2';
@@ -13,61 +14,22 @@ import search_icon from '../../assets/search_icon.png';
 class ChatHeader extends React.Component{
     constructor(props){
         super(props);
-
         this.state = {
-            isLoggedIn : false,
-            username : '',
             search : false,
             message : ''
         }
         this.search = this.search.bind(this);
     }
 
-    componentDidMount(){
-        const error = new Error();
-
-        fetch('/api/users/previousCheck')
-        .then((res) => {
-            if(!res.ok){
-                console.error('res.ok:',res.ok);
-                console.error('res.status:',res.status);
-                console.error('res.statusText:',res.statusText);
-
-                error.status = res.status;
-                error.message = res.statusText;
-                throw error;
-            }
-            return res.json();
-        })
-        .then((obj) => {
-            if(obj.result === 'Authenticated'){
-                this.setState({
-                    isLoggedIn : true,
-                    username : obj.username,
-                });
-            }
-        }).catch((err) => {
-            if(err.status >= 500){
-                this.setState({
-                    message : `${err.status} : ${err.message}`
-                });
-            }else{
-                this.setState({
-                    message : err.message
-                });
-            }
-        });
-    }
-
-    componentDidUpdate(prevProps){ //これが読み込まれるタイミングは、propsを受け取ったタイミング。つまり初回からpropsをもっている
-        if(prevProps.message !== this.props.message){ //propsとstateの変化時に読み込まれてしまうため、条件を設けている
+    componentDidUpdate(prevProps){
+        if(prevProps.message !== this.props.message){
             this.setState({
                 message : this.props.message
             });
         }  
     }
 
-    logout(){
+    logout(){ //ログアウトはここが最上位のコンポーネントとして扱う（これの管理はheaderで行う）
         const error = new Error();
 
         fetch('/api/users/logout')
@@ -122,11 +84,10 @@ class ChatHeader extends React.Component{
                             <a href="/"  className='search_button' onClick={this.search}>
                                 <img src={search_icon} alt='search_icon' className='search_icon' />
                             </a>
-                        </div>{/* 検索ボタンをクリックで下部にpopupの出現を想定 */}
-
+                        </div>
                         <div className='log'>
                             <Log 
-                                isLoggedIn={this.state.isLoggedIn} 
+                                isLoggedIn={this.props.isLoggedIn} 
                                 login={() => {this.props.history.push('/users/login')}} 
                                 logout={this.logout.bind(this)} 
                             />
@@ -143,8 +104,8 @@ class ChatHeader extends React.Component{
                     <div className='middle_border'></div>
                     <div className='header_bottom'>
                         <Status 
-                            isLoggedIn={this.state.isLoggedIn} 
-                            username={this.state.username} 
+                            isLoggedIn={this.props.isLoggedIn} 
+                            username={this.props.username} 
                         />
                     </div>
                 </div>
@@ -159,4 +120,4 @@ class ChatHeader extends React.Component{
     }
 }
 
-export default ChatHeader;
+export default withRouter(ChatHeader);

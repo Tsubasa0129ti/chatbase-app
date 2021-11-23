@@ -4,7 +4,7 @@ const createError = require('http-errors');
 module.exports = {
     loginCheck : (req,res,next) => {
         if(req.isAuthenticated()){
-            res.locals.username = req.user._id;
+            res.locals.username = req.user.name.first + ' ' + req.user.name.last;
             next();
         }else{
             var err = new createError.Unauthorized('please login to view this pages');
