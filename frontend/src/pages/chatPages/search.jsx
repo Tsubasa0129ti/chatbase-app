@@ -1,51 +1,40 @@
 import React from 'react';
 import queryString from 'query-string';
 
-/* import ChatHeader from '../../components/block/chatHeader'; */
-import AddChannel from '../../components/module/addChannel';
-
-class ChatPage extends React.Component{
+class Search extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            message : '',
-            isLoggedIn : false,
-            username : '',
-            search : false,
-            add : false,
             count : '',
-            channel : []
+            channel : [],
+            message : ''
         }
-        this.popup = this.popup.bind(this);
     }
-    
-    componentDidMount(){
-        //初期のページの表示をする
-        const error = new Error();
-        var search = this.props.location.search;
-        var query = queryString.parse(search);
-        console.log(query.page);
 
-        fetch(`/api/chat?page=${query.page}`)
+    componentDidMount(){
+        //ここで検索を実行する
+        var search = this.props.location.search
+        var query = queryString.parse(search);
+        console.log(query);
+
+        const error = new Error();
+
+        fetch(`/api/chat/search?q=${query.q}&sort=${query.sort}&page=${query.page}`)
         .then((res) => {
             if(!res.ok){
                 console.error('res.ok:',res.ok);
                 console.error('res.status:',res.status);
                 console.error('res.statusText:',res.statusText);
-                
+
                 error.status = res.status;
                 error.message = res.statusText;
                 throw error;
             }
             return res.json();
-        }).then((obj) => {
-            //チャンネルが存在するかどうかでまず分岐 一応チャンネルを全件送りこれをページごとに表示を想定している。ただ、件数が増える可能性があるため、ページ更新ごとに、サーバーへのアクセスがベスト
-            console.log(obj);
+        }).then((obj) => {  
             this.setState({
-                isLoggedIn : obj.isLoggedIn,
-                username : obj.username,
-                channel : obj.channel,
                 count : obj.count,
+                channel : obj.channel
             });
         }).catch((err) => {
             if(err.status === 401){
@@ -59,34 +48,22 @@ class ChatPage extends React.Component{
                 console.error(err.message);
             }
         });
-    }
 
-    popup(e){
-        e.preventDefault();
-        this.setState({
-            add : true
-        });
-        console.log(this.state.add);
-    }
-
-    cancel(e){
-        e.preventDefault();
-        this.setState({
-            add : false
-        });
     }
 
     render(){
-        const {channel} = this.state;     
+        const {channel} = this.state;
+
         if(!channel){
-            return null
+            return null;
         }else{
             if(this.state.count === 0){
                 return(
                     <div>
-                        {/* <ChatHeader isLoggedIn={this.state.isLoggedIn} username={this.state.username} /> */}
-                        <p>チャンネルが存在しません。</p>
-                        <p>作成ページより、チャンネルの作成をしてください。</p>
+                        {/* <ChatHeader /> */}
+                        <p>検索結果　：　 {this.state.count}件</p>
+                        <p>チャンネルが見つかりません。</p>
+                        <p>検索し直してください。</p>
                         {/* <Guide />
                         <AddChannel /> */}
                     </div>
@@ -107,22 +84,19 @@ class ChatPage extends React.Component{
 
                 return(
                     <div>
-                        {/* <ChatHeader isLoggedIn={this.state.isLoggedIn} username={this.state.username} /> */}
+                        {/* <ChatHeader /> */}
                         <div className='new_channel'>
                             <p>チャンネル件数　：　{this.state.count}件</p>
                             {items}
                             <div className='paging'></div>
                         </div>
-                        {/* <Guide /> */}
-                        <a href="/" onClick={this.popup}>+</a>
-                        <AddChannel add={this.state.add} onEventCallback={this.cancel.bind(this)} />
+                        {/* <Guide />
+                        <AddChannel /> */}
                     </div>
                 )
-            }    
-        }  
+            }
+        }
     }
 }
 
-export default ChatPage;
-
-//この後やること、、、　③ページングの適用(ページのリンクにクエリ情報の付与/ 存在しないページの場合の分岐も考える）　④ページ変換ごとに、サーバーへの接続　⑤addpopupとそのほかのUI
+export default Search;

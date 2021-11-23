@@ -1,58 +1,68 @@
 var Chat = require("../models/chat");
+const createError = require('http-errors');
 
 module.exports = {
-    index : (req,res) => {
-        res.render("chats/index");
-    },
-    redirectView : (req,res,next) => {
-        var redirectPath = res.locals.redirect;
-        if(redirectPath){
-            res.redirect(redirectPath);
-        }else{
+    loginCheck : (req,res,next) => {
+        if(req.isAuthenticated()){
+            res.locals.username = req.user._id;
             next();
+        }else{
+            var err = new createError.Unauthorized('please login to view this pages');
+            next(err);
         }
     },
-    guide : (req,res) => {
-        res.render("chats/guide");
+    findNew : (req,res,next) => {
+        var username = res.locals.username;
+        var page = req.query.page;
+        if(page){
+            var skipIndex = (page - 1) * 5; 
+        }else{
+            var skipIndex = 0;
+        }
+
+        Chat.countDocuments()
+        .then((count) => {
+            Chat.find().sort({updatedAt : -1}).limit(5).skip(skipIndex)
+            .then((channel) => {
+                res.json({
+                    isLoggedIn : true,
+                    username : username,
+                    count : count,
+                    channel : channel
+                });
+            }).catch((err) => {
+                next(err);
+            });
+        }).catch((err) => {
+            next(err);
+        });
+        
     },
     create : (req,res,next) => {
         var newChat = new Chat({
             channelName : req.body.channelName,
             channelDetail : req.body.channelDetail,
-            createdBy : req.session.currentUser._id
+            createdBy : res.locals.username
         });
 
         newChat.save((err,chat) => {
-            if(chat){
-                var channelName = req.body.channelName;
-                Chat.findOne({channelName:channelName})
-                .then(channel =>{
-                    var id = channel._id;
-                    res.locals.redirect = `/chat/${id}`;
-                    next();
-                }).catch(err => {
-                    res.locals.status = 500;
-                    res.locals.redirect = "/chat";
-                    next(err);
-                });
-            }else if(err){
-                if(err.name==="MongoError"){
-                    res.locals.redirect = "/chat";
-                    next();
+            if(err){
+                console.error(err.message);
+                next(err)
+            }else{
+                if(chat){
+                    Chat.findOne({channelName:newChat.channelName})
+                    .then(channel =>{
+                        var id = channel._id;
+                        res.json({
+                            redirectPath : `/chat/${id}`
+                        });
+                    }).catch(err => {
+                        next(err);
+                    });
                 }
             }
-        });
-    },
-    findAll : (req,res,next) => {
-        Chat.find().sort({updatedAt : -1}).limit(5)
-        .then(channel => {
-            res.locals.channel = channel;
-            next();
-        }).catch(err => {
-            res.locals.redirect = "/"; //ホームに戻すかも
-            res.locals.status = 500;
-            console.log(err.message);
-            next(err);
+
         });
     },
     talk : (req,res) => {
@@ -70,11 +80,10 @@ module.exports = {
                 res.render("chats/channel",channel);
             }
         });
-
-        
     },
     search : (req,res,next) => {
-        var q = req.query.search;
+        var username = res.locals.username;
+        var q = req.query.q;
         var sorting = req.query.sort;
         var sortVal = [{updatedAt : -1},{updatedAt : 1},{createdAt : -1},{createdAt :1}];
         var page = req.query.page;  
@@ -82,22 +91,19 @@ module.exports = {
     
         Chat.countDocuments({$or : [{channelName : new RegExp(".*" + q + ".*" , "i")},{channelDetail : new RegExp(".*" + q + ".*" , "i")}]})
         .then(count => {
-            res.locals.count = count;
             Chat.find({$or : [{channelName : new RegExp(".*" + q + ".*" , "i")},{channelDetail : new RegExp(".*" + q + ".*" , "i")}]})
             .sort(sortVal[sorting]).limit(5).skip(skipIndex)
             .then(channel => {
-                res.locals.channel = channel;
-                res.render("chats/result",channel);
+                res.json({
+                    isLoggedIn : true,
+                    username : username,
+                    count : count,
+                    channel : channel
+                });
             }).catch(err => {
-                res.locals.redirect = "/chat";
-                res.locals.status = 500;
-                console.log(err.message);
                 next(err);
             });
         }).catch(err => {
-            res.locals.redirect = "/chat";
-            res.locals.status = 500;
-            console.log(err.message);
             next(err);
         });
         
