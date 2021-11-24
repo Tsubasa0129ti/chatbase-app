@@ -10,6 +10,6 @@ router.post("/create",chatController.loginCheck,chatController.create);
 //これの位置を下のものよりも下げた場合、なぜか読み込まれなくなる
 router.get("/search",chatController.loginCheck,chatController.search); //ok
 //チャットページへのルーティング
-router.get("/:id",userController.loginCheck,chatController.talk);
+router.get("/:id",chatController.loginCheck,chatController.talk);
 
 module.exports = router;

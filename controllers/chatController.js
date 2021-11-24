@@ -66,18 +66,20 @@ module.exports = {
         });
     },
     talk : (req,res) => {
+        var username = res.locals.username;
         var id = req.params.id;
+        console.log(id);
         Chat.findById(id)
         .populate("chatData.messages")
         .exec((err,channel) =>{
             if(err){
-                res.locals.redirect = "/chat";
-                res.locals.status = 500;
-                console.log(err.message);
                 next(err);
             }else{
-                res.locals.channel = channel;
-                res.render("chats/channel",channel);
+                res.json({
+                    isLoggedIn : true,
+                    username : username,
+                    channel : channel
+                });
             }
         });
     },
