@@ -5,6 +5,7 @@ module.exports = {
     loginCheck : (req,res,next) => {
         if(req.isAuthenticated()){
             res.locals.username = req.user.name.first + ' ' + req.user.name.last;
+            res.locals.userId = req.user._id;
             next();
         }else{
             var err = new createError.Unauthorized('please login to view this pages');
@@ -67,6 +68,7 @@ module.exports = {
     },
     talk : (req,res) => {
         var username = res.locals.username;
+        var userId = res.locals.userId;
         var id = req.params.id;
         console.log(id);
         Chat.findById(id)
@@ -77,6 +79,7 @@ module.exports = {
             }else{
                 res.json({
                     isLoggedIn : true,
+                    userId : userId,
                     username : username,
                     channel : channel
                 });

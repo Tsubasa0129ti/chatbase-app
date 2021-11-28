@@ -3,6 +3,9 @@ import React from 'react';
 class Guide extends React.Component {
     constructor(props){
         super(props);
+        this.state = {
+            message : ''
+        }
     }
 
     componentDidMount(){

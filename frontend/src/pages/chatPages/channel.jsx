@@ -1,19 +1,28 @@
 import React from 'react';
+import socketIOClient from 'socket.io-client';
+import uuid from 'react-uuid';
 
 import ChatHeader from '../../components/block/chatHeader';
+
+const ENDPOINT = 'http://localhost:3001';
+const socket = socketIOClient(ENDPOINT);
 
 class Channel extends React.Component {
     constructor(props){
         super(props);
         this.state = {
             isLoggedIn : false,
+            userId : '',
             username : '',
             channel : {},
             chatData : [],
-            message : ''
+            chat_message : '',
+            socket : [],
+            message : '',
+            test : []
         }
-        this.onChange = this.onChange.bind(this);
-        this.onSubmit = this.onSubmit.bind(this);
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     componentDidMount(){
@@ -39,6 +48,7 @@ class Channel extends React.Component {
         }).then((obj) => {
             this.setState({
                 isLoggedIn : obj.isLoggedIn,
+                userId : obj.userId,
                 username : obj.username,
                 channel : obj.channel,
                 chatData : obj.channel.chatData
@@ -57,7 +67,7 @@ class Channel extends React.Component {
         });
     }
 
-    onChange(e){
+    handleChange(e){
         const target = e.target;
         const name = target.name;
         const value = target.value;
@@ -67,10 +77,55 @@ class Channel extends React.Component {
         });
     }
 
-    onSubmit(e){
+    handleSubmit(e){ //messageの送信層
+        /* 問題点２つの整理
+        	①socket.onの効果がインクリメントしてしまう 一応、イベントリスナの削除をすることでこれを解決
+            ②stateにオブジェクトを内蔵した配列を入れ込むことができない　stateの更新をすることはできたが、一回クリック時には変化がない、ライフサイクルの問題が発生
+        */
         e.preventDefault();
+        
+        //socketの配列を更新する
+        var date = new Date();
+        var dayGetter = ["日","月","火","水","木","金","土"]; 
+        var customId = uuid();
+        var path = this.props.location.pathname;
+        const chatId = path.split('/')[3];
 
-        //ここもfetchだが、とりあえずsocketに送る感じかな
+        if(this.state.chat_message){
+            if(socket !== undefined){
+                const message = {
+                    id : chatId,
+                    userId : this.state.userId,
+                    username : this.state.username,
+                    text : this.state.chat_message,
+                    date : `${date.getFullYear()}年${date.getMonth()+1}月${date.getDate()}日(${dayGetter[date.getDay()]})`,
+                    time : `${date.getHours()}:${date.getMinutes()}`,
+                    customId : customId,
+                }
+
+                console.log(message);
+                socket.emit('message',message);
+
+                socket.once("accepter",(data) => {
+                    //以下の呼び出しが行われていない
+                    console.log(data);
+                    this.setState(prevState => ({
+                        socket : [...prevState.socket,{
+                            userId : data.userId,
+                            username : data.user,
+                            date : data.date,
+                            time : data.time,
+                            text : data.text,
+                            customId : data.customId
+                        }]
+                    }))
+                    console.log(this.state.socket);
+                })
+            }
+        }
+
+        const target = e.target;
+        target['chat_message'].value = '';
     }
 
     Content(i,chatData){
@@ -91,18 +146,60 @@ class Channel extends React.Component {
     }
 
     render(){
-        if(!this.state.channel){
+        if(!this.state.channel){//
             return null;
         }else{
 
             const chatData = this.state.chatData;
     
             const items = [];
-            for(var i=0;i<chatData.length;i++){
+            for(var i=0;i<chatData.length;i++){　//ここが呼び出される回数は、chatData(日付)の量に依存する
+                console.log("aaa");
+                console.log(chatData)
                 items.push(
                     <div>
                         <p>{chatData[i].date}</p>
                         {this.Content(i,chatData)}
+                    </div>
+                )
+            }
+
+            if(this.state.socket){
+                var array = this.state.socket;
+                console.log(array);
+                const socketItems = [];
+                for(var j=0;j<array.length;j++){//ここのトリガー条件がおかしい
+                    socketItems.push(
+                        <div>
+                            <div>
+                                <p>{array[j].date}</p>
+                            </div>
+                            <a href={`/users/${array[j].userId}`}>{array[j].username}</a>
+                            <p>{array[j].time}</p>
+                            <p>{array[j].text}</p>
+                            <input type='hidden' value={array[j].customId} />
+                        </div>
+                    )
+                }
+
+                return(
+                    <div>
+                        <ChatHeader isLoggedIn={this.state.isLoggedIn} username={this.state.username} />
+                        <div className='channel_information'>
+                            <p>チャンネル名　{this.state.channel.channelName}</p>
+                            <p>チャンネル詳細　{this.state.channel.channelDetail}</p>
+                            <p>作成者　{this.state.channel.createdBy}</p>
+                        </div>
+                        <div className='channel_database'>
+                            {items}{/* ここでデータベースからの出力は完了 */}
+                        </div>
+                        <div className='channel_socket'>
+                            {socketItems}
+                        </div>
+                        <form onSubmit={this.handleSubmit}>
+                            <input type="text" name='chat_message' onChange={this.handleChange} />
+                            <input type="submit" value='送信' />
+                        </form>
                     </div>
                 )
             }
@@ -118,9 +215,8 @@ class Channel extends React.Component {
                     <div className='channel_database'>
                         {items}{/* ここでデータベースからの出力は完了 */}
                     </div>
-                    <div className='channel_socket'></div>
                     <form onSubmit={this.handleSubmit}>
-                        <input type="text" name='input_form' onChange={this.handleChange} />
+                        <input type="text" name='chat_message' onChange={this.handleChange} />
                         <input type="submit" value='送信' />
                     </form>
                 </div>
@@ -130,3 +226,5 @@ class Channel extends React.Component {
 }
 
 export default Channel;
+
+//とりあえず、socketそうに関しては分割するべきだが、今回は一旦無理やり条件分岐をしつつテストを行う

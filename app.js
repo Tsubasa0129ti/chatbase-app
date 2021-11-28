@@ -29,6 +29,7 @@ app.use(helmet());
 /* モジュールの使用 */
 app.set("view engine","ejs");
 app.set(express.static(path.join(__dirname,"views")));
+app.use(express.static("public"))
 
 app.use(logger("dev"));
 app.use(express.json());　//下記２行
@@ -58,11 +59,11 @@ var sessionMiddleware = session({
     name : 'user_session',
     store : MongoStore.create({
         mongoUrl : "mongodb://localhost:27017/chatAppDB"
-    }),
+    })/* ,
     genid : function(req){
         console.log("new sessionID is created");
         return uuid.v4();
-    },
+    }, */
 });
 
 app.use(sessionMiddleware);
@@ -103,7 +104,7 @@ app.use((req,res,next) => {
     if(req.session.currentUser){
         res.locals.currentUser = req.session.currentUser.name.first + "_" + req.session.currentUser.name.last;
         res.locals.userId = req.session.currentUser._id;
-    } 
+    }
     next();
 });
 
@@ -130,10 +131,16 @@ app.use(function errorHandler(err,req,res,next){
 const PORT = process.env.PORT || 3001
 const server = http.createServer(app); //こいつの位置に注意
 
-io = require("socket.io")(server);
+io = require("socket.io")(server,{
+    cors : { //これを設定しているため、別のサイトのsessionを取得してしまっている。
+        origin : 'http://localhost:3000',
+        methods : ['GET','POST']
+    }
+});
 /* controllerに移行する予定 */
 io.use(function(socket, next) {
-    sessionMiddleware(socket.request, socket.request.res || {}, next);
+    sessionMiddleware(socket.request, socket.request.res || {}, next); //ここで受け渡しているsessionが認証のものと異なっている
+    console.log(`session : ${JSON.stringify(socket.request.session)}`)
 });
 
 server.listen(PORT,() => {
@@ -141,8 +148,13 @@ server.listen(PORT,() => {
 });
 
 io.on("connection",(socket) => {
-    var userId = socket.request.session.currentUser._id;
+    /* var userId = socket.request.session.currentUser._id;
     var username = socket.request.session.currentUser.name.first + "_" + socket.request.session.currentUser.name.last
+    console.log(`userId : ${userId} && username : ${username}`); */
+
+    console.log(`session : ${JSON.stringify(socket.request.sessionID)}`);
+
+    console.log("pass");
 
     //メッセージの作成処理
     socket.on("message",(message) => {
@@ -150,13 +162,16 @@ io.on("connection",(socket) => {
         if(!room){
             var room = message.id;
             socket.join(room);
+            console.log('入室')
         }
+        console.log(message);
+
         //データベースの保管層
-        var newDate = message.day;
+        var newDate = message.date;
         var newMessage = new Message({
-            userId : userId,
-            username : username,
-            date : message.day,
+            userId : message.userId,
+            username : message.username,
+            date : message.date,
             text : message.text,
             time : message.time,
             customId : message.customId
@@ -176,25 +191,25 @@ io.on("connection",(socket) => {
                     Chat.findByIdAndUpdate(message.id,{
                         $push : {
                             chatData : {
-                                date : message.day,
+                                date : message.date,
                                 messages : msg._id
                             }
                         }
                     }).then(() => {
                         console.log("新しい日付、メッセージの作成に成功しました。");
                         io.to(room).emit("accepter",{
-                            userId : userId,
-                            user : username,
+                            userId : message.userId,
+                            user : message.username,
                             time : message.time,
-                            date : message.day,
+                            date : message.date,
                             text : message.text,
                             customId : message.customId,
                         });
                     }).catch((err) => {
-                        console.log(err.message);
+                        console.log(`エラー：${err.message}`);
                     });
                 }).catch(err => {
-                    console.log(err.message);
+                    console.log(`エラー2：${err.message}`);
                 });
             }else{
                 Message.create(newMessage)
@@ -209,26 +224,26 @@ io.on("connection",(socket) => {
                     ).then(() => {
                         console.log("メッセージの作成に成功しました。");
                         io.to(room).emit("accepter",{
-                            userId : userId,
-                            user : username,
+                            userId : message.userId,
+                            user : message.username,
                             time : message.time,
                             text : message.text,
                             customId : message.customId,
                         });
                     }).catch((err) => {
-                        console.log(err.message);
+                        console.log(`エラー3：${err.message}`);
                     });
                 }).catch(err => {
-                    console.log(err.message);
+                    console.log(`エラー4：${err.message}`);
                 });
             }
         }).catch(err => {
-            console.log(err.message);
+            console.log(`エラー5：${err.message}`);
         });
     });
 
     //メッセージの編集処理 エラー処理については後ほどやる
-    socket.on("update",(message) => {
+    /* socket.on("update",(message) => {
         //ルームへの入室
         if(!room){
             var room = message.chatId;
@@ -260,10 +275,10 @@ io.on("connection",(socket) => {
             
         });
         
-    });
+    }); */
 
     //メッセージの削除処理　これに関しては、Chatのデータベースの一つの連結の解除も必要（データベース二つに対応）
-    socket.on("delete",(message) => {
+    /* socket.on("delete",(message) => {
         //ルームへの入室
         if(!room){
             var room = message.chatId;
@@ -345,7 +360,7 @@ io.on("connection",(socket) => {
             console.log(err.message);
         });
 
-    });
+    }); */
 
     //ルームの退出処理が不明瞭　つまり、一つのルームに入った後に他のルームに切断せずに移動することができるのではないかということ　→この場合、　socketが複数のルームへと適用されるかも
     socket.on("disconnect",(room) => { //これに関しては、切断処理を行う（これを前に指定しまうと、送信前に切断されてしまうことに注意）
