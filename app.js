@@ -140,7 +140,6 @@ io = require("socket.io")(server,{
 /* controllerに移行する予定 */
 io.use(function(socket, next) {
     sessionMiddleware(socket.request, socket.request.res || {}, next); //ここで受け渡しているsessionが認証のものと異なっている
-    console.log(`session : ${JSON.stringify(socket.request.session)}`)
 });
 
 server.listen(PORT,() => {
@@ -152,10 +151,6 @@ io.on("connection",(socket) => {
     var username = socket.request.session.currentUser.name.first + "_" + socket.request.session.currentUser.name.last
     console.log(`userId : ${userId} && username : ${username}`); */
 
-    console.log(`session : ${JSON.stringify(socket.request.sessionID)}`);
-
-    console.log("pass");
-
     //メッセージの作成処理
     socket.on("message",(message) => {
         //ルームへの入室
@@ -164,7 +159,6 @@ io.on("connection",(socket) => {
             socket.join(room);
             console.log('入室')
         }
-        console.log(message);
 
         //データベースの保管層
         var newDate = message.date;
@@ -243,12 +237,12 @@ io.on("connection",(socket) => {
     });
 
     //メッセージの編集処理 エラー処理については後ほどやる
-    /* socket.on("update",(message) => {
+    socket.on("update",(message) => {
         //ルームへの入室
         if(!room){
             var room = message.chatId;
             socket.join(room);
-            console.log(`${userId}は、${message.chatId}に入室しました。`);
+            console.log(`${message.userId}は、${message.chatId}に入室しました。`);
         }
 
         Message.findOne({customId : message.customId},function(err,msg) {
@@ -265,17 +259,14 @@ io.on("connection",(socket) => {
                 }
             ).then(msg => {
                 io.to(room).emit("update",{
-                    text : message.newMsg,
-                    index : message.index
+                    text : message.newMsg
                 });
                 console.log("OK");
             }).catch(err => {
                 console.log(err.message);
-            });
-            
-        });
-        
-    }); */
+            });    
+        }); 
+    });
 
     //メッセージの削除処理　これに関しては、Chatのデータベースの一つの連結の解除も必要（データベース二つに対応）
     /* socket.on("delete",(message) => {

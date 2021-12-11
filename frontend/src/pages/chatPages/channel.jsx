@@ -3,6 +3,7 @@ import socketIOClient from 'socket.io-client';
 import uuid from 'react-uuid';
 
 import ChatHeader from '../../components/block/chatHeader';
+import ChatPopup from '../../components/module/chatPopup';
 
 const ENDPOINT = 'http://localhost:3001';
 const socket = socketIOClient(ENDPOINT);
@@ -18,11 +19,13 @@ class Channel extends React.Component {
             chatData : [],
             chat_message : '',
             socket : [],
-            message : '',
-            test : []
+            self : false,
+            message : ''
         }
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.mouseoverEvent = this.mouseoverEvent.bind(this);
+        this.mouseLeaveEvent = this.mouseLeaveEvent.bind(this);
     }
 
     componentDidMount(){
@@ -77,11 +80,7 @@ class Channel extends React.Component {
         });
     }
 
-    handleSubmit(e){ //messageの送信層
-        /* 問題点２つの整理
-        	①socket.onの効果がインクリメントしてしまう 一応、イベントリスナの削除をすることでこれを解決
-            ②stateにオブジェクトを内蔵した配列を入れ込むことができない　stateの更新をすることはできたが、一回クリック時には変化がない、ライフサイクルの問題が発生
-        */
+    handleSubmit(e){
         e.preventDefault();
         
         //socketの配列を更新する
@@ -107,8 +106,6 @@ class Channel extends React.Component {
                 socket.emit('message',message);
 
                 socket.once("accepter",(data) => {
-                    //以下の呼び出しが行われていない
-                    console.log(data);
                     this.setState(prevState => ({
                         socket : [...prevState.socket,{
                             userId : data.userId,
@@ -128,34 +125,71 @@ class Channel extends React.Component {
         target['chat_message'].value = '';
     }
 
+    mouseoverEvent(e){
+        e.preventDefault();
+
+        var userInfo = e.currentTarget.children[0].href;
+        var userId = userInfo.split('/')[4];
+        //この時、customId等の判別によって、user情報を見分ける分岐を作る
+        if(userId === this.state.userId){
+            //ここでpopup①の可視化を実行する
+            this.setState({
+                self : true
+            });
+            console.log(e.currentTarget.children[4].style['display']);
+            e.currentTarget.children[4].style['display'] = 'block'
+            console.log('self')
+        }else{
+            //ここでpopup②の可視化を実行する
+            this.setState({
+                self : false
+            });
+            console.log('other')
+        }
+
+        //初期の分岐　①クラス名がdatabse_messageの時②クラス名がsocket_messageの時③その他（そもそも発火しないので、これについては書かないのもあり）
+        if(e.currentTarget.className === 'database_message'){
+            //この時、
+        }
+    }
+
+    mouseLeaveEvent(e){
+        e.preventDefault();
+        console.log(e);
+
+        e.currentTarget.children[4].style['display'] = 'none';
+    }
+
     Content(i,chatData){
         const messages = chatData[i].messages;
         let content = [];
         for(var j=0;j<messages.length;j++){
             content.push(
-                <div>
+                <div 
+                    className='database_message' 
+                    onMouseEnter={this.mouseoverEvent}
+                    onMouseLeave={this.mouseLeaveEvent}
+                >
                     <a href={`/users/${messages[j].userId}`}>{messages[j].username}</a>
                     <p>{messages[j].time}</p>
                     <p>{messages[j].text}</p>
                     <input type='hidden' value={messages[j].customId} />
+                    <ChatPopup style={{display :'none'}} />
                 </div>
             )
         }
-        console.log(content);
         return content;
     }
 
     render(){
-        if(!this.state.channel){//
+        if(!this.state.channel){
             return null;
         }else{
 
             const chatData = this.state.chatData;
     
             const items = [];
-            for(var i=0;i<chatData.length;i++){　//ここが呼び出される回数は、chatData(日付)の量に依存する
-                console.log("aaa");
-                console.log(chatData)
+            for(var i=0;i<chatData.length;i++){
                 items.push(
                     <div>
                         <p>{chatData[i].date}</p>
@@ -166,18 +200,23 @@ class Channel extends React.Component {
 
             if(this.state.socket){
                 var array = this.state.socket;
-                console.log(array);
                 const socketItems = [];
-                for(var j=0;j<array.length;j++){//ここのトリガー条件がおかしい
+                for(var j=0;j<array.length;j++){
                     socketItems.push(
                         <div>
                             <div>
-                                <p>{array[j].date}</p>
+                                <p>{array[j].date}</p>{/* popupの出現のためにこれを別の方法で出力させるかも */}
                             </div>
-                            <a href={`/users/${array[j].userId}`}>{array[j].username}</a>
-                            <p>{array[j].time}</p>
-                            <p>{array[j].text}</p>
-                            <input type='hidden' value={array[j].customId} />
+                            <div 
+                                className='socket_message'
+                                onMouseEnter={this.mouseoverEvent}
+                                onMouseLeave={this.mouseLeaveEvent}    
+                            >
+                                <a href={`/users/${array[j].userId}`}>{array[j].username}</a>
+                                <p>{array[j].time}</p>
+                                <p>{array[j].text}</p>
+                                <input type='hidden' value={array[j].customId} />
+                            </div>
                         </div>
                     )
                 }

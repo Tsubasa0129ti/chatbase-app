@@ -3,7 +3,7 @@ import {Route,Switch} from 'react-router-dom';
 import ChatPage from './main';
 import Search from './search';
 import Guide from './guide';
-import Channel from './channel';
+import Channel from './channel2';
 import ChatHeader from '../../components/block/chatHeader';
 
 function Chat(props) {
