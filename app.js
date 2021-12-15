@@ -269,7 +269,7 @@ io.on("connection",(socket) => {
     });
 
     //メッセージの削除処理　これに関しては、Chatのデータベースの一つの連結の解除も必要（データベース二つに対応）
-    /* socket.on("delete",(message) => {
+    socket.on("delete",(message) => {
         //ルームへの入室
         if(!room){
             var room = message.chatId;
@@ -308,7 +308,6 @@ io.on("connection",(socket) => {
                                         console.log(err.message);
                                     }
                                     io.to(room).emit("delete",{
-                                        index : message.index, //これは取得してその番号を非表示化する
                                         confirm : "dateDeleted" //これを取得した際にはdateが消えるように作るためのもの
                                     });
                                     console.log("削除に成功");
@@ -332,7 +331,7 @@ io.on("connection",(socket) => {
                                         console.log(err.message);
                                     }
                                     io.to(room).emit("delete",{
-                                        index : message.index //これは取得してその番号を非表示化する
+                                        confirm : 'deleted'
                                     });
                                     console.log("削除に成功");
                                 });
@@ -351,7 +350,7 @@ io.on("connection",(socket) => {
             console.log(err.message);
         });
 
-    }); */
+    });
 
     //ルームの退出処理が不明瞭　つまり、一つのルームに入った後に他のルームに切断せずに移動することができるのではないかということ　→この場合、　socketが複数のルームへと適用されるかも
     socket.on("disconnect",(room) => { //これに関しては、切断処理を行う（これを前に指定しまうと、送信前に切断されてしまうことに注意）

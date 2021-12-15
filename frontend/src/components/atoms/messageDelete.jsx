@@ -8,7 +8,14 @@ class MessageDelete extends React.Component{
     render(){
         return(
             <div>
-                <p>本当にメッセージの削除をしてもよろしいでしょうか。</p>
+                <h3>メッセージを削除する</h3>
+                <a href="/" onClicK={this.props.onCancelCallback}>×</a>
+                <p>このメッセージを本当に削除しますか？削除後は元に戻すことはできません。</p>
+                {/* <div className='preDelete_message'>
+                    <p>{this.props.username}</p>
+                    <p>{this.props.time}</p>
+                    <p>{this.props.text}</p>
+                </div> */}
                 <input type="submit" value='キャンセル'　onClick={this.props.onCancelCallback} />
                 <input type="submit" value='削除する'　onClick={this.props.onDeleteCallback} />
             </div>

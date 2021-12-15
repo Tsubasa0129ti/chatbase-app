@@ -5,6 +5,8 @@ import uuid from 'react-uuid';
 import ChatHeader from '../../components/block/chatHeader';
 import ChannelDB from '../../components/module/channelDB';
 import ChannelSocket from '../../components/module/channelSocket';
+import MessageDelete from '../../components/ReactModal/messageDelete';
+import {showContext} from '../../context/showContext';
 
 const ENDPOINT = 'http://localhost:3001';
 const socket = socketIOClient(ENDPOINT);
@@ -19,7 +21,10 @@ class Channel extends React.Component {
             channel : {},
             chatData : [],
             chat_message : '',
-            socket : []
+            socket : [],
+            show : false,
+            deleteData : {},
+            block : {}
         }
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
@@ -122,6 +127,38 @@ class Channel extends React.Component {
         target['chat_message'].value = '';
     }
 
+    cancel(e){
+        e.preventDefault();
+        this.setState({
+            show : false
+        });
+    }
+
+    delete(e){
+        e.preventDefault();
+        const target = e.currentTarget;
+        var deleteModal = target.closest('.delete_modal');
+
+        var path = this.props.location.pathname;
+        var chatId = path.split('/')[3];
+        var customId = deleteModal.children[3].lastChild.value;
+
+        const message = {
+            chatId : chatId,
+            customId : customId
+        };
+        socket.emit('delete',message);
+
+        socket.once('delete',(data) => {
+            var block = this.state.block;
+            block.style.display = 'none';
+        });
+        
+        this.setState({
+            show : false
+        });
+    }
+
     render(){
         if(!this.state.userId){
             return null;
@@ -130,19 +167,82 @@ class Channel extends React.Component {
                 <div>
                     <ChatHeader isLoggedIn={this.state.isLoggedIn} username={this.state.username} />
 
-                    <div className='chat_main'>
-                        <div className='channel_information'>
-                            <p>チャンネル名　{this.state.channel.channelName}</p>
-                            <p>チャンネル詳細　{this.state.channel.channelDetail}</p>
-                            <p>作成者　{this.state.channel.createdBy}</p>
+                    <showContext.Provider value=
+                        {{
+                            showEvent : (e) => {
+                                e.preventDefault();
+
+                                var target = e.currentTarget;
+                        
+                                var block;
+                                if(target.closest('.aaa_test')){
+                                    block = target.closest('.aaa_test');
+
+                                    var dayChat = block.closest('.ccc_test');
+
+                                    var deleteData = {
+                                        username : block.children[0].textContent,
+                                        time : block.children[1].textContent,
+                                        text : block.children[2].textContent,
+                                        customId : block.children[3].value,
+                                        date : dayChat.children[0].textContent,
+                                    }
+
+                                }else{
+                                    block = target.closest('.bbb_test');
+                                    var newDate = block.previousElementSibling.firstElementChild;
+
+                                    if(newDate.textContent){
+                                        var deleteData = {
+                                            username : block.children[0].textContent,
+                                            time : block.children[1].textContent,
+                                            text : block.children[2].textContent,
+                                            customId : block.children[3].value,
+                                            date : newDate.textContent,
+                                        }
+                                    }else{
+                                        var record = block.closest('.channel_instant').previousElementSibling;
+                                        var newDate = record.lastElementChild.children[0];
+                                        
+                                        var deleteData = {
+                                            username : block.children[0].textContent,
+                                            time : block.children[1].textContent,
+                                            text : block.children[2].textContent,
+                                            customId : block.children[3].value,
+                                            date : newDate.textContent,
+                                        }
+                                    }
+                                }
+                                console.log(block);
+
+                                this.setState({
+                                    show : true,
+                                    deleteData : deleteData,
+                                    block : block
+                                });
+                            }
+                        }}>
+                        <div className='chat_main'>
+                            <div className='channel_information'>
+                                <p>チャンネル名　{this.state.channel.channelName}</p>
+                                <p>チャンネル詳細　{this.state.channel.channelDetail}</p>
+                                <p>作成者　{this.state.channel.createdBy}</p>
+                            </div>
+                            <ChannelDB chatData={this.state.chatData} userId={this.state.userId} />
+                            <ChannelSocket socket={this.state.socket} userId={this.state.userId} />
+                            <form className='message_submit' onSubmit={this.handleSubmit}>
+                                <input type="text" name='chat_message' onChange={this.handleChange} />
+                                <input type="submit" value='送信' />
+                            </form>
                         </div>
-                        <ChannelDB chatData={this.state.chatData} userId={this.state.userId} />
-                        <ChannelSocket socket={this.state.socket} userId={this.state.userId} />
-                        <form className='message_submit' onSubmit={this.handleSubmit}>
-                            <input type="text" name='chat_message' onChange={this.handleChange} />
-                            <input type="submit" value='送信' />
-                        </form>
-                    </div>
+                    </showContext.Provider>
+
+                    <MessageDelete 
+                        show={this.state.show} 
+                        deleteData={this.state.deleteData} 
+                        onCancelCallback={this.cancel.bind(this)}
+                        onDeleteCallback={this.delete.bind(this)}
+                    />
                 </div>
             )
         }

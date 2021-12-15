@@ -78,7 +78,7 @@ class ChannelDB extends React.Component{
         const chat = [];
         for(var i=0;i<chatData.length;i++){
             chat.push(
-                <div>
+                <div　className='ccc_test'>
                     <p>{chatData[i].date}</p>
                     {this.Content(chatData,i)}
                 </div>
