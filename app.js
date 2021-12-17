@@ -296,7 +296,7 @@ io.on("connection",(socket) => {
                                 {_id : message.chatId},
                                 {
                                     $pull : {
-                                        chatData : { //ここが消す対象になる
+                                        chatData : {
                                             date : msgDate
                                         }
                                     }
@@ -308,7 +308,7 @@ io.on("connection",(socket) => {
                                         console.log(err.message);
                                     }
                                     io.to(room).emit("delete",{
-                                        confirm : "dateDeleted" //これを取得した際にはdateが消えるように作るためのもの
+                                        confirm : "dateDeleted"
                                     });
                                     console.log("削除に成功");
                                 });

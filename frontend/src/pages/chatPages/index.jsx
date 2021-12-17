@@ -3,7 +3,7 @@ import {Route,Switch} from 'react-router-dom';
 import ChatPage from './main';
 import Search from './search';
 import Guide from './guide';
-import Channel from './channel2';
+import Channel from './channel';
 
 function Chat(props) {
     return(
@@ -17,9 +17,3 @@ function Chat(props) {
 }
 
 export default Chat;
-
-
-/* 現状の問題点としては、そもそもchannel以外にはpopupは不要であるということもある。他のpopupが同様に読み込むことができるのであれば別なのだが、
-    読み込むことのできるコンポーネントが一種類だけなのであれば、これを実行する意味がない。だったらチャンネルの直下にこれを持ってくる方がいいのではないか
-    ただ、ヘッダーやフッターなどの共通するものに関しては、これを用いてもいいと思う（データの受け渡し層の変更が必要なのでしないけど）
-*/
