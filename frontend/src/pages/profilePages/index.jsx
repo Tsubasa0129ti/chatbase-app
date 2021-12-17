@@ -1,7 +1,6 @@
 import {Route,Switch} from "react-router-dom";
 
 //ファイルimport層
-//import Id from './:id'
 import New from './new';
 import Edit from './edit';
 import Id from './id';

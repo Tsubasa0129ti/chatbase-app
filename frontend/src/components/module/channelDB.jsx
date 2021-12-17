@@ -18,7 +18,7 @@ class ChannelDB extends React.Component{
 
         //この時にstateの変化を実行する（propsとして渡す値の真偽値の変更） 確認したいこと　→ 全部のポップアップが表示されてしまう
         var userInfo = e.currentTarget.children[0].href;
-        var userId = userInfo.split('/')[4];
+        var userId = userInfo.split('/')[5];
 
         //ここから直接currentTargetのstyleの変更を実行する
         e.currentTarget.children[4].style.display = 'inline-block';
@@ -60,7 +60,7 @@ class ChannelDB extends React.Component{
                     onMouseEnter={this.mouseenterEvent}
                     onMouseLeave={this.mouseleaveEvent}
                 >
-                    <a className='test' href={`/users/${messages[j].userId}`}>{messages[j].username}</a>
+                    <a className='test' href={`/profile/account/${messages[j].userId}`}>{messages[j].username}</a>
                     <p>{messages[j].time}</p>
                     <p>{messages[j].text}</p>
                     <input type='hidden' value={messages[j].customId} />

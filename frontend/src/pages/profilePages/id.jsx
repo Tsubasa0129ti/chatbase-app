@@ -19,6 +19,8 @@ class Id extends React.Component{
         //ここではログインチェックは必要？一応他のユーザーへ向けた公開を想定している。
         const pathname = this.props.location.pathname;
         var id = pathname.split('/')[3];
+        
+        console.log(id);
 
         const error = new Error();
 

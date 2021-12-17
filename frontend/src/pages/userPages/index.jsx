@@ -31,5 +31,3 @@ function Users(props) {
 
 
 export default Users;
-
-//ログアウトについて作成し、これを一旦mypageで読み込んでいるが、これは孫コンポーネントとして利用するため、後で親コンポーネント（header）を作成する。

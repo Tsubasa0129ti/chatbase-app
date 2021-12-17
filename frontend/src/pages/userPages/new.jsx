@@ -67,8 +67,6 @@ class New extends React.Component {
         const value = target.value;
         const name = target.name;
 
-        //var group = {[name] : value}; これで値の取得ができる
-
         /* バリデーションの設定 */
         //first_errorの出力
         if(name === 'first'){
@@ -300,5 +298,3 @@ class New extends React.Component {
 }
 
 export default New;
-
-//この後やること　①validation(サーバーのみ)

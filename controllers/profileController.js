@@ -97,7 +97,7 @@ module.exports = {
             next(err);
         });
     },
-    id : (req,res,next) => {
+    id : (req,res,next) => { //時々なのかはわからないが、userの検索ができなくなったことがあったので、エラー処理をするなどして、対処する必要がありそう
         var userId = req.params.id;
         User.findById(userId)
         .then((user) => {
