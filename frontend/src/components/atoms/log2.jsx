@@ -1,4 +1,4 @@
-import '../../styles/components/atoms/button2.scss';
+import '../../styles/components/atoms/button.scss';
 
 function Log(props){
     if(props.isLoggedIn){

@@ -2,7 +2,7 @@ import '../../styles/components/atoms/button.scss';
 
 function Log(props){
     console.log(props);
-    if(props.isLoggedIn){
+    if(props.isLoggedIn){　//フックなら変更
         return(
 
             <a href="/" 

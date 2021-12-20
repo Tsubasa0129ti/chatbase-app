@@ -57,6 +57,7 @@ class Login extends React.Component{
                 message : this.props.location.state.message
             });
         }
+
     }
 
     handleChange(e){
@@ -128,18 +129,21 @@ class Login extends React.Component{
         return(
             <div>
                 <Header message={this.state.message} />
-                <form className='login_form' method='POST' onSubmit={this.handleSubmit}>
-                    <p>Login Page</p>
-                    <div>
-                        <label htmlFor='email'>Email</label>
-                        <input type='email' name='email' onChange={this.handleChange} />
-                    </div>
-                    <div>
-                        <label htmlFor='password'>Password</label>
-                        <input type='password' name='password' onChange={this.handleChange} />
-                    </div>
-                    <input type='submit' value='ログイン' />
+                <form className='login-form' method='POST' onSubmit={this.handleSubmit}>
+                    <p class="login-text">
+                        <span class="fa-stack fa-lg">
+                            <i class="fa fa-circle fa-stack-2x"></i>
+                            <i class="fa fa-lock fa-stack-1x"></i>
+                        </span>
+                    </p>
+                    <input type='email' name='email' className='login-username' placeholder='Email' required autoFocus onChange={this.handleChange} />
+                    <input type='password' name='password' className='login-password' placeholder='Password' required autoFocus onChange={this.handleChange} />
+                    <input type='submit' className='login-submit' value='ログイン' />
                 </form>
+                <a href="/users/new">register?</a>
+                <a href="#" class="login-forgot-pass">forgot password?</a>
+                <div class="underlay-photo"></div>
+                <div class="underlay-black"></div> 
             </div>
         )
     }

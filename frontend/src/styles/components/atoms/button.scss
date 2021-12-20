@@ -1,13 +1,17 @@
 .button {
     //ここに関してはボタンの一般的な設定を盛り込む
+    display: inline-block;
     border-radius: 30px;
+    justify-content: center;
+    text-align: center;
 }
 
 .log_button {
     //ここには、ログインボタン特有の設定を入れる
-    height: 30px;
     width: 130px;
-    margin: 10px 20px 0 20px;
+    height: 40px;
+    line-height: 35px;
+    margin: 10px 20px;
 
     color: black;
     background-color: rgb(164,216,215);

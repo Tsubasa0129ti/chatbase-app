@@ -14,4 +14,4 @@ function Message(props){
 
 export default Message;
 
-//同様に、pageのスタート位置（heightのmargin）を変更する必要がある。
+//同様に、pageのスタート位置（heightのmargin）を変更する必要がある　。
