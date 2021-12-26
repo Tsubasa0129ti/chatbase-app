@@ -1,3 +1,89 @@
-.login-form {
-    margin : 240px 0;
+$pc : 960px;
+$tab : 520px;
+
+@mixin pc {
+    @media(min-width: ($pc)){
+        @content;
+    }
+}
+
+@mixin tab {
+    @media(max-width : ($tab)){
+        @content;
+    }
+}
+
+@include pc {
+    .login_page {
+        background-image: linear-gradient(white,gray,rgb(48, 48, 180));
+        text-align: center;
+        position: fixed;
+        width : 100%;
+        height: 100%;
+        margin: 180px 0;
+        .login-form {
+            margin-top: 60px;
+            .login-icon {
+                .fa-circle {
+                    color : white;
+                }
+            
+                .color {
+                    color: black;
+                }
+            }
+            .error_code {
+                width: 70%;
+                margin: 0 auto;
+                color: white;
+            }
+            .login-username, .login-password {
+                background: transparent;
+                border: 0 solid;
+                border-bottom: 1px solid rgba(white, .5);
+                display: block;
+                margin: 40px auto;
+                width: 280px;
+                height: 30px;
+                &:focus {
+                    background: white;
+                    color: black;
+                    transition: 250ms background ease-in;
+                }
+            }
+            .login-submit {
+                background: transparent;
+                border: 1px solid white;
+                color: white;
+                width: 150px;
+                height: 40px;
+                font-size: 21px;
+                transition: 250ms background ease-in;
+                &:hover {
+                    background: white;
+                    color: black;
+                    transition: 250ms background ease-in;
+                }
+            }
+        }
+        .link {
+            position: absolute;
+            bottom: 190px;
+            left: 50%;
+            transform: translateX(-50%);
+            -webkit-transform: translateX(-50%);
+            -ms-transform: translateX(-50%);
+            .user-register, .login-forgot-pass {
+                display: block;
+                color: white;
+                font-size: 18px;
+                text-decoration: none;
+
+                &:hover {
+                    text-decoration: underline;
+                    transition: 500ms ease-in;
+                }
+            }
+        }
+    }
 }

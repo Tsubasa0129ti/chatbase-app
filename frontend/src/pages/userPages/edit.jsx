@@ -1,6 +1,12 @@
 import React from 'react';
 import Header from '../../components/block/header';
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPen } from "@fortawesome/free-solid-svg-icons";
+import {faCircle} from '@fortawesome/free-regular-svg-icons';
+
+import '../../styles/layouts/users/edit.scss';
+
 class Edit extends React.Component{
     constructor(props){
         super(props);
@@ -182,23 +188,30 @@ class Edit extends React.Component{
     render(){
         return(  
             <div>
-                <Header message={this.state.message} />
-                <form onSubmit={this.handleSubmit}>
-                    <h3>User Edit</h3>
-                    <div className='errorMsg'>
-                        <p>{this.state.first_error}</p>
-                        <p>{this.state.last_error}</p>    
+                <Header />
+                <div className='userEdit_page'>
+                    <div className='edit-top'>
+                        <p className='edit-icon'>
+                            <FontAwesomeIcon icon={faPen} size='5x' />
+                        </p>
+                        <p className='edit-title'>Edit Account</p>
+                        <p className='error_code'>{this.state.message}</p>
                     </div>
-                    <div>
-                        <label htmlFor='firstName'>First Name</label>
-                        <input type='text' name='first' value={this.state.first} onChange={this.handleChange} />
-                    </div>
-                    <div>
-                        <label htmlFor='lastName'>Last Name</label>
-                        <input type='text' name='last' value={this.state.last} onChange={this.handleChange} />
-                    </div>
-                    <input type='submit' value='送信' />
-                </form>
+                    <form className='edit_form' onSubmit={this.handleSubmit}>
+                        <div className='firstName_block'>
+                            <label htmlFor="firstName" className='label'>First Name</label>
+                            <input type="text" name='first' className='edit_input' value={this.state.first} onChange={this.handleChange} />
+                            <p className='error_message'>{this.state.first_error}</p>
+                        </div>
+                        <div className='lastName_block'>
+                            <label htmlFor="lastName" className='label'>Last Name</label>
+                            <input type='text' name='last' className='edit_input' value={this.state.last} onChange={this.handleChange} />
+                            <p className='error_message'>{this.state.last_error}</p>
+                        </div>
+                        <input type='submit' value='Edit Account' className='edit-submit' />
+                    </form>
+                    <div className='link'></div>
+                </div>
             </div>
         )
     }

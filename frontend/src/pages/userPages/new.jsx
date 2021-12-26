@@ -1,6 +1,8 @@
 import React from 'react'
 import Header from '../../components/block/header';
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
 import '../../styles/layouts/users/new.scss';
 
 class New extends React.Component {
@@ -248,50 +250,62 @@ class New extends React.Component {
                         message : `${err.status} : ユーザーの作成に失敗しました。`
                     });
                 }else{
+                    console.log(err.message);
                     this.props.history.push({
                         pathname : '/users',
                         state : {message : err.message}
                     });
                 }
-            });
+            });//usernameが存在する場合のエラーが取得できていない。err.messageが空になっているのが原因のようだ
         }        
     }
 
     render(){
         return(
-            <div>
-                <Header message={this.state.message} />
-                <form　className='create_form' onSubmit={this.handleSubmit} method='POST'>
-                    <h3>ユーザー作成ページ</h3>
-                    <div className='errorMsg'>
-                        <p>{this.state.first_error}</p>
-                        <p>{this.state.last_error}</p>
-                        <p>{this.state.email_error}</p>
-                        <p>{this.state.password_error}</p>
-                        <p>{this.state.passCheck_error}</p>
+            <div className='user_new'>
+                <Header />      
+                <div className='create_page'>
+                    <div className='empty'></div>
+                    <div className='create-top'>
+                        <p className='create-icon'>
+                            <FontAwesomeIcon icon={faUserCircle} size='5x' />
+                        </p>
+                        <p className='create_title'>Create Account</p>
+                        <p className='error_code'>{this.state.message}</p>
                     </div>
-                    <div className='firstName'>
-                        <label htmlFor='firstName'>First Name</label>
-                        <input type='text' name='first' required onChange={this.handleChange} />
+                    <form className='create_form' onSubmit={this.handleSubmit} method='POST'>
+                        <div className='name_block block'>
+                            <label htmlFor="name" className='label'>Name</label>
+                            <input type="text" name='first' className='input-firstName input_box' placeholder='First Name' required autoFocus onChange={this.handleChange} />
+                            <input type="text" name='last' className='input-lastName input_box' placeholder='Last Name' required  autoFocus onChange={this.handleChange} />
+                            <p className='firstName-error error_message'>{this.state.first_error}</p>
+                            <p className='lastName-error error_message'>{this.state.last_error}</p>
+                        </div>
+
+                        <div className='email_block block'>
+                            <label htmlFor="email" className='label'>Email</label>
+                            <input type="text" name='email' className='input-email input_box' placeholder='Email' required autoFocus onChange={this.handleChange} />
+                            <p className='email-error error_message'>{this.state.email_error}</p>
+                        </div>
+
+                        <div className='password_block block'>
+                            <label htmlFor="password" className='label'>Password</label>
+                            <input type="password" name='password' className='input-password input_box' placeholder='Password' required autoFocus onChange={this.handleChange} />
+                            <p className='password-error error_message'>{this.state.password_error}</p>
+                        </div>
+
+                        <div className='passCheck_block block'>
+                            <label htmlFor="passCheck" className='label'>Password Confirm</label>
+                            <input type="password" name='passCheck' className='input-passCheck input_box' placeholder='Password Confirm' required autoFocus onChange={this.handleChange} />
+                            <p className='passCheck-error error_message'>{this.state.passCheck_error}</p>
+                        </div>
+                        <input type="submit" className='create-submit' value='Sign Up' />
+                    </form>
+                    <div className='link'>
+                        <a href="/users/login" className='user-login'>Already have an account?</a>
                     </div>
-                    <div className='lastName'>
-                        <label htmlFor='lastName'>Last Name</label>
-                        <input type='text' name='last' required onChange={this.handleChange} />
-                    </div>
-                    <div className='email'>
-                        <label htmlFor='email'>Email</label> 
-                        <input type='email' name='email' required onChange={this.handleChange} />               
-                    </div>
-                    <div className='password'>
-                        <label htmlFor='password'>Password</label>
-                        <input type='password' name='password' required onChange={this.handleChange} />
-                    </div>
-                    <div className='passCheck'>
-                        <label htmlFor='passCheck'>Password Confirm</label>
-                        <input type='password' name='passCheck' onChange={this.handleChange} />
-                    </div>
-                    <input type='submit' className='submit' value='送信' />
-                </form>
+                </div>
+                
             </div>
         )
     }

@@ -1,7 +1,7 @@
-import React,{useState,useEffect} from 'react';
+import React from 'react';
 import {withRouter} from 'react-router-dom';
 
-//import usePrevious from '../events/usePrevious';
+//import usePrevious from '../events/usePrevious'; 
 
 import Log from '../atoms/log';
 import Navigation from '../atoms/navigation';
@@ -38,6 +38,7 @@ class Header extends React.Component{
             return res.json();
         })
         .then((obj) => {
+            console.log('pass1');
             if(obj.result === 'Authenticated'){
                 this.setState({
                     isLoggedIn : true,
@@ -45,6 +46,7 @@ class Header extends React.Component{
                 });
             }
         }).catch((err) => {
+            console.log(err);
             if(err.status >= 500){
                 this.setState({
                     message : `${err.status} : ${err.message}`

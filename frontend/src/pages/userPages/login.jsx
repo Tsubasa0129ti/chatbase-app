@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from '../../components/block/header';
 
+import 'font-awesome/css/font-awesome.min.css';
 import '../../styles/layouts/users/login.scss';
 
 class Login extends React.Component{
@@ -128,22 +129,28 @@ class Login extends React.Component{
     render(){
         return(
             <div>
-                <Header message={this.state.message} />
-                <form className='login-form' method='POST' onSubmit={this.handleSubmit}>
-                    <p class="login-text">
-                        <span class="fa-stack fa-lg">
-                            <i class="fa fa-circle fa-stack-2x"></i>
-                            <i class="fa fa-lock fa-stack-1x"></i>
-                        </span>
-                    </p>
-                    <input type='email' name='email' className='login-username' placeholder='Email' required autoFocus onChange={this.handleChange} />
-                    <input type='password' name='password' className='login-password' placeholder='Password' required autoFocus onChange={this.handleChange} />
-                    <input type='submit' className='login-submit' value='ログイン' />
-                </form>
-                <a href="/users/new">register?</a>
-                <a href="#" class="login-forgot-pass">forgot password?</a>
-                <div class="underlay-photo"></div>
-                <div class="underlay-black"></div> 
+                <Header />
+                <div className='login_page'>
+                    <form className='login-form' method='POST' onSubmit={this.handleSubmit}>
+                        <p className="login-icon">
+                            <span className="fa-stack fa-3x">
+                                <i className="fa fa-circle fa-stack-2x"></i>
+                                <i className="fa fa-lock fa-stack-1x color"></i>
+                            </span>
+                        </p>
+                        <p className='error_code'>{this.state.message}</p>
+                        <input type='email' name='email' className='login-username' placeholder='Email' required autoFocus onChange={this.handleChange} />
+                        <input type='password' name='password' className='login-password' placeholder='Password' required autoFocus onChange={this.handleChange} />
+                        <input type='submit' className='login-submit' value='Login' />
+                    </form>
+                    <div className='link'>
+                        <a href="/users/new" className='user-register'>register?</a>
+                        <a href="#" className="login-forgot-pass">forgot password?</a>
+                    </div>
+                    
+                    <div class="underlay-photo"></div>
+                    <div class="underlay-black"></div> 
+                </div>
             </div>
         )
     }

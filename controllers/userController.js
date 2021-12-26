@@ -71,10 +71,32 @@ module.exports = {
             next(err);
         }
     },
-    mypageView : (req,res) => {
-        res.json({
-            username : req.user.name
-        });
+    mypageView : (req,res) => { //現状mypageに繋いだ時、usernameの情報のみしか送っていない。これを変えていく。まずは情報として、①userDataの全て②profileの有無③profileがある場合、その全て（＋アイコン情報）
+        var user = req.user;
+        if(user.profile === undefined) {
+            User.findById(user._id)
+            .then((user) => {
+                res.json({
+                    profile : false,
+                    user : user
+                });
+            }).catch((err) => {
+                return next(err);
+            });
+        }else{
+            User.findById(user._id)
+            .populate("profile")
+            .exec((err,user) => {
+                if(err){
+                    return next(err);
+                }else{
+                    res.json({
+                        profile : true,
+                        user : user
+                    });
+                }
+            })
+        }
     },
     show : (req,res) => {
         var user = req.user;

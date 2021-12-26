@@ -1,0 +1,65 @@
+$pc : 960px;
+$tab : 520px;
+
+@mixin pc {
+    @media(min-width: ($pc)){
+        @content;
+    }
+}
+
+@mixin tab {
+    @media(max-width : ($tab)){
+        @content;
+    }
+}
+
+.userEdit_page {
+    margin-top : 180px;
+    width: 700px;
+    height: 100%;
+    margin: 180px auto;
+    text-align: center;
+
+    .edit-top {
+        margin-top: 60px;
+        .edit-icon {
+            margin: 0;
+        }
+        .edit-title {
+            font-size: 24px;
+            font-weight: bold;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            margin-top: 5px;
+        }
+        .error_code {
+            font-size: 15px;
+            color: red;
+            margin: 5px 0;
+        }
+    }
+    .edit_form {
+        .firstName_block, .lastName_block {
+            margin: 20px 0;
+            .label {
+                display: block;
+            }
+            .edit_input {
+                width: 350px;
+                height: 25px;
+            }
+            .error_message {
+                color: yellow;
+                font-size: 12px;
+                margin: 2px 0;
+            }
+        }
+        .edit-submit {
+            width: 175px;
+            height: 25px;
+            margin-top: 30px;
+        }
+    }
+    .link {
+
+    }
+}

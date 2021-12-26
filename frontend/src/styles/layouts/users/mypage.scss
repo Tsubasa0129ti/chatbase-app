@@ -1,0 +1,350 @@
+$pc : 960px;
+$tab : 520px;
+
+@mixin pc {
+    @media(min-width: ($pc)){
+        @content;
+    }
+}
+
+@mixin tab {
+    @media(max-width : ($tab)){
+        @content;
+    }
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+}
+
+#root {
+    height: 100%;
+}
+
+.mypage {
+    background-image: linear-gradient(white,blue);
+    height: 100%;
+    margin-top: 180px;
+    .users_mypage { //上部のmarginを開ける予定（後回し）
+        text-align: center;
+        
+        .mypage-top {
+            position: relative;
+            .mypage-title {
+                margin: 12px 0;
+                font-size: 48px;
+                font-family: Georgia, 'Times New Roman', Times, serif;
+                font-weight: bold;
+            }
+            .mypage-menu {
+                position: absolute;
+                top: 7px;
+                right: 20px;
+
+                .menu-button {
+                    border: none;
+                    background: transparent;
+
+                    &:hover {
+                        cursor: pointer;
+                    }
+
+                    .cog-icon {
+                        &:hover {
+                            transition: ease-in-out 0.5s;
+                            transform: rotate(180deg);
+                        }
+                    }
+                }
+
+                .prevPopup {
+                    transition: ease-in-out 0.5s;
+                    border: 1px solid black;
+                    border-radius: 5px;
+                    margin-top: 15px;
+                    position: absolute;
+                    right: -2400px;
+
+                    .toEdit, .toDelete {
+                        display: block;
+                        width: 250px;
+                        height: 40px;
+                    }
+                }
+
+                .popup-menu {
+                    transition: ease-in-out 0.5s;
+                    border: 1px solid black;
+                    border-radius: 5px;
+                    margin-top: 15px;
+                    position: absolute;
+                    right: -10px;
+
+                    .toEdit, .toDelete {
+                        display: block;
+                        width: 250px;
+                        height: 40px;
+                        font-size: 18px;
+                    }
+                }
+            }
+            .welcome-msg {
+                font-size: 18px;
+                font-family: Verdana, Geneva, Tahoma, sans-serif;
+                font-weight: bolder;
+                margin-top: 32px;
+            }
+        }
+
+        .user-info {
+            text-align: start;
+            width: 300px;
+            margin: 60px auto;
+            .userInfo-title {
+                display: flex;
+                align-items: center;
+                
+                &::before ,&::after {
+                    content: '';
+                    flex-grow: 1;
+                    height: 2px;
+                    background: #000; /* 線の色 */
+                    margin:0 10px;
+                }
+                
+                .title-content {
+                    padding: 0 5px;
+                    font-size: 18px;
+                    font-weight: bolder;
+                }
+            }
+            .user-record {
+                .label {
+                    display: block;
+                    margin: 10px 0;
+                    font-size: 18px;
+                }
+                .user-value {
+                    background: transparent;
+                    width: 300px;
+                    border: none;
+                    border-bottom: 1px solid;
+                    text-align: center;
+                    padding: 5px 0;
+                    font-size: 15px;
+                }
+            }
+        }
+
+        .toCreateProfile {
+            width: 500px;
+            
+            text-align: center;
+            margin: 20px auto;
+            .profileDesc {
+                font-size: 15px;
+                color: white;
+                font-weight: bolder;
+            }
+            .toProfile {
+                position: relative;
+                margin-top: 20px;
+                width: 240px;
+                height: 45px;
+                border-radius: 20px;
+                border-color: transparent; //ボタンのカラーに合わせる
+                box-shadow: 0 5px rgb(51, 230, 89);
+                font-size: 24px;
+                font-weight: bolder;
+                background-color: #adffb3;
+                color: rgb(82, 82, 82);
+
+                &:hover {
+                    box-shadow: 0 2px #66b9bf;
+                    transform: translateY(3px);
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+}
+
+.mypage {
+    .container {
+        display: flex;
+        justify-content: space-between;
+        height: 80%;
+        .aside {
+            width: 28%;
+            margin: 30px 50px;
+
+            .user-icon {
+                
+                .icon {
+                    width: 200px;
+                    height: 200px;
+                    text-align: center;
+                    border-radius: 5px;
+                    border: 1px solid black;
+                    padding: 10px 20px;
+                }
+                
+            }
+            .setting {
+                margin-top: 10px;
+                .text-line {
+                    display: flex;
+                    align-items: center;
+                
+                    &::after {
+                        opacity: 0.3;
+                        border-top: 1px solid;
+                        content: "";
+                        flex-grow: 1;
+                        border-color: black;
+                        margin-left: 15px;
+                    }
+
+                    p {
+                        font-size: 24px;
+                        font-weight: lighter;
+                    }
+                }
+                a {
+                    display: block;
+                    font-size: 18px;
+                    font-weight: bolder;
+                    letter-spacing: 1px;
+                    margin-left: 5px;
+                    padding: 5px;
+                }
+            }
+            .application {
+                margin-top: 10px;
+                .text-line {
+                    display: flex;
+                    align-items: center;
+                
+                    &::after {
+                        opacity: 0.3;
+                        border-top: 1px solid;
+                        content: "";
+                        flex-grow: 1;
+                        border-color: black;
+                        margin-left: 15px;
+                    }
+
+                    p {
+                        font-size: 24px;
+                        font-weight: lighter;
+                    }
+                }
+                a {
+                    display: block;
+                    font-size: 18px;
+                    font-weight: bolder;
+                    letter-spacing: 1px;
+                    margin-left: 5px;
+                    padding: 5px;
+                }
+            }
+        }
+        .main {
+            width: 66%;
+            margin: 0 120px 0 30px;
+
+            .profile-header {
+                margin-top: 20px;
+                height: 25%;
+                .username {
+                    margin: 0;
+                    font-size: 36px;
+                }
+                .intro {
+                    margin: 0px 10px;
+                    height: 120px;
+                    display: table;
+                    width: 100%;
+
+                    .intro-text {
+                        display: table-cell;
+                        vertical-align: middle;
+                        //margin: 5px 10px;
+                        font-size: 18px;
+                        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+                    }
+                }
+            }
+
+            .profile-detail {
+                .about {
+
+                    .about-top {
+                        font-size: 18px;
+                        border-bottom: 1px solid rgba($color: #000000, $alpha: 0.8);
+                        padding: 1px 0;
+                    }                    
+                    //後で途中の色換えを実行する
+
+                    .contact-info {
+                        margin-top: 20px;
+                        p {
+                            //要素が増えれば名前等を変えるかもしれない
+                            font-size: 15px;
+                            opacity: 0.5;
+                        }
+
+                        .content {
+                            display: flex;
+                            margin-left: 5px;
+                            .label {
+                                width: 30%;
+                                font-size: 18px;
+                            }
+                            .item {
+                                width: 70%;
+                                border: none;
+                                background: transparent;
+                                border-bottom: 1px dashed rgba($color: #000000, $alpha: 0.2);
+
+                                font-size: 18px;
+                                color: black;
+                                padding: 5px;
+                            }
+                        }
+                    }
+                    .basic-info {
+                        margin-top: 20px;
+                        p {
+                            //要素が増えれば名前等を変えるかもしれない
+                            font-size: 15px;
+                            opacity: 0.5;
+                        }
+
+                        .content {
+                            display: flex;
+                            margin-left: 5px;
+                            .label {
+                                width: 30%;
+                                font-size: 18px;
+                            }
+                            .item {
+                                width: 70%;
+                                border: none;
+                                background: transparent;
+                                border-bottom: 1px dashed rgba($color: #000000, $alpha: 0.2);
+
+                                font-size: 18px;
+                                color: black;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
