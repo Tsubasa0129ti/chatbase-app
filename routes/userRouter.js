@@ -15,7 +15,6 @@ router.post("/auth",passport.authenticate("local"),userControllers.auth,userCont
 router.get("/logout",userControllers.logout);　
 
 router.get("/mypage",userControllers.loginCheck,userControllers.mypageView);
-router.get("/mypage/show",userControllers.loginCheck,userControllers.show);
 
 router.get("/mypage/edit",userControllers.loginCheck,userControllers.edit);
 router.put("/mypage/update",userControllers.loginCheck,userControllers.update);

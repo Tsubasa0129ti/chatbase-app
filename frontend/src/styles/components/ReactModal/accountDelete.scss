@@ -1,0 +1,73 @@
+
+.overray {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .deleteModal {
+        
+        text-align: center;
+        background-color: white;
+        z-index: 3;
+        width: 50%;
+        height: 30%;
+        border: 1px solid black;
+        border-radius: 10px;
+        border-top: 10px solid red;
+
+        .warn-icon {
+            color: red;
+            margin-top: 10px;
+        }
+
+        .delete {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+             //under-line
+        }
+
+        .delete-message {
+            font-weight: bolder;
+            font-size: 18px;
+        }
+
+        button {
+            margin-top: 30px;
+            border-radius: 5px;
+            font-size: 24px;
+            width: 160px;
+            height: 40px;
+            font-weight: bolder;
+            cursor: pointer;
+        }
+
+        .cancel-button {
+            margin-right: 10px;
+            background-color: white;
+
+            &:hover {
+                background-color: rgb(233, 231, 231);
+            }
+        }
+
+        .delete-button {
+            margin-left: 10px;
+            background-color: red;
+            color: white;
+
+            &:hover {
+                color: yellow;
+                background-color: rgb(173, 0, 0);
+                text-decoration: underline yellow;
+            }
+        }
+    }
+}

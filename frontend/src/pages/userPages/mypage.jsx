@@ -1,6 +1,6 @@
 import React from 'react';
-import {Link} from 'react-router-dom';
 import Header from '../../components/block/header';
+import AccountDelete from '../../components/ReactModal/accountDelete';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCog , faAddressCard , faEdit , faTrashAlt ,faIdCard ,faUser , faChartLine , faBlog} from "@fortawesome/free-solid-svg-icons";
@@ -15,8 +15,10 @@ class Mypage extends React.Component{
             user : {},
             username : '',
             profile : false,
+            show : false,
             message : ''
         }
+        this.delete = this.delete.bind(this);
     }
 
     componentDidMount(){
@@ -79,6 +81,57 @@ class Mypage extends React.Component{
         }
     }
 
+    cancel(e) {
+        e.preventDefault();
+        this.setState({
+            show : false
+        });
+    }
+
+    delete(e) {
+        e.preventDefault();
+
+        const error = new Error();
+
+        fetch(`/api/users/mypage/delete`,{
+            method : 'DELETE',
+            headers : {
+                'Accept': 'application/json,text/plain, */*',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then((res) => {
+            if(!res.ok){
+                console.error('res.ok:',res.ok);
+                console.error('res.status:',res.status);
+                console.error('res.statusText:',res.statusText);
+
+                error.status = res.status;
+                error.message = res.statusText;
+                throw error;
+            }
+            return res.json();
+        })
+        .then((obj) => {
+            this.props.history.push({
+                pathname : obj.redirectPath,
+                state : {message : 'アカウントの削除に成功しました。'}
+            });
+        }).catch((err) => {
+            if(err.status >= 500){
+                this.props.history.push({
+                    pathname : '/users/mypage',
+                    state : {message : `${err.status} : ${err.message}`}
+                });
+            }else{
+                this.props.history.push({
+                    pathname : '/users/mypage',
+                    state : {message : err.message}
+                });
+            }
+        });
+    }
+
     render(){
         if(!this.state.profile) {
             return(
@@ -111,7 +164,12 @@ class Mypage extends React.Component{
                                     </button>
                                     <button
                                         className='toDelete'
-                                        onClick={() => console.log('A')}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            this.setState({
+                                                show : true
+                                            });
+                                        } }
                                     >
                                         <FontAwesomeIcon icon={faTrashAlt} /> Delete Account
                                     </button>
@@ -148,6 +206,11 @@ class Mypage extends React.Component{
                             </button>
                         </div>
                     </div>
+                    <AccountDelete
+                        show={this.state.show}
+                        onCancelCallback={this.cancel.bind(this)}
+                        onDeleteCallback={this.delete.bind(this)}
+                    />
                 </div>
             )
         }else{
@@ -165,7 +228,17 @@ class Mypage extends React.Component{
                                 </div>
                                 <a href="/users/edit"><FontAwesomeIcon icon={faEdit} /> Edit Account</a>
                                 <a href="/profile/edit"><FontAwesomeIcon icon={faIdCard} /> Edit Profile</a>
-                                <a href="/users/delete"><FontAwesomeIcon icon={faTrashAlt} /> Delete</a>
+                                <a 
+                                    href='/' 
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        this.setState({
+                                            show : true
+                                        });
+                                    }}
+                                >
+                                    <FontAwesomeIcon icon={faTrashAlt} /> Delete
+                                </a>
                             </div>
                             <div className='application'>
                                 <div className='text-line'>
@@ -232,6 +305,11 @@ class Mypage extends React.Component{
                             </div>
                         </div>
                     </div>
+                    <AccountDelete
+                        show={this.state.show}
+                        onCancelCallback={this.cancel.bind(this)}
+                        onDeleteCallback={this.delete.bind(this)}
+                    />
                 </div>
             )
         }
@@ -246,11 +324,7 @@ export default Mypage;
 //ここでやらなければならないこと　profileの有無の分岐
 //追記　fetchの２パターンのエラー処理の作成
 
-/* 構想　条件付きレンダー（profileの有無による）を行い、条件によってUIを変化させる。このため、サーバーからprofileが存在するかどうかの情報を取得する。
-    profileが存在しない場合、①アカウントの編集②profileの作成③アカウントの削除④アカウントの閲覧
-    profileが存在する場合、①アカウントの編集②profileの編集③アカウントの削除④アカウントの閲覧
-    ただ、mypageがこれだけだと物足りないので何かを付随させたい
-    後に入れる候補としては
+/* 構想　
     ①写真（プロフ画、）
     ②後は、投稿系統（ブログなど）を作成した場合にそれに付随したもの
 

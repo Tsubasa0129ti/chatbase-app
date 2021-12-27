@@ -1,7 +1,7 @@
 const User = require("../models/user"),
     Profile = require("../models/profile"),
     passport = require("passport"),
-    createError = require("http-errors");
+    createError = require("http-errors"); 
 
 module.exports = {
     preLoginCheck : (req,res) => {
@@ -96,32 +96,6 @@ module.exports = {
                     });
                 }
             })
-        }
-    },
-    show : (req,res) => {
-        var user = req.user;
-        if(user.profile === undefined){
-            User.findById(user._id)
-            .then((user) => {
-                res.json({
-                    profileExist : false,
-                    user : user
-                });
-            }).catch((err) => {
-                return next(err);
-            });
-        }else{
-            User.findById(user._id)
-            .populate("profile")
-            .exec((err,user) => {
-                if(err){
-                    return next(err);
-                }
-                res.json({
-                    profileExist : true,
-                    user : user
-                });
-            });
         }
     },
     edit : (req,res) => {
