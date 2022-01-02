@@ -6,21 +6,31 @@ var profileSchema = new Schema(
         intro : {
             type : String,
         },
-        age : {
-            type: String
-        },
-        prefecture : {
-            type : String,
+        country : {
+            type : String
         },
         address : {
             type : String,　//API（このアプリは適用しないかもだが）
         },
-        birthday : {
+        professional : {
             type : String
         },
         belongings : {
             type : String,
-        }
+        },
+        site : {
+            type :String
+        },
+        gender : {
+            type : String
+        },
+        age : {
+            type: String
+        },
+        birthday : {
+            type : String
+        },
+        
     }
 );
 

@@ -1,17 +1,22 @@
 import React from 'react';
 import Header from '../../components/block/header';
 
+import '../../styles/layouts/profiles/new.scss';
+
 class New extends React.Component{
     constructor(props){
         super(props);
         this.state = {
             username : '',
             intro : '',
-            age : '',
-            prefecture : '',
+            country : '',
             address : '',
-            birthday : '',
+            professional : '',
             belongings : '',
+            site : '',
+            gender : '',
+            age : '',
+            birthday : '',
             message : '',
             intro_error : '',
             age_error : '',
@@ -80,9 +85,9 @@ class New extends React.Component{
         const value = target.value;
 
         if(name === 'intro'){
-            if(value.length > 50){
+            if(value.length > 100){
                 this.setState({
-                    intro_error : 'Intro　: ひとことは50文字以内に設定してください。'
+                    intro_error : '*Intro　: ひとことは100文字以内に設定してください。'
                 });
             }else{
                 this.setState({
@@ -94,7 +99,7 @@ class New extends React.Component{
         if(name === 'age'){
             if(value < 0 || value > 120){
                 this.setState({
-                    age_error : '正しい年齢を記載してください。'
+                    age_error : '*正しい年齢を記載してください。'
                 });
             }else{
                 this.setState({
@@ -106,7 +111,7 @@ class New extends React.Component{
         if(name === 'address'){
             if(addressChecker(value)){
                 this.setState({
-                    address_error : 'ハイフンを含めた、正しい郵便番号を記入してください。'
+                    address_error : '*ハイフンを含めた、正しい郵便番号を記入してください。'
                 });
             }else{
                 this.setState({
@@ -135,7 +140,7 @@ class New extends React.Component{
 
         if(this.state.intro_error || this.state.address_error || this.state.age_error){
             this.setState({
-                message : 'エラーを修正してください。'
+                message : '*エラーを修正してください。'
             });
         }else{
             const error = new Error();
@@ -148,11 +153,14 @@ class New extends React.Component{
                 },
                 body : JSON.stringify({
                     intro : this.state.intro,
-                    age : this.state.age,
-                    prefecture : this.state.prefecture,
+                    country : this.state.country,
                     address : this.state.address,
+                    professional : this.state.professional,
+                    belongings : this.state.belongings,
+                    site : this.state.site,
+                    gender : this.state.gender,
+                    age : this.state.age,
                     birthday : this.state.birthday,
-                    belongings : this.state.belongings
                 })
             })
             .then((res) => {
@@ -202,98 +210,102 @@ class New extends React.Component{
     render(){
         return(
             <div>
-                <Header message={this.state.message} />
-                <form onSubmit={this.handleSubmit}>
-                    <p>{this.state.username}さんのプロフィール作成画面</p>
-                    <div className='errorMsg'>
-                        <p>{this.state.intro_error}</p>
-                        <p>{this.state.address_error}</p>
-                        <p>{this.state.age_error}</p>
+                {/* <Header message={this.state.message} /> */}
+
+                <div className='main'>
+                    <div className='main-top'>
+                        <h1 className='main-title'>
+                            <span className='page-title-main'>Create Profile</span>
+                            <span className='page-title-sub'>プロフィールの作成</span>
+                        </h1>
+                        <div className='lowlayer-link'>
+                            <ul className='breadcrumb'>
+                                <li><a className='toHome' href="/">Home</a></li>
+                                <li className='line'></li>
+                                <li><span>Create Profile</span></li>
+                            </ul>
+                        </div>
                     </div>
-                    <div>
-                        <label htmlFor='intro'>ひとこと</label>
-                        <textarea name='intro' cols='40' rows='3' maxLength='60' onChange={this.handleChange} />
+                    
+
+                    <div className='profile'>
+                        <div className='profile-status'>
+                            <div className='profile-status-inner'>
+                                <p>プロフィール作成画面</p>
+                            </div>
+                        </div>
+
+                        <div className='profile-form'>
+                            <div className='profile-form-inner'>
+                                <form onSubmit={this.handleSubmit} className='submit-form'>
+                                    <div className='contact-information'>
+                                        <p>Contact Information</p>
+                                        <div className='content'>
+                                            <label htmlFor="country" className='label'>Country　:</label>
+                                            <input type="text" name='country' className='item' onChange={this.handleChange} />
+                                        </div>
+                                        <div className='content'>
+                                            <label htmlFor="Address" className='label'>Address　:</label>
+                                            <input type="text" name='address' className='item' onChange={this.handleChange} />
+                                            <p className='error-message'>{this.state.address_error}</p>
+                                        </div>
+                                        <div className='content'>
+                                            <label htmlFor="professional" className='label'>Professional　:</label>
+                                            <input type="text" name='professional' className='item' onChange={this.handleChange} />
+                                        </div>
+                                        <div className='content'>
+                                            <label htmlFor="belongings" className='label'>Belongings　:</label>
+                                            <input type="text" name='belongings' className='item' onChange={this.handleChange} />
+                                        </div>
+                                        <div className='content'>
+                                            <label htmlFor="site" className='label'>Site　:</label>
+                                            <input type="text" name='site' className='item' onChange={this.handleChange} />
+                                        </div>
+                                    </div>
+
+                                    <div className='basic-information'>
+                                        <p>Basic Information</p>
+                                        <div className='content'>
+                                            <label htmlFor="gender" className='label'>Gender　:</label>
+                                            <select name="gender" className='item'　onChange={this.handleChange}>
+                                                <option value="male">Male</option>
+                                                <option value="female">Female</option>
+                                                <option value="others"> Others</option>
+                                                <option value="no-answer">No Answer</option>
+                                            </select>
+                                        </div>
+                                        <div className='content'>
+                                            <label htmlFor="age" className='label'>Age　:</label>
+                                            <input type="number" name='age' className='item' onChange={this.handleChange} />
+                                            <p className='error-message'>{this.state.age_error}</p>
+                                        </div>
+                                        <div className='content'>
+                                            <label htmlFor="birthday" className='label'>Birthday　:</label>
+                                            <input type="date" name='birthday' className='item' onChange={this.handleChange} />
+                                        </div>
+                                    </div>
+
+                                    <div className='comment'>
+                                        <p>Comment</p>
+                                        <div className='content'>
+                                            <label htmlFor="intro" className='label'>Introduction　:</label>
+                                            <textarea name='intro' className='item' maxLength='100' onChange={this.handleChange} />
+                                            <p className='error-message'>{this.state.intro_error}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className='error-code'>
+                                        <p>{this.state.message}</p>
+                                    </div>
+                                    <input type='submit' value='Create Profile' className='toCreate' />
+                                </form>
+                            </div>
+                        </div>
+
                     </div>
-                    <div>
-                        <label htmlFor="age">年齢</label>
-                        <input type="number" name='age' onChange={this.handleChange} />
-                    </div>
-                    <div>
-                        <label htmlFor='prefecture'>都道府県</label>
-                        <select name='prefecture' onChange={this.handleChange}>
-                            <option value='' defaultValue>都道府県</option>
-                            <option value='北海道'>北海道</option>
-                            <option value='青森県'>青森県</option>
-                            <option value='岩手県'>岩手県</option>
-                            <option value='宮城県'>宮城県</option>
-                            <option value='秋田県'>秋田県</option>
-                            <option value='山形県'>山形県</option>
-                            <option value='福島県'>福島県</option>
-                            <option value='茨城県'>茨城県</option>
-                            <option value='栃木県'>栃木県</option>
-                            <option value='群馬県'>群馬県</option>
-                            <option value='埼玉県'>埼玉県</option>
-                            <option value='千葉県'>千葉県</option>
-                            <option value='東京都'>東京都</option>
-                            <option value='神奈川県'>神奈川県</option>
-                            <option value='新潟県'>新潟県</option>
-                            <option value='富山県'>富山県</option>
-                            <option value='石川県'>石川県</option>
-                            <option value='福井県'>福井県</option>
-                            <option value='山梨県'>山梨県</option>
-                            <option value='長野県'>長野県</option>
-                            <option value='岐阜県'>岐阜県</option>
-                            <option value='静岡県'>静岡県</option>
-                            <option value='愛知県'>愛知県</option>
-                            <option value='三重県'>三重県</option>
-                            <option value='滋賀県'>滋賀県</option>
-                            <option value='京都府'>京都府</option>
-                            <option value='大阪府'>大阪府</option>
-                            <option value='兵庫県'>兵庫県</option>
-                            <option value='奈良県'>奈良県</option>
-                            <option value='和歌山県'>和歌山県</option>
-                            <option value='鳥取県'>鳥取県</option>
-                            <option value='島根県'>島根県</option>
-                            <option value='岡山県'>岡山県</option>
-                            <option value='広島県'>広島県</option>
-                            <option value='山口県'>山口県</option>
-                            <option value='徳島県'>徳島県</option>
-                            <option value='香川県'>香川県</option>
-                            <option value='愛媛県'>愛媛県</option>
-                            <option value='高知県'>高知県</option>
-                            <option value='福岡県'>福岡県</option>
-                            <option value='佐賀県'>佐賀県</option>
-                            <option value='長崎県'>長崎県</option>
-                            <option value='熊本県'>熊本県</option>
-                            <option value='大分県'>大分県</option>
-                            <option value='宮崎県'>宮崎県</option>
-                            <option value='鹿児島県'>鹿児島県</option>
-                            <option value='沖縄県'>沖縄県</option>
-                            </select>
-                    </div>
-                    <div>
-                        <label htmlFor='address'>住所</label>
-                        <input type='text' name='address' onChange={this.handleChange} />
-                    </div>
-                    <div>
-                        <label htmlFor='birthday'>生年月日</label>
-                        <input type='date' name='birthday' onChange={this.handleChange} />
-                    </div>
-                    <div>
-                        <label htmlFor='belongings'>所属</label>
-                        <input type='radio' name='belongings' value='会社員' onChange={this.handleChange} />会社員
-                        <input type='radio' name='belongings' value='公務員' onChange={this.handleChange} />公務員
-                        <input type='radio' name='belongings' value='自営業' onChange={this.handleChange} />自営業
-                        <input type='radio' name='belongings' value='会社役員' onChange={this.handleChange} />会社役員
-                        <input type='radio' name='belongings' value='自由業' onChange={this.handleChange} />自由業
-                        <input type='radio' name='belongings' value='専業主婦' onChange={this.handleChange} />専業主婦
-                        <input type='radio' name='belongings' value='学生' onChange={this.handleChange} />学生
-                        <input type='radio' name='belongings' value='パート・アルバイト' onChange={this.handleChange} />パート・アルバイト
-                        <input type='radio' name='belongings' value='無職' onChange={this.handleChange} />無職
-                        <input type='radio' name='belongings' value='その他' onChange={this.handleChange} />その他
-                    </div>
-                    <input type='submit' value='送信' />
-                </form>
+                </div>
+
+                {/* ここでfooterを読み込む */}
             </div>
         )
     }

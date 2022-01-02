@@ -4,11 +4,14 @@ var Profile = require("../models/profile");
 function getProfile(body) {
     return {
         intro : body.intro,
-        age : body.age,
-        prefecture : body.prefecture,
+        country : body.country,
         address : body.address,
-        birthday : body.birthday,
-        belongings : body.belongings
+        professional : body.professional,
+        belongings : body.belongings,
+        site : body.site,
+        gender : body.gender,
+        age : body.age,
+        birthday : body.birthday,   
     }
 };
 
@@ -21,7 +24,7 @@ module.exports = {
         }else{
             res.json({
                 exist : true,
-                redirectPath : '/users/mypage/show'
+                redirectPath : '/users/mypage'
             });
         }
     },
