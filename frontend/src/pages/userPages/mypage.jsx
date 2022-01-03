@@ -75,6 +75,7 @@ class Mypage extends React.Component{
         });
 
         if(this.props.location.state){
+            console.log(this.props.location.state.message);
             this.setState({
                 message : this.props.location.state.message
             });

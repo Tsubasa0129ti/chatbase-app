@@ -1,31 +1,33 @@
-import React from 'react'
+import React,{useState,useEffect} from 'react';
+import {useHistory} from 'react-router-dom';
+
 import Header from '../../components/block/header';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
 import '../../styles/layouts/users/new.scss';
 
-class New extends React.Component {
-    constructor(props){
-        super(props);
-        this.state = {
-            first : '',
-            last : '',
-            email : '',
-            password : '',
-            passCheck : '',
-            message : '',
-            first_error : '',
-            last_error : '',
-            email_error : '',
-            password_error : '',
-            passCheck_error : ''
-        }
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-    }
 
-    componentDidMount(){
+function New(props){
+    const [message,setMessage] = useState('');
+    const [formData,setFormData] = useState({
+        first : '',
+        last : '',
+        email : '',
+        password : '',
+        passCheck : ''
+    });
+    const [validation,setValidation] = useState({
+        first_error : '',
+        last_error : '',
+        email_error : '',
+        password_error : '',
+        passCheck_error : ''
+    });
+
+    const history = useHistory();
+
+    useEffect(() => {
         const error = new Error();
 
         fetch('/api/users/previousCheck')
@@ -43,28 +45,27 @@ class New extends React.Component {
         })
         .then((obj) => {
             if(obj.result === 'Authenticated'){
-                this.props.history.push({
+                history.push({
                     pathname : obj.redirectPath,
                     state : {message : 'You are already authenticated'}
                 });
             }
         }).catch((err) => {
             if(err.status){
-                this.props.history.push({
+                history.push({
                     pathname : '/users',
                     state : {message : `${err.status} : ${err.message}`}
                 });
             }else{
-                this.props.history.push({
+                history.push({
                     pathname : '/users',
                     state : {message : err.message}
                 });
             }
         });
-    }
+    },[]);
 
-    //formのステートの設定
-    handleChange(e){
+    const handleChange = (e) => {
         const target = e.target;
         const value = target.value;
         const name = target.name;
@@ -73,16 +74,16 @@ class New extends React.Component {
         //first_errorの出力
         if(name === 'first'){
             if(nameChecker(value)){
-                this.setState({
+                setValidation({
                     first_error : 'First Name : 1文字目は、大文字で設定してください。'
                 });
             }else{
                 if(value.length <= 3 || value.length >= 8){
-                    this.setState({
+                    setValidation({
                         first_error : 'First Name : 名前は4~7文字で記入してください'
                     });
                 }else{
-                    this.setState({
+                    setValidation({
                         first_error : ''
                     });
                 }
@@ -92,16 +93,16 @@ class New extends React.Component {
         //lastのエラー作成
         if(name === 'last'){
             if(nameChecker(value)){
-                this.setState({
+                setValidation({
                     last_error : 'Last Name : 1文字目は、大文字で設定してください。'
                 });
             }else{
                 if(value.length <= 3 || value.length >= 8){
-                    this.setState({
+                    setValidation({
                         last_error : 'Last Name : 名前は4~7文字で記入してください'
-                    });
+                    })
                 }else{
-                    this.setState({
+                    setValidation({
                         last_error : ''
                     });
                 }
@@ -111,11 +112,11 @@ class New extends React.Component {
         //emailのエラー作成
         if(name === 'email'){
             if(emailChecker(value)){
-                this.setState({
+                setValidation({
                     email_error : 'Email : 正しいメールアドレスを記入してください。'
                 });
             }else{
-                this.setState({
+                setValidation({
                     email_error : ''
                 });
             }
@@ -127,26 +128,26 @@ class New extends React.Component {
                 if(isUpper(value)){
                     if(numIncluder(value)){
                         if(strChecker(value)){
-                            this.setState({
+                            setValidation({
                                 password_error : ''
                             });
                         }else{
-                            this.setState({
-                                password_error : 'Password : 半角英数字で設定してください。'
+                            setValidation({
+                                password_error : 'Password : 半角英数字で設定してください。'　//このバリデーションが効いていない
                             });
                         }
                     }else{
-                        this.setState({
+                        setValidation({
                             password_error : 'Password : 数値も含めてください。'
                         });
                     }
                 }else{
-                    this.setState({
+                    setValidation({
                         password_error : 'Password : 最初の文字は大文字に設定してください。'
                     });
                 }
             }else{
-                this.setState({
+                setValidation({
                     password_error : 'Password : 文字数は8文字以上16文字以内に設定してください。'
                 });
             }
@@ -190,25 +191,22 @@ class New extends React.Component {
             }
         };
 
-        this.setState({
-            [name] : value
-        })
+        setFormData({...formData,hasChanged:true,[name]:value});
+        console.log(formData);
     }
 
-    handleSubmit(e){
+    const handleSubmit = (e) => {
         e.preventDefault();
-        var passCheck = this.state.passCheck;
-        var pass = this.state.password;
+        var passCheck = formData.passCheck;
+        var pass = formData.password;
 
         if(pass !== passCheck){
-            this.setState({
-                message : 'エラーの修正をしてください。',
+            setMessage('エラーの修正をしてください。');
+            setValidation({
                 passCheck_error : 'Password Confirm : 確認の値が異なっています。'
             });
-        }else if(this.state.first_error || this.state.last_error || this.state.email_error || this.state.password_error){
-            this.setState({
-                message : 'エラーの修正をしてください。'
-            });
+        }else if(validation.first_error || validation.last_error || validation.email_error || validation.password_error){
+            setMessage('エラーの修正をしてください。')
         }else{
             const error = new Error();
 
@@ -220,11 +218,11 @@ class New extends React.Component {
                 },
                 body : JSON.stringify({
                     name : {
-                        first : this.state.first,
-                        last : this.state.last
+                        first : formData.first,
+                        last : formData.last
                     },
-                    email : this.state.email,
-                    password : this.state.password
+                    email : formData.email,
+                    password : formData.password
                 })
             })
             .then(res => {
@@ -240,75 +238,73 @@ class New extends React.Component {
                 return res.json();
             })
             .then(obj => {
-                this.props.history.push({
+                history.push({
                     pathname : obj.redirectPath,
                     state : {message : 'ユーザーの作成に成功しました。'}
                 });
             }).catch(err => {
                 if(err.status >= 500){
-                    this.setState({
-                        message : `${err.status} : ユーザーの作成に失敗しました。`
-                    });
+                    setMessage(`${err.status} : ユーザーの作成に失敗しました。`)
                 }else{
                     console.log(err.message);
-                    this.props.history.push({
+                    history.push({
                         pathname : '/users',
                         state : {message : err.message}
                     });
                 }
-            });//usernameが存在する場合のエラーが取得できていない。err.messageが空になっているのが原因のようだ
+            });//usernameが存在する場合のエラーが取得できていない。err.messageが空になっているのが原因のようだ。最下層のエラーへとぶ
         }        
     }
 
-    render(){
-        return(
-            <div className='user_new'>
-                <Header />      
-                <div className='create_page'>
-                    <div className='empty'></div>
-                    <div className='create-top'>
-                        <p className='create-icon'>
-                            <FontAwesomeIcon icon={faUserCircle} size='5x' />
-                        </p>
-                        <p className='create_title'>Create Account</p>
-                        <p className='error_code'>{this.state.message}</p>
-                    </div>
-                    <form className='create_form' onSubmit={this.handleSubmit} method='POST'>
-                        <div className='name_block block'>
-                            <label htmlFor="name" className='label'>Name</label>
-                            <input type="text" name='first' className='input-firstName input_box' placeholder='First Name' required autoFocus onChange={this.handleChange} />
-                            <input type="text" name='last' className='input-lastName input_box' placeholder='Last Name' required  autoFocus onChange={this.handleChange} />
-                            <p className='firstName-error error_message'>{this.state.first_error}</p>
-                            <p className='lastName-error error_message'>{this.state.last_error}</p>
-                        </div>
 
-                        <div className='email_block block'>
-                            <label htmlFor="email" className='label'>Email</label>
-                            <input type="text" name='email' className='input-email input_box' placeholder='Email' required autoFocus onChange={this.handleChange} />
-                            <p className='email-error error_message'>{this.state.email_error}</p>
-                        </div>
-
-                        <div className='password_block block'>
-                            <label htmlFor="password" className='label'>Password</label>
-                            <input type="password" name='password' className='input-password input_box' placeholder='Password' required autoFocus onChange={this.handleChange} />
-                            <p className='password-error error_message'>{this.state.password_error}</p>
-                        </div>
-
-                        <div className='passCheck_block block'>
-                            <label htmlFor="passCheck" className='label'>Password Confirm</label>
-                            <input type="password" name='passCheck' className='input-passCheck input_box' placeholder='Password Confirm' required autoFocus onChange={this.handleChange} />
-                            <p className='passCheck-error error_message'>{this.state.passCheck_error}</p>
-                        </div>
-                        <input type="submit" className='create-submit' value='Sign Up' />
-                    </form>
-                    <div className='link'>
-                        <a href="/users/login" className='user-login'>Already have an account?</a>
-                    </div>
+    return(
+        <div className='user_new'>
+            <Header />      
+            <div className='create_page'>
+                <div className='empty'></div>
+                <div className='create-top'>
+                    <p className='create-icon'>
+                        <FontAwesomeIcon icon={faUserCircle} size='5x' />
+                    </p>
+                    <p className='create_title'>Create Account</p>
+                    <p className='error_code'>{message}</p>
                 </div>
-                
+                <form className='create_form' onSubmit={handleSubmit} method='POST'>
+                    <div className='name_block block'>
+                        <label htmlFor="name" className='label'>Name</label>
+                        <input type="text" name='first' className='input-firstName input_box' placeholder='First Name' required autoFocus onChange={handleChange} />
+                        <input type="text" name='last' className='input-lastName input_box' placeholder='Last Name' required  autoFocus onChange={handleChange} />
+                        <p className='firstName-error error_message'>{validation.first_error}</p>
+                        <p className='lastName-error error_message'>{validation.last_error}</p>
+                    </div>
+
+                    <div className='email_block block'>
+                        <label htmlFor="email" className='label'>Email</label>
+                        <input type="text" name='email' className='input-email input_box' placeholder='Email' required autoFocus onChange={handleChange} />
+                        <p className='email-error error_message'>{validation.email_error}</p>
+                    </div>
+
+                    <div className='password_block block'>
+                        <label htmlFor="password" className='label'>Password</label>
+                        <input type="password" name='password' className='input-password input_box' placeholder='Password' required autoFocus onChange={handleChange} />
+                        <p className='password-error error_message'>{validation.password_error}</p>
+                    </div>
+
+                    <div className='passCheck_block block'>
+                        <label htmlFor="passCheck" className='label'>Password Confirm</label>
+                        <input type="password" name='passCheck' className='input-passCheck input_box' placeholder='Password Confirm' required autoFocus onChange={handleChange} />
+                        <p className='passCheck-error error_message'>{validation.passCheck_error}</p>
+                    </div>
+                    <input type="submit" className='create-submit' value='Sign Up' />
+                </form>
+                <div className='link'>
+                    <a href="/users/login" className='user-login'>Already have an account?</a>
+                </div>
             </div>
-        )
-    }
+        </div>
+    )
 }
 
 export default New;
+
+//email重複時のエラーの取得ができていない。あと、やはりuseEffectの問題があるっぽい。関数分離は行うかもしれない
