@@ -1,22 +1,21 @@
-import React from 'react';
+import React, {useState,useEffect} from 'react';
+import { useHistory,useLocation } from 'react-router';
 import Header from '../../components/block/header';
 
 import 'font-awesome/css/font-awesome.min.css';
 import '../../styles/layouts/users/login.scss';
 
-class Login extends React.Component{
-    constructor(props){
-        super(props);
-        this.state = {
-            email : '',
-            password : '',
-            message : ''
-        }
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-    }
+function Login(props) {
+    const [formData,setFormData] = useState({
+        email : '',
+        password : ''
+    });
+    const [message,setMessage] = useState('');
 
-    componentDidMount(){
+    const history = useHistory();
+    const location = useLocation();
+
+    useEffect(() => {
         const error = new Error();
 
         fetch('/api/users/previousCheck')
@@ -34,46 +33,42 @@ class Login extends React.Component{
         })
         .then((obj) => {
             if(obj.result === 'Authenticated'){
-                this.props.history.push({
+                history.push({
                     pathname : obj.redirectPath,
                     state : {message : 'You are already authenticated'}
                 });
             }
         }).catch((err) => {
             if(err.status){
-                this.props.history.push({
+                history.push({
                     pathname : '/users',
                     state : {message : `${err.status} : ${err.message}`}
                 });
             }else{
-                this.props.history.push({
+                history.push({
                     pathname : '/users',
                     state : {message : err.message}
                 });
             }
-        });
+        }); 
+    },[]);
 
-        if(this.props.location.state){ //他のページからもらったエラーを取得
-            this.setState({
-                message : this.props.location.state.message
-            });
+    useEffect(() => {
+        if(location.state){
+            setMessage(location.state.message);
         }
+    },[]);
 
-    }
-
-    handleChange(e){
+    const handleChange = (e) => {
         const target = e.target;
         const value = target.value;
         const name = target.name;
 
-        this.setState({
-            [name] : value
-        });
+        setFormData({...formData,hasChanged:true,[name]:value});
     }
 
-    handleSubmit(e){
+    const handleSubmit = (e) => {
         e.preventDefault();
-
         const error = new Error();
 
         fetch('/api/users/auth',{
@@ -83,8 +78,8 @@ class Login extends React.Component{
                 'Content-Type': 'application/json'
             },
             body : JSON.stringify({
-                email : this.state.email,
-                password : this.state.password
+                email : formData.email,
+                password : formData.password
             })
         })
         .then((res) => {
@@ -100,25 +95,19 @@ class Login extends React.Component{
             return res.json();
         })
         .then((obj) => {
-            this.props.history.push({
+            history.push({
                 pathname : obj.redirectPath,
                 state : {message : 'ログイン成功しました。'}
             });  
         }).catch((err) => {
             if(err.status === 400){
-                this.setState({
-                    message : `${err.status} : ユーザー名もしくはパスワードを記入してください。`
-                });
+                setMessage(`${err.status} : ユーザー名もしくはパスワードを記入してください。`);
             }else if(err.status === 401){
-                this.setState({
-                    message : `${err.status} : ユーザー名もしくはパスワードが異なります。`
-                });
+                setMessage(`${err.status} : ユーザー名もしくはパスワードが異なります。`);
             }else if(err.status >= 500){
-                this.setState({
-                    message : `${err.status} : ${err.message}`
-                });
+                setMessage(`${err.status} : ${err.message}`)
             }else{
-                this.props.history.push({
+                history.push({
                     pathname : '/users',
                     state : {message : err.message}
                 });
@@ -126,34 +115,34 @@ class Login extends React.Component{
         });
     }
 
-    render(){
-        return(
-            <div>
-                <Header />
-                <div className='login_page'>
-                    <form className='login-form' method='POST' onSubmit={this.handleSubmit}>
-                        <p className="login-icon">
-                            <span className="fa-stack fa-3x">
-                                <i className="fa fa-circle fa-stack-2x"></i>
-                                <i className="fa fa-lock fa-stack-1x color"></i>
-                            </span>
-                        </p>
-                        <p className='error_code'>{this.state.message}</p>
-                        <input type='email' name='email' className='login-username' placeholder='Email' required autoFocus onChange={this.handleChange} />
-                        <input type='password' name='password' className='login-password' placeholder='Password' required autoFocus onChange={this.handleChange} />
-                        <input type='submit' className='login-submit' value='Login' />
-                    </form>
-                    <div className='link'>
-                        <a href="/users/new" className='user-register'>register?</a>
-                        <a href="#" className="login-forgot-pass">forgot password?</a>
-                    </div>
-                    
-                    <div class="underlay-photo"></div>
-                    <div class="underlay-black"></div> 
+    return(
+        <div>
+            <Header />
+            <div className='login_page'>
+                <form className='login-form' method='POST' onSubmit={handleSubmit}>
+                    <p className="login-icon">
+                        <span className="fa-stack fa-3x">
+                            <i className="fa fa-circle fa-stack-2x"></i>
+                            <i className="fa fa-lock fa-stack-1x color"></i>
+                        </span>
+                    </p>
+                    <p className='error_code'>{message}</p>
+                    <input type='email' name='email' className='login-username' placeholder='Email' required autoFocus onChange={handleChange} />
+                    <input type='password' name='password' className='login-password' placeholder='Password' required autoFocus onChange={handleChange} />
+                    <input type='submit' className='login-submit' value='Login' />
+                </form>
+                <div className='link'>
+                    <a href="/users/new" className='user-register'>register?</a>
+                    {/* <a href="#" className="login-forgot-pass">forgot password?</a> */}
                 </div>
+                
+                <div class="underlay-photo"></div>
+                <div class="underlay-black"></div> 
             </div>
-        )
-    }
+        </div>
+    )
 }
 
 export default Login;
+
+//line54と60でReact Hook useEffect has a missing dependency: 'props.history'. Either include it or remove the dependency array
