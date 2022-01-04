@@ -4,7 +4,7 @@ const User = require("../models/user"),
     createError = require("http-errors"); 
 
 module.exports = {
-    preLoginCheck : (req,res) => {
+    preLoginCheck : (req,res) => { //ここ若干変えるかもしれない　（headerの機能縮小）
         if(req.isAuthenticated()){
             var user = req.user;
             const username = user.name.first + ' ' + user.name.last;

@@ -2,28 +2,13 @@ import '../../styles/components/atoms/button.scss';
 
 function Log(props){
     console.log(props);
-    if(props.isLoggedIn){　//フックなら変更
+    if(props.isLoggedIn){
         return(
-
-            <a href="/" 
-                className='button log_button' 
-                onClick={e=>{
-                    props.logout();
-                    e.preventDefault();
-                }}
-            >Logout</a>
-
+            <button onClick={() => {props.logout()}}>Logout</button>
         )
     }else{
         return(
-            <a href="/"
-                className='button log_button'
-                onClick={e=>{
-                    props.login();
-                    e.preventDefault();
-                }}
-            >Login</a>
-            
+            <button onClick={props.login}>Login</button>
         )
     }
 }
