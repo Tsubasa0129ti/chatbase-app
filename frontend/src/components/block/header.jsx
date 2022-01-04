@@ -94,7 +94,7 @@ function Header(props){
                 </div>
                 <nav className='header-navi'>
                     <ul>
-                        <li><a href="/user">Account</a></li>
+                        <li><a href="/users">Account</a></li>
                         <li><a href="/chat">Chat</a></li>
                         <li><a href="/blog">Blog</a></li>
                         <li><a href="/contact">Contact</a></li>
