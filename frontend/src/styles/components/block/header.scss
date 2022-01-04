@@ -18,54 +18,82 @@ $tab : 520px;
     .header {
         //全体には位置の固定を行う
         z-index: 2;
-        overflow: hidden;
         position: fixed;
         top: 0;
         width: 100%;
-        height: auto; //これに関しては効いていない（widthもかも）
-        box-sizing: border-box;
-        .in_header{
-            //ここの内部に枠の適用をする
-            border: 1px solid rgb(94, 87, 87) ;
-            .header-top {
-                .header-left {
-                    height : 125px;
-                    margin: 0 10px;
-                    color: rgb(62, 78, 128);
-                    font-size: 18px;
-                    font-family: 'Courier New', Courier, monospace;
-                    float: left;
+
+        .header-inner {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 30px;
+
+            .header-left {
+                width: 190px;
+                text-align: center;
+            
+                a {
+                    //文字の調整
+                    display: block;
+                    margin: 15px 0;
+                    font-size: 28px;
+                    font-family: cursive;
+                    text-decoration: none;
+                    background: linear-gradient( to right,  rgba(69,179,224,1) 25%, rgba(102,51,153,1) 75% );
+                    -webkit-background-clip: text;
+                    color: transparent;
                 }
-                .header-right {
-                    float: right;
-                    
-                    .navigation {
-                        margin: 22.41px 22.41px 0px 22.41px;
+            }
+
+            .header-navi {
+
+                ul {
+                    display: flex;
+                    justify-content: space-between;
+                    list-style-type: none;
+                    padding-left: 0;
+
+                    li {
+                        margin: 10px 25px;
+
+                        a {
+                            font-size: 15px;
+                            font-family: serif;
+                            color: rgb(32, 32, 32);
+                            text-decoration: none;
+
+                            &:hover {
+                                transition: 0.3s;
+                                background: linear-gradient( to right,  rgb(69, 224, 164) 25%, rgba(102,51,153,1) 75% );
+                                -webkit-background-clip: text;
+                                color: transparent;
+                            }
+                        }
+
                     }
-                    .log {
-                        float: right;
-                        margin: 5px 22.41px;
+                }
+            }
+
+            .header-right {
+                margin: 20px 0;
+
+                .signup-btn {
+                    height: 35px;
+                    width: 90px;
+                    font-size: 15px;
+                    font-weight: 600;
+                    color: white;
+                    background-color: #7D2AE8;
+                    border-radius: 3px;
+                    border: 1px solid transparent;
+                    cursor: pointer;
+
+                    &:hover {
+                        opacity: 0.6;
+                        transition-duration: 0.3s;
                     }
                 }
-                .clear {
-                    clear : both;
-                }
             }
-            .middle-border {
-                border-bottom: 1px solid black;
-                width: 56%;
-                margin: 0 22%;
-            }
-            .header-buttom {
-                height : 52px ;
-                display: flex;
-                justify-content: center;//ここに関しては、文字を前半（status）,中間（:）,後半（Guest）とに分割する必要があるかも
-            }
-        }
-        
-        .box {
-            box-sizing: border-box;
-        }
+        }  
     }
 }
 

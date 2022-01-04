@@ -1,25 +1,18 @@
-.button {
-    //ここに関してはボタンの一般的な設定を盛り込む
-    display: inline-block;
-    border-radius: 30px;
-    justify-content: center;
-    text-align: center;
-}
-
-.log_button {
-    //ここには、ログインボタン特有の設定を入れる
-    width: 130px;
-    height: 40px;
-    line-height: 35px;
-    margin: 10px 20px;
-
+.log-btn {
+    height: 35px;
+    width: 90px;
+    margin-right: 10px;
+    font-size: 15px;
+    font-family: 'Courier Ne, Courier, monospacew';
+    font-weight: 500;
     color: black;
-    background-color: rgb(164,216,215);
-    text-decoration: none;
-
+    background-color: rgba(64,87,109,.07);
+    border-radius: 3px;
+    border: 1px solid transparent;
+    cursor: pointer;
 
     &:hover {
-        transition-duration: .3s;
-        opacity: 0.7;
+        background-color: rgba(64,87,109,0.2);
+        transition-duration: 0.3s;
     }
 }

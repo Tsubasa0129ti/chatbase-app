@@ -210,7 +210,7 @@ class New extends React.Component{
     render(){
         return(
             <div>
-                {/* <Header message={this.state.message} /> */}
+                <Header message={this.state.message} />
 
                 <div className='main'>
                     <div className='main-top'>

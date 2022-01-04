@@ -4,11 +4,21 @@ function Log(props){
     console.log(props);
     if(props.isLoggedIn){
         return(
-            <button onClick={() => {props.logout()}}>Logout</button>
+            <button 
+                className='log-btn'
+                onClick={() => {props.logout()}}
+            >
+                ログアウト
+            </button>
         )
     }else{
         return(
-            <button onClick={props.login}>Login</button>
+            <button
+                className='log-btn'
+                onClick={props.login}
+            >
+                ログイン
+            </button>
         )
     }
 }

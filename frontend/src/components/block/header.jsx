@@ -7,7 +7,7 @@ import '../../styles/components/block/header.scss';
 
 function Header(props){
     const [loggedIn,setLoggedIn] = useState(false);
-    const [message,setMessage] = useState('');
+    /* const [message,setMessage] = useState(''); */
 
     const history = useHistory();
 
@@ -88,27 +88,38 @@ function Header(props){
 
     return(
         <div className='header'>
-            <div className='header-left'>React Chat</div>
-            <nav className='header-navi'>
-                <ul>
-                    <li><a href="/about">About us</a></li>
-                    <li><a href="/chat">Chat</a></li>
-                    <li><a href="/blog">Blog</a></li>
-                    <li><a href="/contact">Contact</a></li>
-                </ul>
-            </nav>
-            <div className='header-right'>
-                <Log 
-                    isLoggedIn={loggedIn}
-                    login={() => {
-                        history.push('/users/login');
-                    }}
-                    logout={() => {
-                        logout();
-                    }} 
-                />
-                <button onClick={() => {history.push('/users/new')}}>Sign Up</button>
+            <div className='header-inner'>
+                <div className='header-left'>
+                    <a href="/">React Chat</a>
+                </div>
+                <nav className='header-navi'>
+                    <ul>
+                        <li><a href="/about">About us</a></li>
+                        <li><a href="/chat">Chat</a></li>
+                        <li><a href="/blog">Blog</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </nav>
+                <div className='header-right'>
+                    <Log 
+                        className='btn log-btn'
+                        isLoggedIn={loggedIn}
+                        login={() => {
+                            history.push('/users/login');
+                        }}
+                        logout={() => {
+                            logout();
+                        }} 
+                    />
+                    <button 
+                        className='btn signup-btn'
+                        onClick={() => {history.push('/users/new')}}
+                    >
+                        登録
+                    </button>
+                </div>
             </div>
+            
         </div>
     )
 }
