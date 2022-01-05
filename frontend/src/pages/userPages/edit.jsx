@@ -1,27 +1,26 @@
-import React from 'react';
+import React,{useState,useEffect} from 'react';
+import { useHistory,useLocation } from 'react-router';
+
 import Header from '../../components/block/header';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
-import {faCircle} from '@fortawesome/free-regular-svg-icons';
 
 import '../../styles/layouts/users/edit.scss';
 
-class Edit extends React.Component{
-    constructor(props){
-        super(props);
-        this.state = {
-            first : '',
-            last : '',
-            message : '',
-            first_error : '',
-            last_error : ''
-        }
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-    }
+function Edit(props){
+    const [formData,setFormData] = useState({
+        first : '',
+        last : ''
+    });
+    const [first_error,setFirst_error] = useState('');
+    const [last_error,setLast_error] = useState('');
+    const [message,setMessage] = useState('');
 
-    componentDidMount(){
+    const history = useHistory();
+    const location  = useLocation();
+
+    useEffect(() => {
         const error = new Error();
 
         fetch('/api/users/mypage/edit')
@@ -38,37 +37,37 @@ class Edit extends React.Component{
             return res.json();
         })
         .then((obj) => {
-            this.setState({
+            setFormData({
                 first : obj.name.first,
                 last : obj.name.last
             });
         }).catch((err) => {
             if(err.status === 401){
-                this.props.history.push({
+                history.push({
                     pathname : '/users/login',
                     state : {message : `${err.status} : ログインしてください。`}
                 });
             }else if(err.status >= 500){
-                this.props.history.push({
+                history.push({
                     pathname : '/users/mypage',
                     state : {message : `${err.status} : ${err.message}`}
                 });
             }else{
-                this.props.history.push({
+                history.push({
                     pathname : '/users',
                     state : {message : err.message}
                 });
             }
         });
+    },[]);
 
-        if(this.props.location.state){
-            this.setState({
-                message : this.props.location.state.message
-            });
+    useEffect(() => {
+        if(location.state){
+            setMessage(location.state);
         }
-    }
+    },[]);
 
-    handleChange(e){
+    const handleChange = (e) => {
         const target = e.target;
         const value = target.value;
         const name = target.name;
@@ -76,18 +75,12 @@ class Edit extends React.Component{
         //first_errorの出力
         if(name === 'first'){
             if(nameChecker(value)){
-                this.setState({
-                    first_error : 'First Name : 1文字目は、大文字で設定してください。'
-                });
+                setFirst_error('First Name : 1文字目は、大文字で設定してください。')
             }else{
                 if(value.length <= 3 || value.length >= 8){
-                    this.setState({
-                        first_error : 'First Name : 名前は4~7文字で記入してください'
-                    });
+                    setFirst_error('First Name : 名前は4~7文字で記入してください。')
                 }else{
-                    this.setState({
-                        first_error : ''
-                    });
+                    setFirst_error('')
                 }
             }
         }
@@ -95,18 +88,12 @@ class Edit extends React.Component{
         //last_errorの出力
         if(name === 'last'){
             if(nameChecker(value)){
-                this.setState({
-                    last_error : 'Last Name : 1文字目は、大文字で設定してください。'
-                });
+                setLast_error('Last Name : 1文字目は、大文字で設定してください。');
             }else{
                 if(value.length <= 3 || value.length >= 8){
-                    this.setState({
-                        last_error : 'Last Name : 名前は4~7文字で記入してください'
-                    });
+                    setLast_error('Last Name : 名前は4~7文字で記入してください。');
                 }else{
-                    this.setState({
-                        last_error : ''
-                    });
+                    setLast_error('');
                 }
             }
         }
@@ -118,17 +105,13 @@ class Edit extends React.Component{
             }
         };
 
-        this.setState({
-            [name] : value
-        });
-    }
+        setFormData({...formData,hasChanged:true,[name]:value});
+    };
 
-    handleSubmit(e){
+    const handleSubmit = (e) => {
         e.preventDefault();
-        if(this.state.first_error || this.state.last_error){
-            this.setState({
-                message : 'エラーの修正をしてください。'
-            })
+        if(first_error || last_error){
+            setMessage('エラーの修正をしてください。');
         }else{
             const error = new Error();
 
@@ -140,8 +123,8 @@ class Edit extends React.Component{
                 },
                 body : JSON.stringify({
                     name : {
-                        first : this.state.first,
-                        last : this.state.last
+                        first : formData.first,
+                        last : formData.last
                     }
                 })
             })
@@ -158,25 +141,21 @@ class Edit extends React.Component{
                 return res.json();
             })
             .then((obj) => {
-                this.setState({
-                    message : ''
-                });
-                this.props.history.push({
+                setMessage('');
+                history.push({
                     pathname : obj.redirectPath,
                     state : {message : 'アカウントの変更をしました。'}
                 });
             }).catch((err) => {
                 if(err.status === 401){
-                    this.props.history.push({
+                    history.push({
                         pathname : '/users/login',
                         state : {message : `${err.status} : ログインしてください。`}
                     });
                 }else if(err.status >= 500){
-                    this.setState({
-                        message : `${err.status} : ${err.message}`
-                    });
+                    setMessage(`${err.status} : ${err.message}`);
                 }else{
-                    this.props.history.push({
+                    history.push({
                         pathname : '/users/mypage',
                         state : {message : err.message}
                     });
@@ -184,39 +163,36 @@ class Edit extends React.Component{
             });
         }
     }
-    
-    render(){
-        return(  
-            <div>
-                <Header />
-                <div className='userEdit_page'>
-                    <div className='edit-top'>
-                        <p className='edit-icon'>
-                            <FontAwesomeIcon icon={faPen} size='5x' />
-                        </p>
-                        <p className='edit-title'>Edit Account</p>
-                        <p className='error_code'>{this.state.message}</p>
-                    </div>
-                    <form className='edit_form' onSubmit={this.handleSubmit}>
-                        <div className='firstName_block'>
-                            <label htmlFor="firstName" className='label'>First Name</label>
-                            <input type="text" name='first' className='edit_input' value={this.state.first} onChange={this.handleChange} />
-                            <p className='error_message'>{this.state.first_error}</p>
-                        </div>
-                        <div className='lastName_block'>
-                            <label htmlFor="lastName" className='label'>Last Name</label>
-                            <input type='text' name='last' className='edit_input' value={this.state.last} onChange={this.handleChange} />
-                            <p className='error_message'>{this.state.last_error}</p>
-                        </div>
-                        <input type='submit' value='Edit Account' className='edit-submit' />
-                    </form>
-                    <div className='link'></div>
+
+    return(
+        <div>
+            <Header />
+            <div className='userEdit_page'>
+                <div className='edit-top'>
+                    <p className='edit-icon'>
+                        <FontAwesomeIcon icon={faPen} size='5x' />
+                    </p>
+                    <p className='edit-title'>Edit Account</p>
+                    <p className='error_code'>{message}</p>
                 </div>
+                <form className='edit_form' onSubmit={handleSubmit}>
+                    <div className='firstName_block'>
+                        <label htmlFor="firstName" className='label'>First Name</label>
+                        <input type="text" name='first' className='edit_input' value={formData.first} onChange={handleChange} />
+                        <p className='error_message'>{first_error}</p>
+                    </div>
+                    <div className='lastName_block'>
+                        <label htmlFor="lastName" className='label'>Last Name</label>
+                        <input type='text' name='last' className='edit_input' value={formData.last} onChange={handleChange} />
+                        <p className='error_message'>{last_error}</p>
+                    </div>
+                    <input type='submit' value='Edit Account' className='edit-submit' />
+                </form>
+                <div className='link'></div>
             </div>
-        )
-    }
+        </div>
+    )
 }
 
 export default Edit;
-
 //これに関する不足点　①サーバー全般　②バリデーション機能(フロント部分は完了)

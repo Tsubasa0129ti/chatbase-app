@@ -227,7 +227,7 @@ class Mypage extends React.Component{
                                 <div className='text-line'>
                                     <p><FontAwesomeIcon icon={faCog} /> Setting</p>
                                 </div>
-                                <a href="/users/edit"><FontAwesomeIcon icon={faEdit} /> Edit Account</a>
+                                <a href="/users/mypage/edit"><FontAwesomeIcon icon={faEdit} /> Edit Account</a>
                                 <a href="/profile/edit"><FontAwesomeIcon icon={faIdCard} /> Edit Profile</a>
                                 <a 
                                     href='/' 
