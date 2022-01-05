@@ -74,18 +74,12 @@ function New(props){
         //first_errorの出力
         if(name === 'first'){
             if(nameChecker(value)){
-                setValidation({
-                    first_error : 'First Name : 1文字目は、大文字で設定してください。'
-                });
+                setValidation({...validation,hasChanged:true,first_error:'First Name : 1文字目は、大文字で設定してください。'});
             }else{
                 if(value.length <= 3 || value.length >= 8){
-                    setValidation({
-                        first_error : 'First Name : 名前は4~7文字で記入してください'
-                    });
+                    setValidation({...validation,hasChanged:true,first_error:'First Name : 名前は4~7文字で記入してください。'});
                 }else{
-                    setValidation({
-                        first_error : ''
-                    });
+                    setValidation({...validation,hasChanged:true,first_error:''});
                 }
             }
         }
@@ -93,18 +87,12 @@ function New(props){
         //lastのエラー作成
         if(name === 'last'){
             if(nameChecker(value)){
-                setValidation({
-                    last_error : 'Last Name : 1文字目は、大文字で設定してください。'
-                });
+                setValidation({...validation,hasChanged:true,last_error:'Last Name : 1文字目は、大文字で設定してください。'});
             }else{
                 if(value.length <= 3 || value.length >= 8){
-                    setValidation({
-                        last_error : 'Last Name : 名前は4~7文字で記入してください'
-                    })
+                    setValidation({...validation,hasChanged:true,last_error:'Last Name : 名前は4~7文字で記入してください。'});
                 }else{
-                    setValidation({
-                        last_error : ''
-                    });
+                    setValidation({...validation,hasChanged:true,last_error:''});
                 }
             }
         }
@@ -112,13 +100,9 @@ function New(props){
         //emailのエラー作成
         if(name === 'email'){
             if(emailChecker(value)){
-                setValidation({
-                    email_error : 'Email : 正しいメールアドレスを記入してください。'
-                });
+                setValidation({...validation,hasChanged:true,email_error:'Email : 正しいメールアドレスを記入してください。'});
             }else{
-                setValidation({
-                    email_error : ''
-                });
+                setValidation({...validation,hasChanged:true,email_error:''});
             }
         }
 
@@ -128,28 +112,18 @@ function New(props){
                 if(isUpper(value)){
                     if(numIncluder(value)){
                         if(strChecker(value)){
-                            setValidation({
-                                password_error : ''
-                            });
-                        }else{
-                            setValidation({
-                                password_error : 'Password : 半角英数字で設定してください。'　//このバリデーションが効いていない
-                            });
+                            setValidation({...validation,hasChanged:true,password_error:''});
+                        }else{//ここの確認も
+                            setValidation({...validation,hasChanged:true,password_error:'Password : 半角英数字で設定してください。'});
                         }
                     }else{
-                        setValidation({
-                            password_error : 'Password : 数値も含めてください。'
-                        });
+                        setValidation({...validation,hasChanged:true,password_error:'Password : 数値も含めてください。'});
                     }
                 }else{
-                    setValidation({
-                        password_error : 'Password : 最初の文字は大文字に設定してください。'
-                    });
+                    setValidation({...validation,hasChanged:true,password_error:'Password : 最初の文字は大文字に設定してください。'});
                 }
             }else{
-                setValidation({
-                    password_error : 'Password : 文字数は8文字以上16文字以内に設定してください。'
-                });
+                setValidation({...validation,hasChanged:true,password_error:'Password : 文字数は8文字以上16文字以内に設定してください。'});
             }
         }
 
@@ -192,7 +166,6 @@ function New(props){
         };
 
         setFormData({...formData,hasChanged:true,[name]:value});
-        console.log(formData);
     }
 
     const handleSubmit = (e) => {
@@ -202,9 +175,7 @@ function New(props){
 
         if(pass !== passCheck){
             setMessage('エラーの修正をしてください。');
-            setValidation({
-                passCheck_error : 'Password Confirm : 確認の値が異なっています。'
-            });
+            setValidation({...validation,hasChanged:true,passCheck_error:'Password Confirm : 確認の値が異なっています。'});
         }else if(validation.first_error || validation.last_error || validation.email_error || validation.password_error){
             setMessage('エラーの修正をしてください。')
         }else{
