@@ -73,15 +73,15 @@ module.exports = {
     edit : (req,res) => {
         var currentUser = req.user;
         User.findById(currentUser._id)
-        .populate("profile")
+        .populate("profile") 
         .exec(function(err,user){
             if(err){
                 next(err);
             }
-            const username = user.name.first + ' ' + user.name.last;
-            const profile = user.profile
+            const email = user.email;
+            const profile = user.profile;
             res.json({
-                username : username,
+                email : email,
                 profile : profile
             });
             
