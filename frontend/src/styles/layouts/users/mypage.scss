@@ -28,7 +28,7 @@ body {
 .mypage {
     background-image: linear-gradient(white,blue);
     height: 100%;
-    margin-top: 180px;
+    margin-top: 80px;
     .users_mypage { //上部のmarginを開ける予定（後回し）
         text-align: center;
         
@@ -177,7 +177,7 @@ body {
     .container {
         display: flex;
         justify-content: space-between;
-        height: 80%;
+        /* height: 80%; */
         .aside {
             width: 28%;
             margin: 30px 50px;
@@ -259,24 +259,34 @@ body {
 
             .profile-header {
                 margin-top: 20px;
-                height: 25%;
+                height: 35%;
                 .username {
                     margin: 0;
                     font-size: 36px;
                 }
-                .intro {
-                    margin: 0px 10px;
-                    height: 120px;
-                    display: table;
-                    width: 100%;
 
-                    .intro-text {
-                        display: table-cell;
-                        vertical-align: middle;
-                        //margin: 5px 10px;
-                        font-size: 18px;
-                        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+                .comment {
+                    /* .comment-top {
+                        font-size: 24px;
+                        border-bottom: 1px solid rgba($color: #000000, $alpha: 0.8);
+                        padding: 5px 0;
                     }
+                    .changeField {
+                        float : right;
+                    }
+                    .intro {
+                        margin: 30px 10px;
+                        //height: 80px;
+                        display: table;
+                        width: 100%;
+                        .intro-text {
+                            display: table-cell;
+                            vertical-align: middle;
+                            //margin: 5px 10px;
+                            font-size: 18px;
+                            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+                        }
+                    } */
                 }
             }
 
@@ -284,9 +294,9 @@ body {
                 .about {
 
                     .about-top {
-                        font-size: 18px;
+                        font-size: 24px;
                         border-bottom: 1px solid rgba($color: #000000, $alpha: 0.8);
-                        padding: 1px 0;
+                        padding: 5px 0;
                     }                    
                     //後で途中の色換えを実行する
 

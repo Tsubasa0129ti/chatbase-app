@@ -87,6 +87,18 @@ module.exports = {
             
         });
     },
+    introUpdate : (req,res) => {
+        var id = req.user.profile;
+        Profile.findByIdAndUpdate(id,{
+            $set : {intro : req.body.intro}
+        }).then(profile => {
+            res.json({
+                redirectPath : '/users/mypage'
+            });
+        }).catch(err => {
+            next(err);
+        })
+    },
     update : (req,res,next) => {
         let profileParams = getProfile(req.body);
         var id = req.user.profile;

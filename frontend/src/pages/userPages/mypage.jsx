@@ -2,9 +2,10 @@ import React,{useState,useEffect} from 'react';
 import { useHistory,useLocation } from 'react-router';
 import Header from '../../components/block/header';
 import AccountDelete from '../../components/ReactModal/accountDelete';
+import ProfileComment from '../../components/atoms/profileComment';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCog , faAddressCard , faEdit , faTrashAlt ,faIdCard ,faUser , faChartLine , faBlog} from "@fortawesome/free-solid-svg-icons";
+import { faCog , faAddressCard , faEdit , faTrashAlt ,faIdCard ,faUser , faChartLine , faBlog , faComment} from "@fortawesome/free-solid-svg-icons";
 import {faComments} from '@fortawesome/free-regular-svg-icons'
 
 import '../../styles/layouts/users/mypage.scss';
@@ -226,10 +227,8 @@ function Mypage(props){
                     </div>
                     <div className='main'>
                         <div className='profile-header'>
-                            <p className='username'>{username}</p>
-                            <div className='intro'>
-                                <p className='intro-text'>{user.profile.intro}</p>
-                            </div>
+                            <p className='username'>Welcome back, {username}</p>
+                            <ProfileComment intro={user.profile.intro} />
                         </div>
                         <div className='profile-detail'>
                             <div className='about'>

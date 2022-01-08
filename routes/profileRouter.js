@@ -11,6 +11,8 @@ router.post('/create',userController.loginCheck,profileController.profileCheck,p
 router.get('/edit',userController.loginCheck,profileController.getProfile,profileController.edit);
 router.put('/update',userController.loginCheck,profileController.update);
 
+router.put('/introUpdate',userController.loginCheck,profileController.introUpdate);
+
 router.get('/:id',userController.loginCheck,profileController.id);
 
 module.exports = router;
