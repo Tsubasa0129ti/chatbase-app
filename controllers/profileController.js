@@ -17,8 +17,7 @@ function getProfile(body) {
 
 module.exports = {
     profileCheck : (req,res,next) => {
-        var user = req.user;
-        res.locals.username = user.name.first + ' ' + user.name.last;
+        const user = req.user;
         if(user.profile === undefined){
             next();
         }else{
@@ -29,10 +28,7 @@ module.exports = {
         }
     },
     new : (req,res) => {
-        var username = res.locals.username;
-        res.json({
-            username : username
-        });
+        res.json('success');
     },
     create : (req,res) => {
         const user = req.user;
@@ -129,9 +125,11 @@ module.exports = {
                 });
             }else{
                 const username = user.name.first + ' ' + user.name.last;
+                const email = user.email;
                 res.json({
                     notExist : true,
-                    username : username
+                    username : username,
+                    email : email
                 });
             }
         }).catch((err) => {
