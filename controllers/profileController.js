@@ -111,7 +111,7 @@ module.exports = {
     id : (req,res,next) => { //時々なのかはわからないが、userの検索ができなくなったことがあったので、エラー処理をするなどして、対処する必要がありそう
         var userId = req.params.id;
         User.findById(userId)
-        .then((user) => {
+        .then((user) => { //なるほど、結果がなくても検索自体は一応できてしまうのか
             if(user.profile){
                 User.findById(userId)
                 .populate('profile')
@@ -120,20 +120,17 @@ module.exports = {
                         next(err);
                     }
                     res.json({
+                        profileExist : true,
                         user : user
                     });
                 });
             }else{
-                const username = user.name.first + ' ' + user.name.last;
-                const email = user.email;
                 res.json({
-                    notExist : true,
-                    username : username,
-                    email : email
+                    user : user
                 });
             }
         }).catch((err) => {
-            next(err);
+            next(err); //ここだね。おそらくこのエラーが出たときに/mypageに飛ぶ
         })
     }
 }

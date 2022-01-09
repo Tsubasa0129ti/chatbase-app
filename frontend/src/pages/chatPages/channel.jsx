@@ -7,6 +7,7 @@ import ChannelDB from '../../components/module/channelDB';
 import ChannelSocket from '../../components/module/channelSocket';
 import MessageDelete from '../../components/ReactModal/messageDelete';
 import {showContext} from '../../context/showContext';
+import UserProfile from '../../components/ReactModal/userProfile';
 
 const ENDPOINT = 'http://localhost:3001';
 const socket = socketIOClient(ENDPOINT);
@@ -24,7 +25,10 @@ class Channel extends React.Component {
             socket : [],
             show : false,
             deleteData : {},
-            block : {}
+            block : {},
+            showAccount : false,
+            profileExist : false,
+            userData : {}
         }
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
@@ -159,6 +163,66 @@ class Channel extends React.Component {
         });
     }
 
+    profileShow(e) {
+        e.preventDefault();
+        const target = e.target;
+        const id = target.dataset.user;
+
+        const error = new Error();
+
+        fetch(`/api/profile/${id}`)
+        .then((res) => {
+            if(!res.ok){
+                console.error('res.ok:',res.ok);
+                console.error('res.status',res.status);
+                console.error('res.statusText:',res.statusText);
+
+                error.status = res.status;
+                error.message = res.statusText;
+                throw error;
+            }
+            return res.json();
+        }).then((obj) => { //単純にprofileの有無によって分岐するだけだが、どのように行うか。。。
+            console.log(obj.user);
+            this.setState({
+                userData : obj.user,
+                showAccount : true
+            });
+
+            if(obj.profileExist){
+                this.setState({
+                    profileExist : true
+                });
+            }
+        }).catch((err) => {
+            if(err.status === 401){
+                this.props.history.push({
+                    pathname : '/users/login',
+                    state : {message : `${err.status} : ログインしてください。`}
+                });
+            }else if(err.status >= 500){
+                this.props.history.push({
+                    pathname : '/users/mypage',
+                    state : {message : `${err.status} : ${err.message}`}
+                })
+            }else{
+                this.props.history.push({
+                    pathname : '/users',
+                    stete : {message : err.message}
+                });
+            }
+        });
+    }
+
+    close(e) {
+        e.preventDefault();
+        this.setState({
+            profileExist : false,
+            showAccount : false,
+            user : {}
+        });
+    }
+
     render(){
         if(!this.state.userId){
             return null;
@@ -230,8 +294,16 @@ class Channel extends React.Component {
                                 <p>チャンネル詳細　{this.state.channel.channelDetail}</p>
                                 <p>作成者　{this.state.channel.createdBy}</p>
                             </div>
-                            <ChannelDB chatData={this.state.chatData} userId={this.state.userId} />
-                            <ChannelSocket socket={this.state.socket} userId={this.state.userId} />
+                            <ChannelDB 
+                                chatData={this.state.chatData} 
+                                userId={this.state.userId}
+                                profileShow={this.profileShow.bind(this)}
+                            />
+                            <ChannelSocket
+                                socket={this.state.socket}
+                                userId={this.state.userId}
+                                profileShow={this.profileShow.bind(this)}
+                            />
                             <form className='message_submit' onSubmit={this.handleSubmit}>
                                 <input type="text" name='chat_message' onChange={this.handleChange} />
                                 <input type="submit" value='送信' />
@@ -244,6 +316,12 @@ class Channel extends React.Component {
                         deleteData={this.state.deleteData} 
                         onCancelCallback={this.cancel.bind(this)}
                         onDeleteCallback={this.delete.bind(this)}
+                    />
+                    <UserProfile
+                        userData={this.state.userData}
+                        show={this.state.showAccount}
+                        profileExist={this.state.profileExist}
+                        onCloseCallback={this.close.bind(this)}
                     />
                 </div>
             )

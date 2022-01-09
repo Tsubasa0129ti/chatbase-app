@@ -60,7 +60,14 @@ class ChannelDB extends React.Component{
                     onMouseEnter={this.mouseenterEvent}
                     onMouseLeave={this.mouseleaveEvent}
                 >
-                    <a className='test' href={`/profile/account/${messages[j].userId}`}>{messages[j].username}</a>
+                    <a 
+                        className='test' 
+                        href={`/profile/account/${messages[j].userId}`}
+                        data-user={messages[j].userId}
+                        onClick={this.props.profileShow}    
+                    >
+                        {messages[j].username}
+                    </a>
                     <p>{messages[j].time}</p>
                     <p>{messages[j].text}</p>
                     <input type='hidden' value={messages[j].customId} />
