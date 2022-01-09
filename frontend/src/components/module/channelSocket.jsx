@@ -63,7 +63,13 @@ class ChannelSocket extends React.Component{
                             onMouseEnter={this.mouseenterEvent}
                             onMouseLeave={this.mouseleaveEvent}
                         >
-                            <a href={`/profile/account/${socket[j].userId}`}>{socket[j].username}</a>
+                            <a 
+                                href={`/profile/account/${socket[j].userId}`}
+                                data-user={socket[j].userId}
+                                onClick={this.props.profileShow}
+                            >
+                                {socket[j].username}
+                            </a>
                             <p>{socket[j].time}</p>
                             <p>{socket[j].text}</p>
                             <input type='hidden' value={socket[j].customId} />
