@@ -1,26 +1,25 @@
-import React from 'react';
+import React,{useState,useEffect} from 'react';
+import { useHistory,useLocation } from 'react-router';
 import Header from '../../components/block/header';
 
-class Id extends React.Component{
-    constructor(props){
-        super(props);
-        this.state = {
-            username : '',
-            intro : '未設定',
-            age : '未設定',
-            prefecture : '未設定',
-            birthday : '未設定',
-            belongings : '未設定',
-            message : ''
-        } 
-    }
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faUser} from '@fortawesome/free-solid-svg-icons';
 
-    componentDidMount(){
-        //ここではログインチェックは必要？一応他のユーザーへ向けた公開を想定している。
-        const pathname = this.props.location.pathname;
+function Id(props){
+    const [userData,setUserData] = useState({
+        username : '',
+        country : '未設定',
+        professional : '未設定',
+        email : '',
+        birthday : '未設定'
+    });
+
+    const history = useHistory();
+    const location = useLocation();
+
+    useEffect(() => {
+        const pathname = location.pathname;
         var id = pathname.split('/')[3];
-        
-        console.log(id);
 
         const error = new Error();
 
@@ -36,79 +35,80 @@ class Id extends React.Component{
                 throw error;
             }
             return res.json();
-        })
-        .then((obj) => {
+        }).then((obj) => {
             if(obj.notExist){
-                this.setState({
-                    username : obj.username
+                setUserData({
+                    username : obj.username,
+                    email : obj.email
                 });
             }else{
-                this.setState({
+                setUserData({
                     username : obj.user.name.first + ' ' + obj.user.name.last,
                     intro : obj.user.profile.intro,
-                    age : obj.user.profile.age,
-                    prefecture : obj.user.profile.prefecture,
-                    birthday : obj.user.profile.birthday,
-                    belongings : obj.user.profile.belongings
+                    country : obj.user.profile.country,
+                    professional : obj.user.profile.professional,
+                    email : obj.user.email,
+                    birthday : obj.user.profile.birthday
                 });
             }
         }).catch((err) => {
             if(err.status === 401){
-                this.props.history.push({
+                history.push({
                     pathname : '/users/login',
                     state : {message : `${err.status} : ログインしてください。`}
                 });
             }else if(err.status >= 500){
-                this.props.history.push({
+                history.push({
                     pathname : '/users/mypage',
                     state : {message : `${err.status} : ${err.message}`}
                 })
             }else{
-                this.props.history.push({
+                history.push({
                     pathname : '/users',
                     stete : {message : err.message}
                 });
             }
         });
-    }
+    },[]);
 
-    render(){
-        return(
-            <div>
-                <Header message={this.state.message} />
-                <div>
-                    <h3>{this.state.username}さんのプロフィール</h3>
+
+    return(
+        <div>
+            <Header />
+            <div className='main'>
+                <div className='profile-top'>
                     <div className='icon'>
-
+                        <FontAwesomeIcon icon={faUser} size='10x' className='icon' />
                     </div>
-                    <div className='name'>
-                        <label htmlFor='name'>名前</label>
-                        <p>{this.state.username}</p>
+                    <p className='username'>{userData.username}</p>
+                    <div className='comment'>
+                        <input type="text" className='user-comment' value={userData.intro} />
                     </div>
-                    <div className='intro'>
-                        <label htmlFor='intro'>ひとこと</label>
-                        <p>{this.state.intro}</p>
+                </div> 
+                <div className='profile-main'>
+                    <div className='profile-block'>
+                        <label htmlFor="country">Country</label>
+                        <input type="text" className='profile-item' value={userData.country} disabled />
                     </div>
-                    <div>
-                        <label htmlFor="age">年齢</label>
-                        <p>{this.state.age}</p>
+                    <div className='profile-block'>
+                        <label htmlFor="professional">
+                            <label htmlFor="professional">Professional</label>
+                            <input type="text" className='profile-item' value={userData.professional} disabled />
+                        </label>
                     </div>
-                    <div className='prefecture'>
-                        <label htmlFor='prefecture'>都道府県</label>
-                        <p>{this.state.prefecture}</p>
+                    <div className='profile-block'>
+                        <label htmlFor="email">Email</label>
+                        <input type="text" className='profile-item' value={userData.email} disabled />
                     </div>
-                    <div className='birthday'>
-                        <label htmlFor='birthday'>誕生日</label>
-                        <p>{this.state.birthday}</p>
-                    </div>
-                    <div className='belongings'>
-                        <label htmlFor='belongings'>所属</label>
-                        <p>{this.state.belongings}</p>
+                    <div className='profile-block'>
+                        <label htmlFor="birthday">Birthday</label>
+                        <input type="text" className='profile-item' value={userData.birthday} disabled />
                     </div>
                 </div>
             </div>
-        )
-    }
+        </div>
+    )
 }
 
+//将来的には、データベース内の公開範囲設定を参照し、これを分岐に用いることによって、情報の公開範囲を決める予定
 export default Id;

@@ -113,9 +113,11 @@ module.exports = {
                 });
             }else{
                 const username = user.name.first + ' ' + user.name.last;
+                const email = user.email;
                 res.json({
                     notExist : true,
-                    username : username
+                    username : username,
+                    email : email
                 });
             }
         }).catch((err) => {
