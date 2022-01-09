@@ -6,6 +6,8 @@ import {faUser} from '@fortawesome/free-solid-svg-icons';
 
 import Header from '../../components/block/header';
 
+import '../../styles/layouts/profiles/edit.scss';
+
 function Edit(props){
     const [email,setEmail] = useState('');
     const [formData,setFormData] = useState({
@@ -62,6 +64,7 @@ function Edit(props){
                     birthday : obj.profile.birthday,
                     intro : obj.profile.intro
                 });
+                console.log(email);
             }
         }).catch((err) => {
             if(err.status === 401){
@@ -179,60 +182,100 @@ function Edit(props){
     return(
         <div>
             <Header />
-            <div>
-                <div className='profile-detail'>
-                    <form onSubmit={handleSubmit} className='about'>
-                        <p className='about-top'><FontAwesomeIcon icon={faUser} /> About</p>
-                        <p className='error_code'>{message}</p>
+           
+            <div className='main'>
+                <div className='page-top'>  
+                    <h1 className='page-title'>
+                        <p className='page-title-main'>Edit Profile</p>
+                        <p className='page-title-sub'>プロフィールの編集</p>
+                    </h1>
+                    <div className='lowlayer-link'>
+                        <ul className='breadcrumb'>
+                            <li><a className='toHome' href="/">Home</a></li>
+                            <li className='line'></li>
+                            <li><span>プロフィールの編集</span></li>
+                        </ul>    
+                    </div> 
+                </div>
+                <div className='container'>
+                    <form className='edit-form' onSubmit={handleSubmit}>
+                        <div className='form-top'>
+                            <p className='form-top-title'><FontAwesomeIcon icon={faUser} /> About</p>
+                            <p className='form-top-detail'>以下のフォームからプロフィール情報の更新をしてください。</p>
+                            <p className='error_code'>{message}</p>
+                        </div>
                         <div className='contact-info'>
-                            <p>Contact Information</p>
+                            <p className='information-title'>Contact Information</p>
                             <div className='content'>
-                                <label htmlFor="email" className='label'>Email　:</label>
-                                <input type="text" className='item' value={email} disabled />
+                                <label htmlFor="email" className='label'>Email</label>
+                                <div className='item'>
+                                    <input type="text" className='input-item' value={email} disabled />
+                                </div>
                             </div>
                             <div className='content'>
-                                <label htmlFor="country" className='label'>Country　:</label>
-                                <input type="text" name='country' className='item' value={formData.country} onChange={handleChange} />
+                                <label htmlFor="country" className='label'>Country</label>
+                                <div className='item'>
+                                    <input type="text" name='country' className='input-item' value={formData.country} onChange={handleChange} />
+                                </div>
                             </div>
                             <div className='content'>
-                                <label htmlFor="Address" className='label'>Address　:</label>
-                                <input type="text" name='address' className='item' value={formData.address} onChange={handleChange} />
-                                <p className='error_message'>{validation.address_error}</p>
+                                <label htmlFor="Address" className='label'>Address</label>                                
+                                <div className='item'>
+                                    <input type="text" name='address' className='input-item' value={formData.address} onChange={handleChange} />
+                                    <p className='error_message'>{validation.address_error}</p>
+                                </div>
                             </div>
                             <div className='content'>
                                 <label htmlFor="professional" className='label'>Professional</label>
-                                <input type="text" name='professional' className='item' value={formData.professional} onChange={handleChange} />
+                                <div className='item'>
+                                    <input type="text" name='professional' className='input-item' value={formData.professional} onChange={handleChange} />
+                                </div>
                             </div>
                             <div className='content'>
-                                <label htmlFor="belongings" className='label'>Belongings　:</label>
-                                <input type="text" name='belongings' className='item' value={formData.belongings} onChange={handleChange} />
+                                <label htmlFor="belongings" className='label'>Belongings</label>
+                                <div className='item'>
+                                    <input type="text" name='belongings' className='input-item' value={formData.belongings} onChange={handleChange} />
+                                </div>
                             </div>
                             <div className='content'>
-                                <label htmlFor="site" className='label'>Site　:</label>
-                                <input type="text" name='site' className='item' value={formData.site} onChange={handleChange} />
+                                <label htmlFor="site" className='label'>Site</label>
+                                <div className='item'>
+                                    <input type="text" name='site' className='input-item' value={formData.site} onChange={handleChange} />
+                                </div>
                             </div>
                         </div>
                         <div className='basic-info'>
-                            <p>Basic Information</p>
+                            <p className='information-title'>Basic Information</p>
                             <div className='content'>
-                                <label htmlFor="gender" className='label'>Gender　:</label>
-                                <input type="text" name='gender' className='item' value={formData.gender} onChange={handleChange} />
+                                <label htmlFor="gender" className='label'>Gender</label>
+                                <div className='item'>
+                                    <select name="gender" className='input-item' value={formData.gender}　onChange={handleChange}>
+                                        <option hidden>選択してください</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="others"> Others</option>
+                                        <option value="no-answer">No Answer</option>
+                                    </select>
+                                </div>
                             </div>
                             <div className='content'>
-                                <label htmlFor="age" className='label'>Age　:</label>
-                                <input type="text" name='age' className='item' value={formData.age} onChange={handleChange} />
-                                <p className='error_message'>{validation.age_error}</p>
+                                <label htmlFor="age" className='label'>Age</label>
+                                <div className='item'>
+                                    <input type="number" name='age' className='input-item' value={formData.age} onChange={handleChange} />
+                                    <p className='error_message'>{validation.age_error}</p>
+                                </div>
                             </div>
                             <div className='content'>
-                                <label htmlFor="birthday" name='birthday' className='label'>Birthday　:</label>
-                                <input type="text" className='item' value={formData.birthday} onChange={handleChange} />
+                                <label htmlFor="birthday" name='birthday' className='label'>Birthday</label>
+                                <div className='item'>
+                                    <input type="date" name='birthday' className='input-item' value={formData.birthday} onChange={handleChange} />
+                                </div>
                             </div>
                         </div>
-                        <input type="submit" value='編集' />
-                    </form> 
+                        <input type='submit' className='edit-btn' value='Edit' />
+                    </form>
                 </div>
             </div>
-
         </div>
     )
 }
