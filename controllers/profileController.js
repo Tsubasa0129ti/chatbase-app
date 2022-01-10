@@ -112,7 +112,9 @@ module.exports = {
         var userId = req.params.id;
         User.findById(userId)
         .then((user) => { //なるほど、結果がなくても検索自体は一応できてしまうのか
+            console.log(user);
             if(user.profile){
+                console.log(`pass1:${user.profile}`);
                 User.findById(userId)
                 .populate('profile')
                 .exec((err,user) => {
@@ -125,12 +127,20 @@ module.exports = {
                     });
                 });
             }else{
+                console.log(`pass2:${user.profile}`);
                 res.json({
                     user : user
                 });
             }
         }).catch((err) => {
+            console.log('pass3')
+            console.log('asasas')
+            console.log(err)
+            console.log(`message:${err.message}`);
+            console.log(`name:${err.name}`);
             next(err); //ここだね。おそらくこのエラーが出たときに/mypageに飛ぶ
+
+
         })
     }
 }

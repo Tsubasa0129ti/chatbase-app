@@ -119,11 +119,12 @@ app.use(function notFoundError(req,res,next){
     res.status(404);
 });
 
-app.use(function errorHandler(err,req,res,next){
+app.use(function errorHandler(err,req,res,next){ //おそらくこのエラーハンドラを作り直す必要があるかも
     console.log(err.stack);
     res.status(err.status||500).json({
         status : err.status,
-        error : err
+        error : err,
+        message : err.message
     });
 });
 

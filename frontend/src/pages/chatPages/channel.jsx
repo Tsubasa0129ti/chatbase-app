@@ -28,7 +28,8 @@ class Channel extends React.Component {
             block : {},
             showAccount : false,
             profileExist : false,
-            userData : {}
+            userData : {},
+            message : ''
         }
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
@@ -163,8 +164,10 @@ class Channel extends React.Component {
         });
     }
 
-    profileShow(e) {
+    profileShow(e) { //イベント自体は発火するけど、エラーまで行っていない
         e.preventDefault();
+
+        console.log('yeah')
         const target = e.target;
         const id = target.dataset.user;
 
@@ -173,13 +176,33 @@ class Channel extends React.Component {
         fetch(`/api/profile/${id}`)
         .then((res) => {
             if(!res.ok){
-                console.error('res.ok:',res.ok);
+                /* console.error('res.ok:',res.ok);
+
+                console.log(res);
+
+
                 console.error('res.status',res.status);
                 console.error('res.statusText:',res.statusText);
 
                 error.status = res.status;
                 error.message = res.statusText;
-                throw error;
+                throw error; */
+
+
+                return res.json().then(function(err) {
+
+                    error.statusText = err.message;
+                    if(err.message === "Cannot read property 'profile' of null"){
+                        error.status = 410;
+                    }else{
+                        error.status = 500;
+                    }
+                    
+                    console.error('res.status:',error.status);
+                    console.error('res.statusText:',error.statusText);
+
+                    throw error;
+                });
             }
             return res.json();
         }).then((obj) => { //単純にprofileの有無によって分岐するだけだが、どのように行うか。。。
@@ -200,12 +223,17 @@ class Channel extends React.Component {
                     pathname : '/users/login',
                     state : {message : `${err.status} : ログインしてください。`}
                 });
+            }else if(err.status === 410){
+                this.setState({
+                    message : '現在そのアカウントは存在しません。'
+                });
             }else if(err.status >= 500){
                 this.props.history.push({
                     pathname : '/users/mypage',
                     state : {message : `${err.status} : ${err.message}`}
                 })
             }else{
+                console.log("bbb");
                 this.props.history.push({
                     pathname : '/users',
                     stete : {message : err.message}
@@ -293,6 +321,7 @@ class Channel extends React.Component {
                                 <p>チャンネル名　{this.state.channel.channelName}</p>
                                 <p>チャンネル詳細　{this.state.channel.channelDetail}</p>
                                 <p>作成者　{this.state.channel.createdBy}</p>
+                                <p>{this.state.message}</p>
                             </div>
                             <ChannelDB 
                                 chatData={this.state.chatData} 
