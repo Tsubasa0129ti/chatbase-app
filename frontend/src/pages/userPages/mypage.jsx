@@ -1,11 +1,11 @@
-import React,{useState,useEffect} from 'react';
+import React,{useState,useEffect} from 'react'; 
 import { useHistory,useLocation } from 'react-router';
 import Header from '../../components/block/header';
 import AccountDelete from '../../components/ReactModal/accountDelete';
 import ProfileComment from '../../components/atoms/profileComment';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCog , faAddressCard , faEdit , faTrashAlt ,faIdCard ,faUser , faChartLine , faBlog , faComment} from "@fortawesome/free-solid-svg-icons";
+import { faCog , faAddressCard , faEdit , faTrashAlt ,faIdCard ,faUser , faChartLine , faBlog} from "@fortawesome/free-solid-svg-icons";
 import {faComments} from '@fortawesome/free-regular-svg-icons'
 
 import '../../styles/layouts/users/mypage.scss';
