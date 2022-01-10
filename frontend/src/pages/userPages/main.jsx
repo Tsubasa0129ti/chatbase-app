@@ -1,4 +1,5 @@
 import React,{useState,useEffect} from 'react';
+import {useLocation,useHistory} from 'react-router-dom';
 import Header from '../../components/block/header';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -8,9 +9,12 @@ import '../../styles/layouts/users/main.scss';
 
 function Index(props){
     const [message,setMessage] = useState('');
+    const location = useLocation();
+    const history = useHistory();
+
     useEffect(() => {
-        if(props.location.state){
-            setMessage(props.location.state.message);
+        if(location.state){
+            setMessage(location.state.message);
         }
     });
     console.log(message);
@@ -32,7 +36,7 @@ function Index(props){
                         onClick={
                             (e) => {
                                 e.preventDefault();
-                                props.history.push('/users/login');
+                                history.push('/users/login');
                             }
                         }
                     >
@@ -44,7 +48,7 @@ function Index(props){
                         onClick={
                             (e) => {
                                 e.preventDefault();
-                                props.history.push('/users/new');
+                                history.push('/users/new');
                             }
                         }
                     >
