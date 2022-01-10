@@ -4,6 +4,8 @@ import Header from '../../components/block/header';
 import AccountDelete from '../../components/ReactModal/accountDelete';
 import ProfileComment from '../../components/atoms/profileComment';
 
+import {HandleError,OnRejected} from '../../components/module/errorHandler';
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCog , faAddressCard , faEdit , faTrashAlt ,faIdCard ,faUser , faChartLine , faBlog , faComment} from "@fortawesome/free-solid-svg-icons";
 import {faComments} from '@fortawesome/free-regular-svg-icons'
@@ -21,9 +23,22 @@ function Mypage(props){
     const location = useLocation();
 
     useEffect(() => {
-        const error = new Error();
+        /* const error = new Error(); */
 
         fetch('/api/users/mypage')
+        .then(HandleError)
+        .then((obj) => {
+            setUsername(obj.user.name.first + ' ' + obj.user.name.last);
+            setUser(obj.user);
+            if(obj.profile){
+                setProfile(true);
+            }
+        })
+        .catch(OnRejected,(err) => { //これ以降が読み込まれない
+            console.log('aaaaaa');
+        });
+
+        /* fetch('/api/users/mypage')
         .then((res) => {
             if(!res.ok){
                 console.error('res.ok:',res.ok);
@@ -59,7 +74,7 @@ function Mypage(props){
                     state : {message : err.message}
                 });
             }
-        });
+        }); */
     },[]);
 
     useEffect(() => {
