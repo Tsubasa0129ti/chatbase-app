@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from 'react'; 
+import React,{useState,useEffect} from 'react';
 import { useHistory,useLocation } from 'react-router';
 import Header from '../../components/block/header';
 import AccountDelete from '../../components/ReactModal/accountDelete';

@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState,useEffect} from 'react';
 import {useHistory} from 'react-router-dom';
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
@@ -19,82 +19,70 @@ function ProfileComment(props){
         setEdit(true);
     };
 
-    const handleChange = (e) => {
-        const target = e.target;
-        const name = target.name;
-        const value = target.value;
-
-        if(name === 'intro'){
-            if(value.length > 100){
-                setMessage('コメントは100字以内に設定してください。');
-            }else{
-                setMessage('');
-            }
-        }
-
-        setIntro(value);
-    }
-
     const cancel = (e) => {
         e.preventDefault();
+        setMessage('');
         setEdit(false);
     }
 
     const update = (e) => {
         e.preventDefault();
+        var input = document.getElementById('intro-form-inner').textContent;
 
-        if(message){
-            setMessage('エラーの修正をしてください。');
+        if(input.length > 100){
+            setMessage('コメントは100字以内に設定してください。');
         }else{
-            const error = new Error();
-
-            fetch('/api/profile/introUpdate',{
-                method : 'PUT',
-                headers : {
-                    'Accept': 'application/json,text/plain, */*',
-                    'Content-Type': 'application/json'
-                },
-                body : JSON.stringify({
-                    intro : intro
-                })
-            }).then((res) => {
-                if(!res.ok){
-                    console.error('res.ok:',res.ok);
-                    console.error('res.status',res.status);
-                    console.error('res.statusText:',res.statusText);
-
-                    error.status = res.status;
-                    error.message = res.statusText;
-                    throw error;
-                }
-                return res.json();
-            }).then((obj) => {
-                setEdit(false);
-                history.push({
-                    pathname : obj.redirectPath,
-                    state : {message : 'プロフィールの更新に成功しました。'}
-                });
-            }).catch((err) => {
-                if(err.status === 401){
-                    history.push({
-                        pathname : '/users/login',
-                        state : {message : `${err.status} : ログインしてください。`}
-                    });
-                }else if(err.status >= 500){
-                    setMessage(`${err.status} : ${err.message}`)
-                }else{
-                    history.push({
-                        pathname : '/users/mypage',
-                        stete : {message : err.message}
-                    });
-                }
-            });
+            setIntro(input); //introを更新すると、下のuseEffectが呼び出される。
         }
     }
-    
 
+    useEffect(() => {
+        const error = new Error();
+
+        fetch('/api/profile/introUpdate',{
+            method : 'PUT',
+            headers : {
+                'Accept': 'application/json,text/plain, */*',
+                'Content-Type': 'application/json'
+            },
+            body : JSON.stringify({
+                intro : intro
+            })
+        }).then((res) => {
+            if(!res.ok){
+                console.error('res.ok:',res.ok);
+                console.error('res.status',res.status);
+                console.error('res.statusText:',res.statusText);
+
+                error.status = res.status;
+                error.message = res.statusText;
+                throw error;
+            }
+            return res.json();
+        }).then((obj) => {
+            setEdit(false);
+            history.push({
+                pathname : obj.redirectPath,
+                state : {message : 'プロフィールの更新に成功しました。'}
+            });
+        }).catch((err) => {
+            if(err.status === 401){
+                history.push({
+                    pathname : '/users/login',
+                    state : {message : `${err.status} : ログインしてください。`}
+                });
+            }else if(err.status >= 500){
+                setMessage(`${err.status} : ${err.message}`)
+            }else{
+                history.push({
+                    pathname : '/users/mypage',
+                    stete : {message : err.message}
+                });
+            }
+        });
+    },[intro])
+    
     if(!edit){
-        console.log("aaa")
         return(
             <div className='comment'>
                 <div className='comment-top'>
@@ -113,7 +101,7 @@ function ProfileComment(props){
             </div>
         )  
     }else{
-        console.log('abc')
+        console.log(intro);
         return(
             <div className='comment'>
                 <div className='comment-top'>
@@ -129,9 +117,13 @@ function ProfileComment(props){
 
                 <div className='change-intro'>
                     <p className='error_code'>{message}</p>
-                    <textarea name="intro" className='intro-form' value={intro} onChange={handleChange}></textarea>
-                    <input type="submit" className='toCancel' value='Cancel' onClick={cancel}  />
-                    <input type="submit" className='toUpdate' value='Update' onClick={update} />
+                    <div className='intro-form'>
+                        <p name="intro" id='intro-form-inner' className='intro-form-inner' contenteditable="true">{intro}</p>
+                    </div>
+                    <div className='button'>
+                        <input type="submit" className='toCancel' value='Cancel' onClick={cancel}  />
+                        <input type="submit" className='toUpdate' value='Update' onClick={update} />
+                    </div>
                 </div>
             </div>
         )
