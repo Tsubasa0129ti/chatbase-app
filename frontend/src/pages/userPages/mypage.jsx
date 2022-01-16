@@ -23,24 +23,47 @@ function Mypage(props){
     const location = useLocation();
 
     useEffect(() => {
-        /* const error = new Error(); */
 
-        fetch('/api/users/mypage')
+        /* fetch('/api/users/mypage')
         .then(HandleError)
         .then((obj) => {
+            //成功時の動作はここで行う。ここに関しては基本的に異なるものなので、関数化はほとんどしない。（まとめられるものはするかもしれない）
             setUsername(obj.user.name.first + ' ' + obj.user.name.last);
             setUser(obj.user);
             if(obj.profile){
                 setProfile(true);
             }
         })
-        .catch(OnRejected,(err) => { //これ以降が読み込まれない
-            console.log('aaaaaa');
-        });
+        .catch((err) => {
+            if(!OnRejected(err) === 'next'){
+                OnRejected(err);
+            }else{
+                console.log('エラー出力'); //実際上はこれでもいける。
+                mypageError(err);
+            }
+        }); //ここで複数を呼び出す。ただし、続ける場合結果を用いて分岐をする
 
-        /* fetch('/api/users/mypage')
+
+        function mypageError(err){ //ある程度画一化したいので、これは多分usersErrorみたいな形でまとめるかも
+            if(err.status >= 500){
+                history.push({
+                    pathname : '/users',
+                    state : {message : `${err.status} : ${err.message}`}
+                });
+            }else{
+                history.push({
+                    pathname : '/users',
+                    state : {message : err.message}
+                });
+            }
+        } */
+
+
+        fetch('/api/users/mypage')
         .then((res) => {
             if(!res.ok){
+                const error = new Error();
+
                 console.error('res.ok:',res.ok);
                 console.error('res.status:',res.status);
                 console.error('res.statusText:',res.statusText);
@@ -58,23 +81,27 @@ function Mypage(props){
                 setProfile(true);
             }
         }).catch((err) => {
+            console.log(err.status);
             if(err.status === 401){
+                console.log("pass");
                 history.push({
                     pathname : '/users/login',
                     state : {message : `${err.status} : ログインしてください。`}
                 });
             }else if(err.status >= 500){
+                console.log("pass1");
                 history.push({
                     pathname : '/users',
                     state : {message : `${err.status} : ${err.message}`}
                 });
             }else{
+                console.log("pass2")
                 history.push({
                     pathname : '/users',
                     state : {message : err.message}
                 });
             }
-        }); */
+        });
     },[]);
 
     useEffect(() => {

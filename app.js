@@ -116,11 +116,20 @@ app.use("/api",apiRoutes);
 //app.use(errorRoutes);
 
 app.use(function notFoundError(req,res,next){
-    res.status(404);
+    res.status(404).json({
+        status : 404,
+        error : 'Not Found Error'
+    });
 });
 
-app.use(function errorHandler(err,req,res,next){
-    console.log(err.stack);
+app.use(function errorHandler(err,req,res,next){ //messageに関してはReactでつける予定なので、今は考えない　あとはどうやってバリデーションのエラー取得をするのか
+    console.error(err.stack)
+    if(err instanceof createError.Unauthorized){
+        console.log('');　//ここの中で全て完結することもできるが、そこに関しては完全に未定。
+    }
+
+    console.log("pass131");
+
     res.status(err.status||500).json({
         status : err.status,
         error : err

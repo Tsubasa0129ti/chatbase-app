@@ -12,7 +12,7 @@ function Header(props){
     const history = useHistory();
 
 
-    useEffect(() => {
+    /* useEffect(() => {
         //ここで初期のログインチェックを行う。
         const error = new Error();
 
@@ -48,7 +48,7 @@ function Header(props){
                 });
             }
         });
-    },[]);
+    },[]); */
 
     const logout = () => {
         const error = new Error();
