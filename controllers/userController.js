@@ -11,28 +11,31 @@ const User = require("../models/user"),
             next(error || 'ERROR IS NULL');
         });
     };
-} */
-
-/* 基本的にapp.jsのエラーハンドリングに到達するのは、next(err)であり、createError()をしているものは、その場で完結する。はず。。。 */
+}
+https://neos21.net/blog/2020/06/14-02.html
+*/
 
 module.exports = {
-    preLoginCheck : (req,res,next) => {//ログインページを修正する必要はあるものの、ここはとりあえずOK
+    loginCheck : (req,res,next) => {
         try{
             const loggedIn = req.isAuthenticated();
             if(loggedIn){
-                var user = req.user;
-                const username = user.name.first + ' ' + user.name.last;
-                res.json({
-                    result : 'Authenticated',
-                    username : username,
-                    redirectPath : '/users/mypage'
-                });
+                next();
             }else{
-                var err = new createError.Unauthorized(); //後にreactを大幅に変える必要があるけど、一旦これに関してはOK　loginページが使えなくなった笑
+                var err = new createError.Unauthorized();
                 next(err);
             }
         }catch(err){
-            console.log("koko");
+            next(err);
+        }
+    },
+    resLoggedIn : (req,res,next) => {
+        try{
+            res.json({
+                result : "Authenticated",
+                redirectPath : '/users/mypage'
+            });
+        }catch(err){
             next(err);
         }
     },
@@ -79,7 +82,7 @@ module.exports = {
             })
         });
     },
-    logout : (req,res) => { //OK
+    logout : (req,res) => {
         try{
             req.logout();
             req.session.destroy();
@@ -90,20 +93,7 @@ module.exports = {
             next(err);
         }
     },
-    loginCheck : (req,res,next) => {//OK
-        try{
-            const loggedIn = req.isAuthenticated();
-            if(loggedIn){
-                next();
-            }else{
-                var err = new createError.Unauthorized();
-                next(err);
-            }
-        }catch(err){
-            next(err);
-        }
-    },
-    mypageView : async(req,res,next) => { //OK
+    mypageView : async(req,res,next) => {
         try{
             var user = req.user;
             if(user.profile === undefined){
@@ -120,11 +110,10 @@ module.exports = {
                 });
             }
         }catch(err){
-            console.log('pass');
             next(err);
         }
     },
-    edit : async(req,res,next) => {//OK
+    edit : async(req,res,next) => {
         try{
             var currentUser = req.user;
             const user = await User.findById(currentUser._id).exec();
@@ -135,7 +124,7 @@ module.exports = {
             next(err)
         }
     },
-    update : async(req,res,next) => {//OK
+    update : async(req,res,next) => {
         try{
             var currentUser = req.user;
             const promise = await User.findByIdAndUpdate(currentUser._id,{
@@ -149,7 +138,7 @@ module.exports = {
             next(err);
         }
     },
-    delete : async(req,res,next) => {//OK
+    delete : async(req,res,next) => {
         try{
             var userId = req.user._id;     
             const promise = await User.findByIdAndDelete(userId);
@@ -159,7 +148,7 @@ module.exports = {
             next(err);
         }
     },
-    profileDelete : async(req,res) => {//OK
+    profileDelete : async(req,res) => {
         try{
             var profileId = req.user.profile;
             const promise = await Profile.findByIdAndDelete(profileId);

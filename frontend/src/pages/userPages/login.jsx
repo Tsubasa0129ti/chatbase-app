@@ -18,7 +18,7 @@ function Login(props) {
     useEffect(() => {
         const error = new Error();
 
-        fetch('/api/users/previousCheck')
+        fetch('/api/users/loginCheck')
         .then((res) => {
             if(!res.ok){
                 console.error('res.ok:',res.ok);
@@ -39,7 +39,11 @@ function Login(props) {
                 });
             }
         }).catch((err) => {
-            if(err.status){
+            if(err.status　=== 401){
+                if(location.state){
+                    setMessage(location.state.message);
+                }
+            }else if(err.status){
                 history.push({
                     pathname : '/users',
                     state : {message : `${err.status} : ${err.message}`}
@@ -51,12 +55,6 @@ function Login(props) {
                 });
             }
         }); 
-    },[]);
-
-    useEffect(() => {
-        if(location.state){
-            setMessage(location.state.message);
-        }
     },[]);
 
     const handleChange = (e) => {

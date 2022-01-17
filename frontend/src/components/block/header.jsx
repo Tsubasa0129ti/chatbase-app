@@ -11,12 +11,13 @@ function Header(props){
 
     const history = useHistory();
 
+    //ここでログインの有無の判断をしていたのか　じゃあpropsとして送る形にするしかないか　ただし、上のstateが変化したタイミングでここにも影響を及ぼすことの確認をする
 
     /* useEffect(() => {
         //ここで初期のログインチェックを行う。
         const error = new Error();
 
-        fetch('/api/users/previousCheck')
+        fetch('/api/users/loginCheck')
         .then((res) => {
             if(!res.ok){
                 console.error('res.ok:',res.ok);

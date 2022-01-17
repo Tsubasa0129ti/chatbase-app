@@ -30,7 +30,7 @@ function New(props){
     useEffect(() => {
         const error = new Error();
 
-        fetch('/api/users/previousCheck')
+        fetch('/api/users/loginCheck')
         .then((res) => {
             if(!res.ok){
                 console.error('res.ok:',res.ok);
@@ -51,7 +51,9 @@ function New(props){
                 });
             }
         }).catch((err) => {
-            if(err.status){
+            if(err.status === 401){
+                console.log("pass")
+            }else if(err.status){
                 history.push({
                     pathname : '/users',
                     state : {message : `${err.status} : ${err.message}`}

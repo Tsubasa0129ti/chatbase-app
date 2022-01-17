@@ -83,7 +83,6 @@ function Mypage(props){
         }).catch((err) => {
             console.log(err.status);
             if(err.status === 401){
-                console.log("pass");
                 history.push({
                     pathname : '/users/login',
                     state : {message : `${err.status} : ログインしてください。`}
