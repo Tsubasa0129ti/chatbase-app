@@ -8,7 +8,7 @@ const profileController = require("../controllers/profileController");
 //以下routeing処理
 router.get("/loginCheck",userControllers.loginCheck,userControllers.resLoggedIn); //ここはreact側もOK ただし、headerは修正必須
 //これに関する不足点　④バリデーション（バックエンド）
-router.post("/create",userControllers.create); //もう一段階、validationの層を作成する
+router.post("/create",userControllers.createValidation,userControllers.create);
 
 router.post("/auth",passport.authenticate("local"),userControllers.auth,userControllers.regenerateSessionId);
 

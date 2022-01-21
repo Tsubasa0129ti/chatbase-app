@@ -1,7 +1,8 @@
 const User = require("../models/user"),
     Profile = require("../models/profile"),
     passport = require("passport"),
-    createError = require("http-errors"); 
+    createError = require("http-errors"),
+    {check,validationResult} = require("express-validator");
 
 
 /* function asyncWrap(fn) {
@@ -14,6 +15,14 @@ const User = require("../models/user"),
 }
 https://neos21.net/blog/2020/06/14-02.html
 */
+
+const startUpper = (value) => {
+    const firstValue = value.charAt(0);
+    if(!firstValue.match(/[A-Z]/)){
+        return Promise.reject("error occured");
+    }
+    return true;
+}
 
 module.exports = {
     loginCheck : (req,res,next) => {
@@ -39,8 +48,43 @@ module.exports = {
             next(err);
         }
     },
-    create : (req,res,next) => { //これは後テストをする。目的は、エラーの分岐を増やす　改善の余地あり
+    createValidation : [
+        check("name.first")
+            .notEmpty().withMessage('')
+            .isAlpha().withMessage('')
+            .isLength({min:2,max:10}).withMessage('')
+            .custom(startUpper),
+        check("name.last")
+            .notEmpty().withMessage('')
+            .isAlpha().withMessage('')
+            .isLength({min:2,max:10}).withMessage('')
+            .custom(startUpper),
+        check("email")
+            .notEmpty().withMessage()
+            .isEmail().withMessage("")
+            .custom(value => {
+                return User.findOne({email : value}).then(user => {
+                    if(user){
+                        return Promise.reject('this email has already existed');
+                    }
+                    return true;
+                })
+            }),
+        check("password")
+            .notEmpty().withMessage()
+            .isAscii().withMessage()
+            .matches(/[a-zA-Z]/).withMessage()
+            .matches(/\d/).withMessage()
+            .custom(startUpper)
+            .isLength({min:8,max:16}).withMessage("")
+    ],
+    create : async(req,res,next) => { //これは後テストをする。目的は、エラーの分岐を増やす　改善の余地あり
         try{
+            const err = await validationResult(req);
+            if(!err.isEmpty()){
+                console.log(JSON.stringify(err));
+                return next(err);
+            }
             var newUser = new User(req.body);
             User.register(newUser,req.body.password,(err,user) => {
                 if(err){
