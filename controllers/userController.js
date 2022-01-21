@@ -17,7 +17,8 @@ https://neos21.net/blog/2020/06/14-02.html
 */
 
 const startUpper = (value) => {
-    const firstValue = value.charAt(0);
+    var firstValue = value.charAt(0);
+    
     if(!firstValue.match(/[A-Z]/)){
         return Promise.reject("error occured");
     }
@@ -168,8 +169,26 @@ module.exports = {
             next(err)
         }
     },
+    updateValidation : [
+        check("name.first")
+            .notEmpty().withMessage('a')
+            .isAlpha().withMessage('b')
+            .isLength({min:2,max:10}).withMessage('c')
+            .custom(startUpper),
+        check("name.last")
+            .notEmpty().withMessage('A')
+            .isAlpha().withMessage('B')
+            .isLength({min:2,max:10}).withMessage('C')
+            .custom(startUpper)
+    ],
     update : async(req,res,next) => {
         try{
+            const err = await validationResult(req);
+            if(!err.isEmpty()){
+                console.log(JSON.stringify(err));
+                return next(err);
+            }
+
             var currentUser = req.user;
             const promise = await User.findByIdAndUpdate(currentUser._id,{
                 $set : req.body
