@@ -25,6 +25,10 @@ const startUpper = (value) => {
     return true;
 }
 
+const isEmpty = (obj) => {
+    return !Object.keys(obj).length;
+};
+
 module.exports = {
     loginCheck : (req,res,next) => {
         try{
@@ -32,7 +36,7 @@ module.exports = {
             if(loggedIn){
                 next();
             }else{
-                var err = new createError.Unauthorized('please login to view this page'); //個々にエラーメッセージの記載をすることが可能（ただし、まとめられるものは全てまとめたい。とすると、共通しそうなものに関しては共通のエラー処理層にてこれを設定するのがいいかも）
+                var err = new createError.Unauthorized("please login to view this page"); //個々にエラーメッセージの記載をすることが可能（ただし、まとめられるものは全てまとめたい。とすると、共通しそうなものに関しては共通のエラー処理層にてこれを設定するのがいいかも）
                 next(err);
             }
         }catch(err){
@@ -48,6 +52,13 @@ module.exports = {
         }catch(err){
             next(err);
         }
+    },
+    checkBody : (req,res,next) => {
+        if(isEmpty(req.body)){
+            var err = new createError.BadRequest();
+            next(err);
+        }
+        next();
     },
     createValidation : [
         check("name.first")
