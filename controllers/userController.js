@@ -32,7 +32,7 @@ module.exports = {
             if(loggedIn){
                 next();
             }else{
-                var err = new createError.Unauthorized();
+                var err = new createError.Unauthorized('please login to view this page'); //個々にエラーメッセージの記載をすることが可能（ただし、まとめられるものは全てまとめたい。とすると、共通しそうなものに関しては共通のエラー処理層にてこれを設定するのがいいかも）
                 next(err);
             }
         }catch(err){
@@ -83,7 +83,6 @@ module.exports = {
         try{
             const err = await validationResult(req);
             if(!err.isEmpty()){
-                console.log(JSON.stringify(err));
                 return next(err);
             }
             var newUser = new User(req.body);
@@ -185,7 +184,6 @@ module.exports = {
         try{
             const err = await validationResult(req);
             if(!err.isEmpty()){
-                console.log(JSON.stringify(err));
                 return next(err);
             }
 

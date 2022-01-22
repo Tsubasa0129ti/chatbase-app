@@ -8,7 +8,6 @@ const express = require("express"),
     cookieParser = require("cookie-parser"),
     bodyParser = require("body-parser"),
     uuid = require("uuid"), 
-    createError = require("http-errors"),
     methodOverride = require("method-override"),
     passport = require("passport"),
     mongoose = require("mongoose"),
@@ -20,7 +19,8 @@ const express = require("express"),
 /* rooting */
 const indexRoutes = require("./routes/index");
 var apiRoutes = require("./routes/apiRouter");
-//const errorRoutes = require("./routes/errorRouter");
+var errorRoutes = require("./routes/errorRouter");
+var errorControllers = require("./controllers/errorController");
 
 /* appの指定 */
 var app = express();
@@ -112,29 +112,9 @@ app.use((req,res,next) => {
 app.use("/",indexRoutes);
 app.use("/api",apiRoutes);
 
-/* errorハンドラー　一旦エラーハンドラはこちらで定義して、後に有効化する */
-//app.use(errorRoutes);
-
-app.use(function notFoundError(req,res,next){
-    res.status(404).json({
-        status : 404,
-        error : 'Not Found Error'
-    });
-});
-
-app.use(function errorHandler(err,req,res,next){ //messageに関してはReactでつける予定なので、今は考えない　あとはどうやってバリデーションのエラー取得をするのか
-    console.error(err.stack)
-    if(err instanceof createError.Unauthorized){
-        console.log('');　//ここの中で全て完結することもできるが、そこに関しては完全に未定。
-    }
-
-    console.log("pass131");
-
-    res.status(err.status||500).json({
-        status : err.status,
-        error : err
-    });
-});
+/* errorハンドラー*/
+app.use(errorRoutes);
+app.use(errorControllers.ErrorHandler); //なぜかrouterとcontrollerを経て呼び出すことができないので、一旦controllerから直接呼び出している。
 
 /* サーバーの起動 */
 const PORT = process.env.PORT || 3001

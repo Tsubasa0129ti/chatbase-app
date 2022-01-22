@@ -4,7 +4,7 @@ const mongoose = require("mongoose"),
     passportLocalMongoose = require("passport-local-mongoose");
 
 
-var userSchema = new Schema(
+var userSchema = new Schema( //ここのエラーメッセージも一応後で修正する
     {
         name : {
             first : {
