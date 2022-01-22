@@ -11,9 +11,7 @@ function Header(props){
 
     const history = useHistory();
 
-    //ここでログインの有無の判断をしていたのか　じゃあpropsとして送る形にするしかないか　ただし、上のstateが変化したタイミングでここにも影響を及ぼすことの確認をする
-
-    /* useEffect(() => {
+    useEffect(() => {
         //ここで初期のログインチェックを行う。
         const error = new Error();
 
@@ -31,13 +29,14 @@ function Header(props){
             return res.json();
         })
         .then((obj) => {
-            console.log('pass1');
             if(obj.result === 'Authenticated'){
                 setLoggedIn(true);
             }
         }).catch((err) => {
             console.log(err);
-            if(err.status >= 500){ //サーバー側のエラーページを作成する。（ヘッダーのエラーの場合、メッセージの取得箇所が存在しないため・というか全て共通化するかも）
+            if(err.status === 401){
+                setLoggedIn(false);
+            }else if(err.status >= 500){ //サーバー側のエラーページを作成する。（ヘッダーのエラーの場合、メッセージの取得箇所が存在しないため・というか全て共通化するかも）
                 history.push({
                     pathname : '/error/500',
                     state : {message : `${err.status} : ${err.message}`}
@@ -49,7 +48,7 @@ function Header(props){
                 });
             }
         });
-    },[]); */
+    },[]);
 
     const logout = () => {
         const error = new Error();
@@ -124,6 +123,5 @@ function Header(props){
         </div>
     )
 }
-//必要なこと。ログインの有無は取得が必要（これでログインかログアウトかを変えるから）。
 
 export default withRouter(Header); //補足　もし、メッセージの受け取り機能が必要なら追加

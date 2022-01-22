@@ -20,7 +20,7 @@ const startUpper = (value) => {
     var firstValue = value.charAt(0);
     
     if(!firstValue.match(/[A-Z]/)){
-        return Promise.reject("error occured");
+        return Promise.reject("your initial must be upper case");
     }
     return true;
 }
@@ -62,18 +62,18 @@ module.exports = {
     },
     createValidation : [
         check("name.first")
-            .notEmpty().withMessage('')
-            .isAlpha().withMessage('')
-            .isLength({min:2,max:10}).withMessage('')
+            .notEmpty().withMessage('input your first name!')
+            .isAlpha().withMessage('please input with alphabet')
+            .isLength({min:2,max:10}).withMessage('must be at least 2 characters in length, and no more than 10 characters')
             .custom(startUpper),
         check("name.last")
-            .notEmpty().withMessage('')
-            .isAlpha().withMessage('')
-            .isLength({min:2,max:10}).withMessage('')
+            .notEmpty().withMessage('input your last name!')
+            .isAlpha().withMessage('please input with alphabet')
+            .isLength({min:2,max:10}).withMessage('must be at least 2 characters in length, and no more than 10 characters')
             .custom(startUpper),
         check("email")
             .notEmpty().withMessage()
-            .isEmail().withMessage("")
+            .isEmail().withMessage("input your email!")
             .custom(value => {
                 return User.findOne({email : value}).then(user => {
                     if(user){
@@ -83,12 +83,12 @@ module.exports = {
                 })
             }),
         check("password")
-            .notEmpty().withMessage()
-            .isAscii().withMessage()
-            .matches(/[a-zA-Z]/).withMessage()
-            .matches(/\d/).withMessage()
+            .notEmpty().withMessage("input your password!")
+            .isAscii().withMessage("your can use only Ascii code")
+            .matches(/[a-zA-Z]/).withMessage("please contain alphabet")
+            .matches(/\d/).withMessage("must contain number")
             .custom(startUpper)
-            .isLength({min:8,max:16}).withMessage("")
+            .isLength({min:8,max:16}).withMessage("must be at least 8 characters in length, and no more than 16 characters")
     ],
     create : async(req,res,next) => { //これは後テストをする。目的は、エラーの分岐を増やす　改善の余地あり
         try{
@@ -181,14 +181,14 @@ module.exports = {
     },
     updateValidation : [
         check("name.first")
-            .notEmpty().withMessage('a')
-            .isAlpha().withMessage('b')
-            .isLength({min:2,max:10}).withMessage('c')
+            .notEmpty().withMessage('input your first name!')
+            .isAlpha().withMessage('please input with alphabet')
+            .isLength({min:2,max:10}).withMessage('must be at least 2 characters in length, and no more than 10 characters')
             .custom(startUpper),
         check("name.last")
-            .notEmpty().withMessage('A')
-            .isAlpha().withMessage('B')
-            .isLength({min:2,max:10}).withMessage('C')
+            .notEmpty().withMessage('input your last name!')
+            .isAlpha().withMessage('please input with alphabet')
+            .isLength({min:2,max:10}).withMessage('must be at least 2 characters in length, and no more than 10 characters')
             .custom(startUpper)
     ],
     update : async(req,res,next) => {
