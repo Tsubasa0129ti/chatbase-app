@@ -2,6 +2,7 @@ import React,{useState,useEffect} from 'react';
 import {useHistory} from 'react-router-dom';
 
 import Header from '../../components/block/header';
+import {isUpper,isAlpha,isLength,isEmail,isAscii,isContain} from '../../components/module/validation';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
@@ -75,97 +76,71 @@ function New(props){
         /* バリデーションの設定 */
         //first_errorの出力
         if(name === 'first'){
-            if(nameChecker(value)){
-                setValidation({...validation,hasChanged:true,first_error:'First Name : 1文字目は、大文字で設定してください。'});
-            }else{
-                if(value.length <= 3 || value.length >= 8){
-                    setValidation({...validation,hasChanged:true,first_error:'First Name : 名前は4~7文字で記入してください。'});
+            if(isAlpha(value)){
+                if(isUpper(value)){
+                    if(isLength(value,{min:2,max:10})){
+                        setValidation({...validation,hasChanged:true,first_error:''});
+                    }else{
+                        setValidation({...validation,hasChanged:true,first_error:'First Name : 2文字以上10文字以内で記入してください。'});
+                    }
                 }else{
-                    setValidation({...validation,hasChanged:true,first_error:''});
+                    setValidation({...validation,hasChanged:true,first_error:'First Name : 一文字目は大文字で記入してください。'});
                 }
+            }else{
+                setValidation({...validation,hasChanged:true,first_error:'First Name : アルファベットで記入してください。'});
             }
         }
 
         //lastのエラー作成
         if(name === 'last'){
-            if(nameChecker(value)){
-                setValidation({...validation,hasChanged:true,last_error:'Last Name : 1文字目は、大文字で設定してください。'});
-            }else{
-                if(value.length <= 3 || value.length >= 8){
-                    setValidation({...validation,hasChanged:true,last_error:'Last Name : 名前は4~7文字で記入してください。'});
+            if(isAlpha(value)){
+                if(isUpper(value)){
+                    if(isLength(value,{min:2,max:10})){
+                        setValidation({...validation,hasChanged:true,last_error:''});
+                    }else{
+                        setValidation({...validation,hasChanged:true,last_error:'Last Name : 2文字以上10文字以内で記入してください。'})
+                    }
                 }else{
-                    setValidation({...validation,hasChanged:true,last_error:''});
+                    setValidation({...validation,hasChanged:true,last_error:'Last Name : 一文字目は大文字で記入してください。'})
                 }
+            }else{
+                setValidation({...validation,hasChanged:true,last_error:'Last Name : アルファベットで記入してください。'})
             }
         }
 
         //emailのエラー作成
         if(name === 'email'){
-            if(emailChecker(value)){
-                setValidation({...validation,hasChanged:true,email_error:'Email : 正しいメールアドレスを記入してください。'});
-            }else{
+            if(isEmail(value)){
                 setValidation({...validation,hasChanged:true,email_error:''});
+            }else{
+                setValidation({...validation,hasChanged:true,email_error:'Email : 正しいメールアドレスを記入してください。'});
             }
         }
 
         //passwordのエラー作成
         if(name === 'password'){
-            if(value.length>=8&&value.length<=16){
-                if(isUpper(value)){
-                    if(numIncluder(value)){
-                        if(strChecker(value)){
-                            setValidation({...validation,hasChanged:true,password_error:''});
-                        }else{//ここの確認も
-                            setValidation({...validation,hasChanged:true,password_error:'Password : 半角英数字で設定してください。'});
+            if(isAscii(value)){
+                if(isContain(value,/[A-Za-z]/)){
+                    if(isContain(value,/[0-9]/)){
+                        if(isUpper(value)){
+                            if(isLength(value,{min:8,max:16})){
+                                setValidation({...validation,hasChanged:true,password_error:''});
+                            }else{
+                                setValidation({...validation,hasChanged:true,password_error:'Password : 8文字以上16字以内で記入してください。'});
+                            }
+                        }else{
+                            setValidation({...validation,hasChanged:true,password_error:'Password : 1文字目は大文字で設定してください。'});
                         }
                     }else{
-                        setValidation({...validation,hasChanged:true,password_error:'Password : 数値も含めてください。'});
+                        setValidation({...validation,hasChanged:true,password_error:'Password : 数字を使用してください。'});
                     }
                 }else{
-                    setValidation({...validation,hasChanged:true,password_error:'Password : 最初の文字は大文字に設定してください。'});
+                    setValidation({...validation,hasCahnged:true,password_error:'Password : アルファベットを使用してください。'});
                 }
             }else{
-                setValidation({...validation,hasChanged:true,password_error:'Password : 文字数は8文字以上16文字以内に設定してください。'});
+                setValidation({...validation,hasChanged:true,password_error:'Password : パスワードに使用できない文字が含まれています。'});
             }
-        }
-
-        /* functionの設定 */
-        //name確認用関数
-        function nameChecker(str){
-            var checker = str.match(/[A-Z]{1}[A-Za-z]*/);
-            if(!checker){
-                return true;
-            }
-        };
-
-        //email確認用関数
-        function emailChecker(str){
-            var checker = str.match(/^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]{1,}\.[A-Za-z0-9]{1,}$/);
-            if(!checker){
-                return true;
-            }
-        };
-
-        function isUpper(str){
-            var checker = str.match(/^[A-Z]/);
-            if(checker){
-                return true; 
-            }
-        };
-
-        function numIncluder(str){
-            var checker = str.search(/[0-9]/);
-            if(checker !== -1){
-                return true;
-            }
-        };
-
-        function strChecker(str){
-            var checker = str.match(/^[A-Za-z0-9]+$/);
-            if(checker){
-                return true;
-            }
-        };
+        }        
 
         setFormData({...formData,hasChanged:true,[name]:value});
     }
