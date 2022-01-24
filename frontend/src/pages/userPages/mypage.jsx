@@ -1,10 +1,10 @@
 import React,{useState,useEffect} from 'react';
 import { useHistory,useLocation } from 'react-router';
 import Header from '../../components/block/header';
+import {HandleError} from '../../components/module/errorHandler';
+
 import AccountDelete from '../../components/ReactModal/accountDelete';
 import ProfileComment from '../../components/atoms/profileComment';
-
-import {HandleError,OnRejected} from '../../components/module/errorHandler';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCog , faAddressCard , faEdit , faTrashAlt ,faIdCard ,faUser , faChartLine , faBlog , faComment} from "@fortawesome/free-solid-svg-icons";
@@ -23,57 +23,8 @@ function Mypage(props){
     const location = useLocation();
 
     useEffect(() => {
-
-        /* fetch('/api/users/mypage')
-        .then(HandleError)
-        .then((obj) => {
-            //成功時の動作はここで行う。ここに関しては基本的に異なるものなので、関数化はほとんどしない。（まとめられるものはするかもしれない）
-            setUsername(obj.user.name.first + ' ' + obj.user.name.last);
-            setUser(obj.user);
-            if(obj.profile){
-                setProfile(true);
-            }
-        })
-        .catch((err) => {
-            if(!OnRejected(err) === 'next'){
-                OnRejected(err);
-            }else{
-                console.log('エラー出力'); //実際上はこれでもいける。
-                mypageError(err);
-            }
-        }); //ここで複数を呼び出す。ただし、続ける場合結果を用いて分岐をする
-
-
-        function mypageError(err){ //ある程度画一化したいので、これは多分usersErrorみたいな形でまとめるかも
-            if(err.status >= 500){
-                history.push({
-                    pathname : '/users',
-                    state : {message : `${err.status} : ${err.message}`}
-                });
-            }else{
-                history.push({
-                    pathname : '/users',
-                    state : {message : err.message}
-                });
-            }
-        } */
-
-
         fetch('/api/users/mypage')
-        .then((res) => {
-            if(!res.ok){
-                const error = new Error();
-
-                console.error('res.ok:',res.ok);
-                console.error('res.status:',res.status);
-                console.error('res.statusText:',res.statusText);
-
-                error.message = res.statusText;
-                error.status = res.status;
-                throw error;
-            }
-            return res.json();
-        })
+        .then(HandleError)
         .then((obj) => {
             setUsername(obj.user.name.first + ' ' + obj.user.name.last);
             setUser(obj.user);
@@ -81,23 +32,15 @@ function Mypage(props){
                 setProfile(true);
             }
         }).catch((err) => {
-            console.log(err.status);
             if(err.status === 401){
                 history.push({
                     pathname : '/users/login',
                     state : {message : `${err.status} : ログインしてください。`}
                 });
-            }else if(err.status >= 500){
-                console.log("pass1");
+            }else if(err.status === 500){
                 history.push({
-                    pathname : '/users',
-                    state : {message : `${err.status} : ${err.message}`}
-                });
-            }else{
-                console.log("pass2")
-                history.push({
-                    pathname : '/users',
-                    state : {message : err.message}
+                    pathname : '/500',
+                    state : {message : `${err.status}_${err.type} : ${err.message}`}
                 });
             }
         });
@@ -114,8 +57,6 @@ function Mypage(props){
     };
 
     const deleteEvent = () => {
-        const error = new Error();
-
         fetch(`/api/users/mypage/delete`,{
             method : 'DELETE',
             headers : {
@@ -123,33 +64,22 @@ function Mypage(props){
                 'Content-Type': 'application/json'
             }
         })
-        .then((res) => {
-            if(!res.ok){
-                console.error('res.ok:',res.ok);
-                console.error('res.status:',res.status);
-                console.error('res.statusText:',res.statusText);
-
-                error.status = res.status;
-                error.message = res.statusText;
-                throw error;
-            }
-            return res.json();
-        })
+        .then(HandleError)
         .then((obj) => {
             history.push({
                 pathname : obj.redirectPath,
                 state : {message : 'アカウントの削除に成功しました。'}
             });
         }).catch((err) => {
-            if(err.status >= 500){
+            if(err.status === 401){
                 history.push({
-                    pathname : '/users/mypage',
-                    state : {message : `${err.status} : ${err.message}`}
+                    pathname : '/users/login',
+                    state : {message : `${err.status} : ログインしてください。`}
                 });
-            }else{
+            }else if(err.status === 500){
                 history.push({
-                    pathname : '/users/mypage',
-                    state : {message : err.message}
+                    pathname : '/500',
+                    state : {message : `${err.status} : ${err.message}`}
                 });
             }
         });

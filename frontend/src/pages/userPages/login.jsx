@@ -1,6 +1,8 @@
 import React, {useState,useEffect} from 'react';
 import { useHistory,useLocation } from 'react-router';
+
 import Header from '../../components/block/header';
+import { HandleError } from '../../components/module/errorHandler';
 
 import 'font-awesome/css/font-awesome.min.css';
 import '../../styles/layouts/users/login.scss';
@@ -16,42 +18,22 @@ function Login(props) {
     const location = useLocation();
 
     useEffect(() => {
-        const error = new Error();
-
         fetch('/api/users/loginCheck')
-        .then((res) => {
-            if(!res.ok){
-                console.error('res.ok:',res.ok);
-                console.error('res. status:',res.status);
-                console.error('res.statusText:',res.statusText);
-
-                error.status = res.status;
-                error.message = res.statusText;
-                throw error;
-            }
-            return res.json();
-        })
+        .then(HandleError)
         .then((obj) => {
-            if(obj.result === 'Authenticated'){
-                history.push({
-                    pathname : obj.redirectPath,
-                    state : {message : 'You are already authenticated'}
-                });
-            }
+            history.push({
+                pathname : obj.redirectPath,
+                state : {message : 'You are already authenticated'}
+            });  
         }).catch((err) => {
             if(err.status　=== 401){
-                if(location.state){
+                if(location.state){ //常にログインエラーと出す必要もないので、ここはサーバー再度からのエラーメッセージを取得しない
                     setMessage(location.state.message);
                 }
-            }else if(err.status){
+            }else if(err.status === 500){
                 history.push({
-                    pathname : '/users',
-                    state : {message : `${err.status} : ${err.message}`}
-                });
-            }else{
-                history.push({
-                    pathname : '/users',
-                    state : {message : err.message}
+                    pathname : '/500',
+                    state : {message : `${err.status}_${err.type} : ${err.message}`}
                 });
             }
         }); 
@@ -67,7 +49,6 @@ function Login(props) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const error = new Error();
 
         fetch('/api/users/auth',{
             method : 'POST',
@@ -85,10 +66,11 @@ function Login(props) {
                 console.error('res.ok:',res.ok);
                 console.error('res.status:',res.status);
                 console.error('res.statusText:',res.statusText);
-
-                error.status = res.status;
-                error.message = res.statusText;
-                throw error;
+        
+                return res.json().then(response => {
+                    console.log(response)
+                    throw response;
+                });
             }
             return res.json();
         })
@@ -98,16 +80,16 @@ function Login(props) {
                 state : {message : 'ログイン成功しました。'}
             });  
         }).catch((err) => {
+            console.log(err);
             if(err.status === 400){
+                console.log('aaa')
                 setMessage(`${err.status} : ユーザー名もしくはパスワードを記入してください。`);
             }else if(err.status === 401){
                 setMessage(`${err.status} : ユーザー名もしくはパスワードが異なります。`);
-            }else if(err.status >= 500){
-                setMessage(`${err.status} : ${err.message}`)
-            }else{
+            }else if(err.status === 500){
                 history.push({
-                    pathname : '/users',
-                    state : {message : err.message}
+                    pathname : '/500',
+                    state : {message : `${err.status}_${err.type} : ${err.message}`}
                 });
             }
         });

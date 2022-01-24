@@ -2,6 +2,7 @@ import React,{useState,useEffect} from 'react';
 import { useHistory,useLocation } from 'react-router';
 
 import Header from '../../components/block/header';
+import { HandleError } from '../../components/module/errorHandler';
 import {isUpper,isAlpha,isLength} from '../../components/module/validation';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -25,21 +26,8 @@ function Edit(props){
     const location  = useLocation();
 
     useEffect(() => {
-        const error = new Error();
-
         fetch('/api/users/mypage/edit')
-        .then((res) => {
-            if(!res.ok){
-                console.error('res.ok:',res.ok);
-                console.error('res.status:',res.status);
-                console.error('res.statusText:',res.statusText);
-
-                error.status = res.status;
-                error.message = res.statusText;
-                throw error;
-            }
-            return res.json();
-        })
+        .then(HandleError)
         .then((obj) => {
             setFormData({
                 first : obj.name.first,
@@ -51,15 +39,10 @@ function Edit(props){
                     pathname : '/users/login',
                     state : {message : `${err.status} : ログインしてください。`}
                 });
-            }else if(err.status >= 500){
+            }else if(err.status === 500){
                 history.push({
-                    pathname : '/users/mypage',
-                    state : {message : `${err.status} : ${err.message}`}
-                });
-            }else{
-                history.push({
-                    pathname : '/users',
-                    state : {message : err.message}
+                    pathname : '/500',
+                    state : {message : `${err.status}_${err.type} : ${err.message}`}
                 });
             }
         });
@@ -118,8 +101,6 @@ function Edit(props){
         if(validation.first_error || validation.last_error){
             setMessage('エラーの修正をしてください。');
         }else{
-            const error = new Error();
-
             fetch('/api/users/mypage/update',{　
                 method : 'PUT',
                 headers : {
@@ -133,36 +114,27 @@ function Edit(props){
                     }
                 })
             })
-            .then((res) => {
-                if(!res.ok){
-                    console.error('res.ok:',res.ok);
-                    console.error('res.status:',res.status);
-                    console.error('res.statusText:',res.statusText);
-
-                    error.message = res.statusText;
-                    error.status = res.status;
-                    throw error;
-                }
-                return res.json();
-            })
+            .then(HandleError)
             .then((obj) => {
                 setMessage('');
                 history.push({
                     pathname : obj.redirectPath,
-                    state : {message : 'アカウントの変更をしました。'}
+                    state : {message : 'アカウント名の修正をしました。'}
                 });
             }).catch((err) => {
-                if(err.status === 401){
+                if(err.status === 400){
+                    setMessage(`${err.status}_${err.type} : ${err.message}`);
+                }else if(err.status === 401){
                     history.push({
                         pathname : '/users/login',
                         state : {message : `${err.status} : ログインしてください。`}
                     });
-                }else if(err.status >= 500){
-                    setMessage(`${err.status} : ${err.message}`);
-                }else{
+                }else if(err.status === 422){
+                    setMessage(`${err.status} : ${err.type}`);
+                }else if(err.status  === 500){
                     history.push({
-                        pathname : '/users/mypage',
-                        state : {message : err.message}
+                        pathname : '/500',
+                        state : {message : `${err.status}_${err.type} : ${err.message}`}
                     });
                 }
             });
@@ -200,4 +172,3 @@ function Edit(props){
 }
 
 export default Edit;
-//これに関する不足点　①サーバー全般　②バリデーション機能(フロント部分は完了)

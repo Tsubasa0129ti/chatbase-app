@@ -34,9 +34,9 @@ module.exports = {
             const errors = [];
             err.errors.forEach(e => {
                 errors.push({
-                    params : e.param,
+                    param : e.param,
                     value : e.value,
-                    message : e.msg
+                    msg : e.msg
                 });
             });
 
@@ -44,19 +44,17 @@ module.exports = {
                 type : 'Validation Error',
                 status : 422,
                 address : req.url,
-                errors : errors
+                messages : errors
             });
         }
 
-        res.status(err.status||500).json({
+        console.log(err);
+
+        res.status(err.status||500).json({ //ここに関しては、バリデーションと違い、複数のエラーを処理することがあるかわからないため、とりあえずは１種類のエラーのみを処理する。
             type : err.name,
-            errors : [
-                {
-                    status : err.status,
-                    message : err.message,
-                    address : req.url,
-                }
-            ]
+            status : err.status,
+            message : err.message,
+            address : req.url
         });
     },
 }
