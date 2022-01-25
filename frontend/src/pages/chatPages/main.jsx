@@ -1,5 +1,5 @@
 import {useState,useEffect} from 'react';
-import {useHistory} from 'react-router-dom';
+import {useHistory} from 'react-router';
 import queryString from 'query-string';
 
 import ChatHeader from '../../components/block/chatHeader';
@@ -93,7 +93,7 @@ function ChatPage(props){
                         <div className='paging'></div>
                     </div>
                     {/* <Guide /> */}
-                    <a href="/" onClick={popup}>+</a> {/* これpopupだけでよかったっけ */}
+                    <a href="/" onClick={popup}>+</a>
                     <AddChannel add={add} onEventCallback={(e) => {cancel(e)}} />
                 </div>
             )
