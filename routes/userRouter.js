@@ -1,16 +1,13 @@
 var express = require("express");
 var router = express.Router();
-var passport = require("passport");
 
 const userControllers = require("../controllers/userController");
-const profileController = require("../controllers/profileController");
 
 //以下routeing処理
 router.get("/loginCheck",userControllers.loginCheck,userControllers.resLoggedIn);
 router.post("/create",userControllers.checkBody,userControllers.createValidation,userControllers.create);
 
-router.post("/auth",passport.authenticate("local"),userControllers.auth,userControllers.regenerateSessionId);
-
+router.post("/auth",userControllers.checkBody,userControllers.auth,userControllers.regenerateSessionId);
 router.get("/logout",userControllers.logout);　
 
 router.get("/mypage",userControllers.loginCheck,userControllers.mypageView);

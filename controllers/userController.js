@@ -53,7 +53,7 @@ module.exports = {
             next(err);
         }
     },
-    checkBody : (req,res,next) => {
+    checkBody : (req,res,next) => { //これの改良をする必要がある。いずれかの値がからの時と言うふうに（authのも使えるようにしたい）
         if(isEmpty(req.body)){
             var err = new createError.BadRequest();
             next(err);
@@ -110,8 +110,21 @@ module.exports = {
             next(err);
         }
     },//テスト一覧　①通常のバリデーション　②required ③空白　④重複禁止　⑤500番台（これは普通に無理かも） ちなみにcreate自体はOK 値がおかしい場合のエラーに関しては、ここにいく前に処理されるようになっているな
-    auth : (req,res,next) => {　//ここ何しているの。。。？
-        next();
+    auth : async(req,res,next) => {
+        const promise = await User.authenticate()(req.body.email,req.body.password);
+        console.log(promise);
+
+        if(promise.error){
+            console.log(promise.error);
+            var err = new createError.Unauthorized(promise.error);
+            next(err); //①Unauthorizedしか対応することができない②エラーメッセージを送っても上書きされてしまう
+        }
+
+        if(promise.user){
+            passport.authenticate('local')(req,res,function(){　
+                next();
+            });
+        }
     },
     regenerateSessionId : (req,res,next) => { //ここもいまいちうまく機能していないので一旦飛ばす
         var sessions = {};

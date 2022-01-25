@@ -61,30 +61,14 @@ function Login(props) {
                 password : formData.password
             })
         })
-        .then((res) => {
-            if(!res.ok){
-                console.error('res.ok:',res.ok);
-                console.error('res.status:',res.status);
-                console.error('res.statusText:',res.statusText);
-        
-                return res.json().then(response => {
-                    console.log(response)
-                    throw response;
-                });
-            }
-            return res.json();
-        })
+        .then(HandleError)
         .then((obj) => {
             history.push({
                 pathname : obj.redirectPath,
                 state : {message : 'ログイン成功しました。'}
             });  
         }).catch((err) => {
-            console.log(err);
-            if(err.status === 400){
-                console.log('aaa')
-                setMessage(`${err.status} : ユーザー名もしくはパスワードを記入してください。`);
-            }else if(err.status === 401){
+            if(err.status === 401){
                 setMessage(`${err.status} : ユーザー名もしくはパスワードが異なります。`);
             }else if(err.status === 500){
                 history.push({
