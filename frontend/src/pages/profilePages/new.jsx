@@ -187,7 +187,7 @@ function New(props){
 
     return(
         <div>
-            <Header />
+            <Header loggedIn={true} />
 
             <div className='main'>
                 <div className='main-top'>

@@ -30,25 +30,44 @@ const isEmpty = (obj) => {
 };
 
 module.exports = {
-    loginCheck : (req,res,next) => {
+    isAuthenticated : (req,res) => {
         try{
             const loggedIn = req.isAuthenticated();
             if(loggedIn){
-                next();
+                res.status(303).json({
+                    status : 303,
+                    redirectPath : '/users/mypage'
+                });
             }else{
-                var err = new createError.Unauthorized("please login to view this page"); //個々にエラーメッセージの記載をすることが可能（ただし、まとめられるものは全てまとめたい。とすると、共通しそうなものに関しては共通のエラー処理層にてこれを設定するのがいいかも）
-                next(err);
+                res.status(200).json(null);
+            }
+        }catch(err){
+            next(err)
+        }
+    },
+    setLoggedIn : (req,res) => {
+        try{
+            const loggedIn = req.isAuthenticated();
+            if(loggedIn){
+                res.status(200).json({
+                    isAuthenticated : true
+                });
+            }else{
+                res.status(200).json(null);
             }
         }catch(err){
             next(err);
         }
     },
-    resLoggedIn : (req,res,next) => {
+    loginCheck : (req,res,next) => {
         try{
-            res.json({
-                result : "Authenticated",
-                redirectPath : '/users/mypage'
-            });
+            const loggedIn = req.isAuthenticated();
+            if(loggedIn){
+                next();
+            }else{　//ここでnextに移行させるのはどうだろうか
+                var err = new createError.Unauthorized("please login to view this page"); //個々にエラーメッセージの記載をすることが可能（ただし、まとめられるものは全てまとめたい。とすると、共通しそうなものに関しては共通のエラー処理層にてこれを設定するのがいいかも）
+                next(err);
+            }
         }catch(err){
             next(err);
         }

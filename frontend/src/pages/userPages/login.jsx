@@ -1,5 +1,5 @@
 import React, {useState,useEffect} from 'react';
-import { useHistory,useLocation } from 'react-router';
+import { useHistory } from 'react-router';
 
 import Header from '../../components/block/header';
 import { HandleError } from '../../components/module/errorHandler';
@@ -15,22 +15,18 @@ function Login(props) {
     const [message,setMessage] = useState('');
 
     const history = useHistory();
-    const location = useLocation();
 
     useEffect(() => {
         fetch('/api/users/loginCheck')
         .then(HandleError)
-        .then((obj) => {
-            history.push({
-                pathname : obj.redirectPath,
-                state : {message : 'You are already authenticated'}
-            });  
-        }).catch((err) => {
-            if(err.status　=== 401){
-                if(location.state){ //常にログインエラーと出す必要もないので、ここはサーバー再度からのエラーメッセージを取得しない
-                    setMessage(location.state.message);
-                }
-            }else if(err.status === 500){
+        .then()
+        .catch((err) => {
+            if(err.status　=== 303){
+                history.push({ //ここに関しても統一することができそう　function 303
+                    pathname : err.redirectPath,
+                    state : {message : `${err.status} : Redirect to ${err.redirectPath}`}
+                });
+            }else if(err.status === 500){ //ここも同様　function 500
                 history.push({
                     pathname : '/500',
                     state : {message : `${err.status}_${err.type} : ${err.message}`}
@@ -62,11 +58,11 @@ function Login(props) {
             })
         })
         .then(HandleError)
-        .then((obj) => {
+        .then((obj) => { //createも同様にリダイレクトがあるな　これに関しては303だけど、返還されるのは201 サーバー側での指示ではなく、クライアント側からの指示ということか
             history.push({
                 pathname : obj.redirectPath,
                 state : {message : 'ログイン成功しました。'}
-            });  
+            });
         }).catch((err) => {
             if(err.status === 401){
                 setMessage(`${err.status} : ユーザー名もしくはパスワードが異なります。`);
@@ -81,7 +77,7 @@ function Login(props) {
 
     return(
         <div>
-            <Header />
+            <Header loggedIn={false} />
             <div className='login_page'>
                 <form className='login-form' method='POST' onSubmit={handleSubmit}>
                     <p className="login-icon">

@@ -4,7 +4,8 @@ var router = express.Router();
 const userControllers = require("../controllers/userController");
 
 //以下routeing処理
-router.get("/loginCheck",userControllers.loginCheck,userControllers.resLoggedIn);
+router.get("/loginCheck",userControllers.isAuthenticated);
+router.get("/setLoggedIn",userControllers.setLoggedIn);
 router.post("/create",userControllers.checkBody,userControllers.createValidation,userControllers.create);
 
 router.post("/auth",userControllers.checkBody,userControllers.auth,userControllers.regenerateSessionId);

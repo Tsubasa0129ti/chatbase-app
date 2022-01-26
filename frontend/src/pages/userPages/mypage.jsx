@@ -25,7 +25,7 @@ function Mypage(props){
     useEffect(() => {
         fetch('/api/users/mypage')
         .then(HandleError)
-        .then((obj) => {
+        .then((obj) => {　//正直この部分は他のページとの共通するものとなり得ない。
             setUsername(obj.user.name.first + ' ' + obj.user.name.last);
             setUser(obj.user);
             if(obj.profile){
@@ -46,7 +46,7 @@ function Mypage(props){
         });
     },[]);
 
-    useEffect(() => {
+    useEffect(() => { //この機能いらないのではないか。setMessageはあるけど、messageは使用していない。どう言う時にmessageがよばれる？
         if(location.state){
             setMessage(location.state.message);
         }
@@ -88,7 +88,7 @@ function Mypage(props){
     if(!profile) {
         return(
             <div className='mypage'>
-                <Header />
+                <Header loggedIn={true} />
                 <div className='users_mypage'>
                     <div className='mypage-top'>
                         <p　className='mypage-title'>My Page</p>
@@ -166,7 +166,7 @@ function Mypage(props){
     }else{
         return(
             <div className='mypage'>
-                <Header />
+                <Header loggedIn={true} />
                 <div class='container'>
                     <div className='aside'>
                         <div className='user-icon'>

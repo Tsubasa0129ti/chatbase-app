@@ -1,6 +1,5 @@
 import React,{useState,useEffect} from 'react';
 import {useHistory} from 'react-router-dom';
-import useSWR from 'swr';
 
 import Header from '../../components/block/header';
 import {isUpper,isAlpha,isLength,isEmail,isAscii,isContain} from '../../components/module/validation';
@@ -33,17 +32,13 @@ function New(props){
     useEffect(() => {
         fetch('/api/users/loginCheck')
         .then(HandleError)
-        .then((obj) => { //成功時の処理等もまとめたいけど、historyやstateが使用できなくなる。
-            history.push({
-                pathname : obj.redirectPath,
-                state : {message : 'You are already authenticated!'}
-            });
-        })
-        .catch((err) => { //エラー時の処理も同様
-            console.log(err);
-
-            if(err.status === 401){
-                //特に何も必要ない
+        .then()
+        .catch((err) => {
+            if(err.status　=== 303){
+                history.push({
+                    pathname : err.redirectPath,
+                    state : {message : `${err.status} : Redirect to ${err.redirectPath}`}
+                });
             }else if(err.status === 500){
                 history.push({
                     pathname : '/500',
@@ -188,7 +183,7 @@ function New(props){
 
     return(
         <div className='user_new'>
-            <Header />      
+            <Header loggedIn={false} />      
             <div className='create_page'>
                 <div className='empty'></div>
                 <div className='create-top'>

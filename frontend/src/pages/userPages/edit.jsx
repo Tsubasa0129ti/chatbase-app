@@ -143,7 +143,7 @@ function Edit(props){
 
     return(
         <div>
-            <Header />
+            <Header loggedIn={true} />
             <div className='userEdit_page'>
                 <div className='edit-top'>
                     <p className='edit-icon'>

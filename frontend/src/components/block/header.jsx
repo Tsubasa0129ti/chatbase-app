@@ -8,24 +8,28 @@ import Log from '../atoms/log';
 import '../../styles/components/block/header.scss';
 
 function Header(props){
-    const [loggedIn,setLoggedIn] = useState(false);
     const history = useHistory();
+    const [loggedIn,setLoggedIn] = useState(false);
 
     useEffect(() => {
-        fetch('/api/users/loginCheck')
-        .then(HandleError)
-        .then((obj) => {
-            setLoggedIn(true);
-        }).catch((err) => {
-            if(err.status === 401){
-                setLoggedIn(false);
-            }else if(err.status === 500){
-                history.push({
-                    pathname : '/error/500',
-                    state : {message : `${err.status} : ${err.message}`}
-                });
-            }
-        });
+        if(props.loggedIn === null){
+            fetch('/api/users/setLoggedIn')
+            .then(HandleError)
+            .then((obj) => {
+                if(obj.isAuthenticated){
+                    setLoggedIn(true);
+                }else{
+                    setLoggedIn(false);
+                }
+            }).catch((err) => {
+                if(err.status === 500){
+                    history.push({
+                        pathname : '/error/500',
+                        state : {message : `${err.status} : ${err.message}`}
+                    });
+                }
+            });
+        }
     },[]);
 
     const logout = () => {
@@ -63,7 +67,7 @@ function Header(props){
                 <div className='header-right'>
                     <Log 
                         className='btn log-btn'
-                        isLoggedIn={loggedIn}
+                        isLoggedIn={props.loggedIn || loggedIn}
                         login={() => {
                             history.push('/users/login');
                         }}

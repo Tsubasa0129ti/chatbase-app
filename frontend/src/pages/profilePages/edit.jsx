@@ -181,7 +181,7 @@ function Edit(props){
 
     return(
         <div>
-            <Header />
+            <Header loggedIn={true} />
            
             <div className='main'>
                 <div className='page-top'>  

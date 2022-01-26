@@ -13,11 +13,10 @@ function Index(props){
             setMessage(props.location.state.message);
         }
     });
-    console.log(message);
 
     return(
         <div className='main'>
-            <Header message={message} />
+            <Header message={message} loggedIn={null} />
             <div className='main_page'>
                 <div className='main-top'>
                     <p className='main-icon'>

@@ -20,7 +20,7 @@ class Home extends React.Component{
     render(){
         return(
             <div>
-                <Header message={this.state.message} />
+                <Header message={this.state.message} loggedIn={null} />
                 <div>
                     <h2>Page</h2>
                 </div>
