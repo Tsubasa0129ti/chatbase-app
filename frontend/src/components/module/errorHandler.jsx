@@ -32,22 +32,28 @@ export function OnLoggedIn(obj){ //LoginCheckの成功時の処理　（new.jsx�
 
 
 
-//失敗時の処理
-export function OnRejected(err,next){　//ここに関する課題　①遷移を行うためのhistoryなどが読み込むことができないこと　②実際にエラーを複数個用意すること
-    //ここで行うのは結果的にはページの遷移＋messageの付与もしくはページの移動なしのmessageの付与の２パターン
-    console.log('1')
-    if(err.status === 500){
-        console.log(2)
-        return(
-            console.error(err.status)
-        );
-    }else{
-        //ある程度共通化したエラー処理に関しては、関数内部において行うが、一般的でないエラーについては、ページに引き戻す予定
-        console.log(3)
-        //多分ここにnext関数を置くことができればいける
-        return 'next';
-    }
+//失敗時の処理 これはやっていいものなのだろうか（historyを引数にのせる）
+export function Code303(err,history) {
+    history.push({
+        pathname : err.redirectPath,
+        state : {message : `${err.status} : Redirect to ${err.redirectPath}`}
+    });
+};
+
+export function Code401(err,history){
+    console.log('err401');
+    history.push({
+        pathname : '/users/login',
+        state : {message : `${err.status} : ログインしてください。`}
+    });
 }
+
+export function Code500(err,history){
+    history.push({
+        pathname : '/500',
+        state : {message : `${err.status}_${err.type} : ${err.message}`}
+    });
+};
 
 //上記二つのエラーハンドラーを煮詰めれば、全体に適用することができそうだ　多分users や　porfileなどでエラーの遷移先を変える必要がある　とすると、これに分離する
 

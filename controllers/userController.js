@@ -30,7 +30,7 @@ const isEmpty = (obj) => {
 };
 
 module.exports = {
-    isAuthenticated : (req,res) => {
+    isAuthenticated : (req,res,next) => {
         try{
             const loggedIn = req.isAuthenticated();
             if(loggedIn){
@@ -45,7 +45,7 @@ module.exports = {
             next(err)
         }
     },
-    setLoggedIn : (req,res) => {
+    setLoggedIn : (req,res,next) => {
         try{
             const loggedIn = req.isAuthenticated();
             if(loggedIn){
@@ -169,7 +169,7 @@ module.exports = {
             })
         });
     },
-    logout : (req,res) => {
+    logout : (req,res,next) => {
         try{
             req.logout();
             req.session.destroy();
@@ -252,7 +252,7 @@ module.exports = {
             next(err);
         }
     },
-    profileDelete : async(req,res) => {
+    profileDelete : async(req,res,next) => {
         try{
             var profileId = req.user.profile;
             const promise = await Profile.findByIdAndDelete(profileId);

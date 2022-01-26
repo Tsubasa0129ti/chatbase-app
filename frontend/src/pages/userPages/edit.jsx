@@ -2,7 +2,7 @@ import React,{useState,useEffect} from 'react';
 import { useHistory,useLocation } from 'react-router';
 
 import Header from '../../components/block/header';
-import { HandleError } from '../../components/module/errorHandler';
+import { Code401, Code500, HandleError } from '../../components/module/errorHandler';
 import {isUpper,isAlpha,isLength} from '../../components/module/validation';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -35,15 +35,9 @@ function Edit(props){
             });
         }).catch((err) => {
             if(err.status === 401){
-                history.push({
-                    pathname : '/users/login',
-                    state : {message : `${err.status} : ログインしてください。`}
-                });
+                Code401(err,history);
             }else if(err.status === 500){
-                history.push({
-                    pathname : '/500',
-                    state : {message : `${err.status}_${err.type} : ${err.message}`}
-                });
+                Code500(err,history);
             }
         });
     },[]);
@@ -125,17 +119,11 @@ function Edit(props){
                 if(err.status === 400){
                     setMessage(`${err.status}_${err.type} : ${err.message}`);
                 }else if(err.status === 401){
-                    history.push({
-                        pathname : '/users/login',
-                        state : {message : `${err.status} : ログインしてください。`}
-                    });
+                    Code401(err,history);
                 }else if(err.status === 422){
                     setMessage(`${err.status} : ${err.type}`);
                 }else if(err.status  === 500){
-                    history.push({
-                        pathname : '/500',
-                        state : {message : `${err.status}_${err.type} : ${err.message}`}
-                    });
+                    Code500(err,history);
                 }
             });
         }

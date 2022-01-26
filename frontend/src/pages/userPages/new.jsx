@@ -3,7 +3,7 @@ import {useHistory} from 'react-router-dom';
 
 import Header from '../../components/block/header';
 import {isUpper,isAlpha,isLength,isEmail,isAscii,isContain} from '../../components/module/validation';
-import {HandleError} from '../../components/module/errorHandler';
+import {HandleError,Code303,Code500} from '../../components/module/errorHandler';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
@@ -35,15 +35,9 @@ function New(props){
         .then()
         .catch((err) => {
             if(err.status　=== 303){
-                history.push({
-                    pathname : err.redirectPath,
-                    state : {message : `${err.status} : Redirect to ${err.redirectPath}`}
-                });
+                Code303(err,history);
             }else if(err.status === 500){
-                history.push({
-                    pathname : '/500',
-                    state : {message : `${err.status}_${err.type} : ${err.message}`}
-                });
+                Code500(err,history)
             }
         });
     },[]);
@@ -171,10 +165,7 @@ function New(props){
                     });
 
                 }else if(err.status === 500){
-                    history.push({
-                        pathname : '/500',
-                        state : {message : err.message}
-                    });
+                    Code500(err.history);
                 }
             });
         }        
@@ -230,5 +221,3 @@ function New(props){
 }
 
 export default New;
-
-//email重複時のエラーの取得ができていない。あと、やはりuseEffectの問題があるっぽい。関数分離は行うかもしれない

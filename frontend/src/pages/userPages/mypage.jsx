@@ -1,7 +1,8 @@
 import React,{useState,useEffect} from 'react';
-import { useHistory,useLocation } from 'react-router';
+import { useHistory } from 'react-router';
+
 import Header from '../../components/block/header';
-import {HandleError} from '../../components/module/errorHandler';
+import {HandleError,Code401,Code500} from '../../components/module/errorHandler';
 
 import AccountDelete from '../../components/ReactModal/accountDelete';
 import ProfileComment from '../../components/atoms/profileComment';
@@ -17,10 +18,8 @@ function Mypage(props){
     const [username,setUsername] = useState('');
     const [profile,setProfile] = useState(false);
     const [show,setShow] = useState(false);
-    const [message,setMessage] = useState('');
 
     const history = useHistory();
-    const location = useLocation();
 
     useEffect(() => {
         fetch('/api/users/mypage')
@@ -33,23 +32,11 @@ function Mypage(props){
             }
         }).catch((err) => {
             if(err.status === 401){
-                history.push({
-                    pathname : '/users/login',
-                    state : {message : `${err.status} : ログインしてください。`}
-                });
+                Code401(err,history);
             }else if(err.status === 500){
-                history.push({
-                    pathname : '/500',
-                    state : {message : `${err.status}_${err.type} : ${err.message}`}
-                });
+                Code500(err,history);
             }
         });
-    },[]);
-
-    useEffect(() => { //この機能いらないのではないか。setMessageはあるけど、messageは使用していない。どう言う時にmessageがよばれる？
-        if(location.state){
-            setMessage(location.state.message);
-        }
     },[]);
 
     const cancel = () => {
@@ -72,15 +59,9 @@ function Mypage(props){
             });
         }).catch((err) => {
             if(err.status === 401){
-                history.push({
-                    pathname : '/users/login',
-                    state : {message : `${err.status} : ログインしてください。`}
-                });
+                Code401(err,history);
             }else if(err.status === 500){
-                history.push({
-                    pathname : '/500',
-                    state : {message : `${err.status} : ${err.message}`}
-                });
+                Code500(err,history);
             }
         });
     };

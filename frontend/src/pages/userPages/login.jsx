@@ -2,7 +2,7 @@ import React, {useState,useEffect} from 'react';
 import { useHistory } from 'react-router';
 
 import Header from '../../components/block/header';
-import { HandleError } from '../../components/module/errorHandler';
+import { HandleError, Code303 , Code500 } from '../../components/module/errorHandler';
 
 import 'font-awesome/css/font-awesome.min.css';
 import '../../styles/layouts/users/login.scss';
@@ -13,6 +13,7 @@ function Login(props) {
         password : ''
     });
     const [message,setMessage] = useState('');
+    console.log(props)
 
     const history = useHistory();
 
@@ -22,15 +23,9 @@ function Login(props) {
         .then()
         .catch((err) => {
             if(err.status　=== 303){
-                history.push({ //ここに関しても統一することができそう　function 303
-                    pathname : err.redirectPath,
-                    state : {message : `${err.status} : Redirect to ${err.redirectPath}`}
-                });
+                Code303(err,history);
             }else if(err.status === 500){ //ここも同様　function 500
-                history.push({
-                    pathname : '/500',
-                    state : {message : `${err.status}_${err.type} : ${err.message}`}
-                });
+                Code500(err,history);
             }
         }); 
     },[]);
@@ -67,10 +62,7 @@ function Login(props) {
             if(err.status === 401){
                 setMessage(`${err.status} : ユーザー名もしくはパスワードが異なります。`);
             }else if(err.status === 500){
-                history.push({
-                    pathname : '/500',
-                    state : {message : `${err.status}_${err.type} : ${err.message}`}
-                });
+                Code500(err,history);
             }
         });
     }
