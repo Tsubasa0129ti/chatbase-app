@@ -75,7 +75,7 @@ module.exports = {
     checkBody : (req,res,next) => { //これの改良をする必要がある。いずれかの値がからの時と言うふうに（authのも使えるようにしたい）
         if(isEmpty(req.body)){
             var err = new createError.BadRequest();
-            next(err);
+            return next(err);
         }
         next();
     },
@@ -130,6 +130,11 @@ module.exports = {
         }
     },//テスト一覧　①通常のバリデーション　②required ③空白　④重複禁止　⑤500番台（これは普通に無理かも） ちなみにcreate自体はOK 値がおかしい場合のエラーに関しては、ここにいく前に処理されるようになっているな
     auth : async(req,res,next) => {
+        if(!req.body.email || !req.body.password){
+            var err = new createError.BadRequest();
+            return next(err);
+        }
+
         const promise = await User.authenticate()(req.body.email,req.body.password);
         console.log(promise);
 

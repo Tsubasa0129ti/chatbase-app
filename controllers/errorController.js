@@ -14,12 +14,12 @@ module.exports = {
         });
     },
     ErrorHandler : (err,req,res,next) => {
-        console.error(err.stack)
+        console.error(err.stack);
         
         if(err instanceof BadRequest){
             err.message = 'please put in form';
         }else if(err instanceof Unauthorized){
-            err.message = 'please login to view this page';
+            err.message = 'please login to view this page';   
         }else if(err instanceof Forbidden){
             err.message = 'you cannot access this page';
         }else if(err instanceof RequestTimeout){

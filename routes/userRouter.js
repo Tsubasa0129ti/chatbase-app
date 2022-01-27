@@ -8,7 +8,7 @@ router.get("/loginCheck",userControllers.isAuthenticated);
 router.get("/setLoggedIn",userControllers.setLoggedIn);
 router.post("/create",userControllers.checkBody,userControllers.createValidation,userControllers.create);
 
-router.post("/auth",userControllers.checkBody,userControllers.auth,userControllers.regenerateSessionId);
+router.post("/auth",userControllers.auth,userControllers.regenerateSessionId);
 router.get("/logout",userControllers.logout);　
 
 router.get("/mypage",userControllers.loginCheck,userControllers.mypageView);
