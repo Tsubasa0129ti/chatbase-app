@@ -1,6 +1,8 @@
 import React,{useState,useEffect} from 'react';
 import { useHistory,useLocation } from 'react-router';
+
 import Header from '../../components/block/header';
+import { Code303, Code401, Code500, HandleError } from '../../components/module/errorHandler';
 
 import '../../styles/layouts/profiles/new.scss';
 
@@ -27,44 +29,16 @@ function New(props){
     const location = useLocation();
 
     useEffect(() => {
-        const error = new Error();
-
         fetch('/api/profile/new')
-        .then((res) => {
-            if(!res.ok){
-                console.error('res.ok:',res.ok);
-                console.error('res.status:',res.status);
-                console.error('res.statusText:',res.statusText);
-
-                error.status = res.status;
-                error.message = res.statusText;
-                throw error;
-            }
-            return res.json();
-        })
-        .then((obj) => {
-            if(obj.exist){
-                history.push({
-                    pathname : obj.redirectPath,
-                    state : {message : 'Profileは作成済みです。'}
-                });
-            }
-        }).catch((err) => {
-            if(err.status === 401){
-                history.push({
-                    pathname : '/users/login',
-                    state : {message : `${err.status} : ログインしてください。`}
-                });
-            }else if(err.status >= 500){
-                history.push({
-                    pathname : '/users/mypage',
-                    state : {message : `${err.status} : ${err.message}`}
-                });
-            }else{
-                history.push({
-                    pathname : '/users/mypage',
-                    state : {message : err.message}
-                });
+        .then(HandleError)
+        .then()
+        .catch((err) => {
+            if(err.status === 303){
+                Code303(err,history);
+            }else if(err.status === 401){
+                Code401(err,history);
+            }else if(err.status === 500){
+                Code500(err,history);
             }
         });
     },[]);
@@ -123,8 +97,6 @@ function New(props){
         if(validation.intro_error || validation.address_error || validation.age_error){
             setMessage('*エラーを修正してください。');
         }else{
-            const error = new Error();
-
             fetch('/api/profile/create',{
                 method : 'POST',
                 headers : {
@@ -143,43 +115,19 @@ function New(props){
                     birthday : formData.birthday,
                 })
             })
-            .then((res) => {
-                if(!res.ok){
-                    console.error('res.ok:',res.ok);
-                    console.error('res.status:',res.status);
-                    console.error('res.statusText:',res.statusText);
-
-                    error.status = res.status;
-                    error.message = res.statusText;
-                    throw error;
-                }
-                return res.json();
-            })
-            .then((obj) => {
-                if(obj.exist){
-                    history.push({
-                        pathname : obj.redirectPath,
-                        state : {message : 'Profileは作成済みです。'}
-                    });
-                }else{
-                    history.push({
-                        pathname : obj.redirectPath,
-                        state : {message : 'プロフィールの作成に成功しました。'}
-                    });
-                }
+            .then(HandleError)
+            .then((obj) => { //ここでは成功時の処理しか扱わない
+                history.push({
+                    pathname : obj.redirectPath,
+                    state : {message : 'プロフィールの作成に成功しました。'}
+                });
             }).catch((err) => {
-                if(err.status === 401){
-                    history.push({
-                        pathname : '/users/login',
-                        state : {message : `${err.status} : ログインしてください。`}
-                    });
-                }else if(err.status >= 500){
-                    setMessage(`${err.status} : ${err.message}`);
-                }else{
-                    history.push({
-                        pathname : '/users/mypage',
-                        state : {message : err.message}
-                    });
+                if(err.status === 303){
+                    Code303(err,history);
+                }else if(err.status === 401){
+                    Code401(err,history);
+                }else if(err.status === 500){
+                    Code500(err,history);
                 }
             });
         }

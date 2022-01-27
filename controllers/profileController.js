@@ -1,5 +1,6 @@
 var User = require("../models/user");
 var Profile = require("../models/profile");
+const profile = require("../models/profile");
 
 function getProfile(body) {
     return {
@@ -17,43 +18,46 @@ function getProfile(body) {
 
 module.exports = {
     profileCheck : (req,res,next) => {
-        const user = req.user;
-        if(user.profile === undefined){
-            next();
-        }else{
-            res.json({
-                exist : true,
-                redirectPath : '/users/mypage'
-            });
+        try{
+            const user = req.user;
+            if(user.profile === undefined){
+                next();
+            }else{
+                res.status(303).json({
+                    status : 303,
+                    redirectPath : '/profile/edit',
+                    message : 'You have already created your profile!'
+                });
+            }
+        }catch(err){
+            next(err);
         }
     },
-    new : (req,res) => {
-        res.json('success');
+    new : (req,res,next) => {
+        try{
+            res.json(null);
+        }catch(err){
+            next(err);
+        }
     },
-    create : (req,res) => {
-        const user = req.user;
-        var profileParams = getProfile(req.body);
-        Profile.create(profileParams)
-        .then(profile => { 
+    create : async(req,res,next) => {
+        try{
+            const user = req.user;
             var userId = user._id;
-            User.findByIdAndUpdate(userId,{
+            var profileParams = getProfile(req.body);
+
+            const createProfile = await Profile.create(profileParams); //profileの作成
+            const updateUser = await User.findByIdAndUpdate(userId,{　//userの編集（profileを追加・結び付け）
                 $addToSet : {
                     profile : profile._id
                 }
-            })
-            .then(() => {
-                res.json({
-                    redirectPath : '/users/mypage'
-                });
-            })
-            .catch((err) => {
-                next(err);
             });
-        })
-        .catch(err => {
+            res.json({
+                redirectPath : '/users/mypage'
+            });
+        }catch(err){
             next(err);
-        });
-        
+        }
     },
     getProfile : (req,res,next) => {
         var user = req.user;
