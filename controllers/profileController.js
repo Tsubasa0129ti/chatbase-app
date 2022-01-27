@@ -1,6 +1,5 @@
 var User = require("../models/user");
 var Profile = require("../models/profile");
-const profile = require("../models/profile");
 
 function getProfile(body) {
     return {
@@ -29,7 +28,6 @@ module.exports = {
     new : (req,res,next) => {
         try{
             var exist = res.locals.exist;
-            console.log(exist);
             if(!exist){
                 res.json(null);
             }else{
@@ -43,21 +41,31 @@ module.exports = {
             next(err);
         }
     },
-    create : async(req,res,next) => {//execのテスト
+    create : async(req,res,next) => {
         try{
-            const user = req.user;
-            var userId = user._id;
-            var profileParams = getProfile(req.body);
+            const exist = res.locals.exist;
 
-            const createProfile = await Profile.create(profileParams).exec(); //profileの作成
-            const updateUser = await User.findByIdAndUpdate(userId,{　//userの編集（profileを追加・結び付け）
-                $addToSet : {
-                    profile : profile._id
-                }
-            }).exec();
-            res.json({
-                redirectPath : '/users/mypage'
-            });
+            if(!exist){
+                const user = req.user;
+                var userId = user._id;
+                var profileParams = getProfile(req.body);
+
+                const newProfile = await Profile.create(profileParams);
+                const updateUser = await User.findByIdAndUpdate(userId,{
+                    $addToSet : {
+                        profile : newProfile._id
+                    }
+                }).exec();
+                res.json({
+                    redirectPath : '/users/mypage'
+                });
+            }else{
+                res.status(303).json({
+                    status : 303,
+                    redirectPath : '/profile/edit',
+                    message : 'You have alredy created your profile!'
+                });
+            }
         }catch(err){
             next(err);
         }
@@ -65,7 +73,6 @@ module.exports = {
     edit : async(req,res,next) => {
         try{
             var exist = res.locals.exist;
-            console.log(exist);
             if(exist){
                 var currentUser = req.user;
                 var user = await User.findById(currentUser._id).populate("profile").exec();
@@ -84,14 +91,13 @@ module.exports = {
             next(err);
         }
     },
-    update : async(req,res,next) => {//後で確認したい点　execの有無によるエラー時の結果
+    update : async(req,res,next) => {
         try{
             let profileParams = getProfile(req.body);
             var id = req.user.profile;
             var promise = await Profile.findByIdAndUpdate(id,{
                 $set : profileParams
             }).exec();
-            console.log(promise);
             res.json({
                 redirectPath : '/users/mypage'
             });
@@ -99,13 +105,12 @@ module.exports = {
             next(err);
         }
     },
-    introUpdate : async(req,res,next) => { //execの確認　get処理以外は基本確認
+    introUpdate : async(req,res,next) => {
         try{
             var id = req.user.profile;
             var promise = await Profile.findByIdAndUpdate(id,{
                 $set : {intro : req.body.intro}
             }).exec();
-            console.log(promise);
             res.json({
                 redirectPath : '/users/mypage'
             });
@@ -118,7 +123,7 @@ module.exports = {
             var userId = req.params.id;
             const user = await User.findById(userId).exec();
             if(user.profile){
-                const result = await User.findByIdAndUpdate(userId).populate('profile').exec();
+                const result = await User.findById(userId).populate('profile').exec();
                 res.json({
                     profileExist : true,
                     user : result

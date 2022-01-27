@@ -54,7 +54,7 @@ function Id(props){
 
     return(
         <div>
-            <Header />
+            <Header loggedIn={null} />
             <div className='main'>
                 <div className='profile-top'>
                     <div className='icon'>
