@@ -4,6 +4,8 @@ import {useHistory} from 'react-router-dom';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faComment,faEdit} from '@fortawesome/free-solid-svg-icons';
 
+import { HandleError, Code401, Code500 } from '../module/errorHandler';
+
 import '../../styles/components/atoms/profileComment.scss';
 
 function ProfileComment(props){
@@ -46,8 +48,6 @@ function ProfileComment(props){
         if(message){
             setMessage('エラーの修正をしてください。');
         }else{
-            const error = new Error();
-
             fetch('/api/profile/introUpdate',{
                 method : 'PUT',
                 headers : {
@@ -57,18 +57,9 @@ function ProfileComment(props){
                 body : JSON.stringify({
                     intro : intro
                 })
-            }).then((res) => {
-                if(!res.ok){
-                    console.error('res.ok:',res.ok);
-                    console.error('res.status',res.status);
-                    console.error('res.statusText:',res.statusText);
-
-                    error.status = res.status;
-                    error.message = res.statusText;
-                    throw error;
-                }
-                return res.json();
-            }).then((obj) => {
+            })
+            .then(HandleError)
+            .then((obj) => {
                 setEdit(false);
                 history.push({
                     pathname : obj.redirectPath,
@@ -76,17 +67,9 @@ function ProfileComment(props){
                 });
             }).catch((err) => {
                 if(err.status === 401){
-                    history.push({
-                        pathname : '/users/login',
-                        state : {message : `${err.status} : ログインしてください。`}
-                    });
-                }else if(err.status >= 500){
-                    setMessage(`${err.status} : ${err.message}`)
-                }else{
-                    history.push({
-                        pathname : '/users/mypage',
-                        stete : {message : err.message}
-                    });
+                    Code401(err,history);
+                }else if(err.status === 500){
+                    Code500(err,history);
                 }
             });
         }

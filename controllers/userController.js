@@ -238,7 +238,7 @@ module.exports = {
             var currentUser = req.user;
             const promise = await User.findByIdAndUpdate(currentUser._id,{
                 $set : req.body
-            });
+            }); //exec必要じゃない？　エラーの際のpromiseを確認する
             console.log(promise);
             res.json({
                 redirectPath : '/users/mypage'
@@ -247,7 +247,7 @@ module.exports = {
             next(err);
         }
     },
-    delete : async(req,res,next) => {
+    delete : async(req,res,next) => {　//.exec()
         try{
             var userId = req.user._id;     
             const promise = await User.findByIdAndDelete(userId);
@@ -257,7 +257,7 @@ module.exports = {
             next(err);
         }
     },
-    profileDelete : async(req,res,next) => {
+    profileDelete : async(req,res,next) => { //.exec()
         try{
             var profileId = req.user.profile;
             const promise = await Profile.findByIdAndDelete(profileId);

@@ -5,6 +5,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faUser} from '@fortawesome/free-solid-svg-icons';
 
 import Header from '../../components/block/header';
+import {Code303, Code401, Code500, HandleError} from '../../components/module/errorHandler';
 
 import '../../styles/layouts/profiles/edit.scss';
 
@@ -30,58 +31,28 @@ function Edit(props){
     const history = useHistory();
 
     useEffect(() => {
-        const error = new Error();
-
         fetch('/api/profile/edit')
-        .then((res) => {
-            if(!res.ok){
-                console.error('res.ok:',res.ok);
-                console.error('res.status:',res.status);
-                console.error('res.statusText',res.statusText);
-
-                error.status = res.status;
-                error.statusText = res.statusText;
-                throw error;
-            }
-            return res.json();
-        })
+        .then(HandleError)
         .then((obj) => {
-            if(obj.notExist){
-                history.push({
-                    pathname : obj.redirectPath,
-                    state : {message : obj.result}
-                });
-            }else{
-                setEmail(obj.email);
-                setFormData({
-                    country :  obj.profile.country,
-                    address : obj.profile.address,
-                    professional : obj.profile.professional,
-                    belongings : obj.profile.belongings,
-                    site : obj.profile.site,
-                    gender : obj.profile.gender,
-                    age : obj.profile.age,
-                    birthday : obj.profile.birthday,
-                    intro : obj.profile.intro
-                });
-                console.log(email);
-            }
+            setEmail(obj.email);
+            setFormData({
+                country :  obj.profile.country,
+                address : obj.profile.address,
+                professional : obj.profile.professional,
+                belongings : obj.profile.belongings,
+                site : obj.profile.site,
+                gender : obj.profile.gender,
+                age : obj.profile.age,
+                birthday : obj.profile.birthday,
+                intro : obj.profile.intro
+            });
         }).catch((err) => {
-            if(err.status === 401){
-                history.push({
-                    pathname : '/users/login',
-                    state : {message : `${err.status} : ログインしてください。`}
-                });
+            if(err.status === 303){
+                Code303(err,history);
+            }else if(err.status === 401){
+                Code401(err,history);
             }else if(err.status >= 500){
-                history.push({
-                    pathname : '/users/mypage',
-                    state : {message : `${err.status} : ${err.message}`}
-                });
-            }else{
-                history.push({
-                    pathname : '/users',
-                    state : {message : err.message}
-                });
+                Code500(err,history);
             }
         });
     },[]);
@@ -126,8 +97,6 @@ function Edit(props){
         if(validation.address_error || validation.age_error){
             setMessage('エラーの修正をしてください。');
         }else{
-            const error = new Error();
-
             fetch('/api/profile/update',{
                 method : 'PUT',
                 headers : {
@@ -145,35 +114,18 @@ function Edit(props){
                     birthday : formData.birthday,
                     intro : formData.intro
                 })
-            }).then((res) =>{
-                if(!res.ok){
-                    console.error('res.ok:',res.ok);
-                    console.error('res.status',res.status);
-                    console.error('res.statusText:',res.statusText);
-
-                    error.status = res.status;
-                    error.message = res.statusText;
-                    throw error;
-                }
-                return res.json();
-            }).then((obj) => {
+            })
+            .then(HandleError)
+            .then((obj) => {
                 history.push({
                     pathname : obj.redirectPath,
                     state : {message : 'プロフィールの更新に成功しました。'}
                 });
             }).catch((err) => {
                 if(err.status === 401){
-                    history.push({
-                        pathname : '/users/login',
-                        state : {message : `${err.status} : ログインしてください。`}
-                    });
-                }else if(err.status >= 500){
-                    setMessage(`${err.status} : ${err.message}`)
-                }else{
-                    history.push({
-                        pathname : '/users/mypage',
-                        stete : {message : err.message}
-                    });
+                    Code401(err,history);
+                }else if(err.status === 500){
+                    Code500(err,history);
                 }
             });
         }
