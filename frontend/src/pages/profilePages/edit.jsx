@@ -6,6 +6,7 @@ import {faUser} from '@fortawesome/free-solid-svg-icons';
 
 import Header from '../../components/block/header';
 import {Code303, Code401, Code500, HandleError} from '../../components/module/errorHandler';
+import {isEmpty,isAddress,isURL,isInt} from '../../components/module/validation';
 
 import '../../styles/layouts/profiles/edit.scss';
 
@@ -15,7 +16,6 @@ function Edit(props){
         country : '',
         address : '',
         professional : '',
-        belongings : '',
         site : '',
         gender : '',
         age : '',
@@ -24,8 +24,9 @@ function Edit(props){
     });
     const [message,setMessage] = useState('');
     const [validation,setValidation] = useState({
-        age_error : '',
-        address_error : ''
+        address_error : '',
+        site_error : '',
+        age_error : ''
     });
 
     const history = useHistory();
@@ -39,7 +40,6 @@ function Edit(props){
                 country :  obj.profile.country,
                 address : obj.profile.address,
                 professional : obj.profile.professional,
-                belongings : obj.profile.belongings,
                 site : obj.profile.site,
                 gender : obj.profile.gender,
                 age : obj.profile.age,
@@ -62,39 +62,49 @@ function Edit(props){
         const name = target.name;
         const value = target.value;
 
-        if(name === 'age'){
-            if(value < 0 || value > 120){
-                setValidation({...validation,hasChanged:true,age_error:'正しい年齢を記載してください。'});
-            }else{
-                setValidation({...validation,hasChanged:true,age_error:''});
-            }
-        }
-
         if(name === 'address'){
-            if(addressChecker(value)){
-                setValidation({...validation,hasChanged:true,address_error:'ハイフンを含めた、正しい郵便番号を記入してください。'});
-            }else{
+            if(isEmpty(value)){
                 setValidation({...validation,hasChanged:true,address_error:''});
+            }else{
+                if(isAddress(value)){
+                    setValidation({...validation,hasChanged:true,address_error:''});
+                }else{
+                    setValidation({...validation,hasChanged:true,address_error:'*ハイフンを含めた、正しい郵便番号を記入してください。'});
+                }
             }
         }
 
-        function addressChecker(str) {
-            var checker = str.match(/^[0-9]{3}-[0-9]{4}$/);
-            if(checker || str===""){
-                return false;
+        if(name === 'site'){
+            if(isEmpty(value)){
+                setValidation({...validation,hasChanged:true,site_error:''});
             }else{
-                return true;
+                if(isURL(value)){
+                    setValidation({...validation,hasChanged:true,site_error:''});
+                }else{
+                    setValidation({...validation,hasChanged:true,site_error:'正しいURLを記入してください。'});
+                }
             }
-        };
+        }
+
+        if(name === 'age'){
+            if(isEmpty(value)){
+                setValidation({...validation,hasChanged:true,age_error:''});
+            }else{
+                if(isInt(value,{min:0,max:120})){
+                    setValidation({...validation,hasChanged:true,age_error:''});
+                }else{
+                    setValidation({...validation,hasChanged:true,age_error:'*正しい年齢を記載してください。'});
+                }
+            }
+        }
 
         setFormData({...formData,hasChanged:true,[name]:value});
-        console.log(`name : ${name}/ value : ${value}`);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if(validation.address_error || validation.age_error){
+        if(validation.address_error || validation.site_error || validation.age_error){
             setMessage('エラーの修正をしてください。');
         }else{
             fetch('/api/profile/update',{
@@ -107,7 +117,6 @@ function Edit(props){
                     country : formData.country,
                     address : formData.address,
                     professional : formData.professional,
-                    belongings : formData.belongings,
                     site : formData.site,
                     gender : formData.gender,
                     age : formData.age,
@@ -184,15 +193,10 @@ function Edit(props){
                                 </div>
                             </div>
                             <div className='content'>
-                                <label htmlFor="belongings" className='label'>Belongings</label>
-                                <div className='item'>
-                                    <input type="text" name='belongings' className='input-item' value={formData.belongings} onChange={handleChange} />
-                                </div>
-                            </div>
-                            <div className='content'>
                                 <label htmlFor="site" className='label'>Site</label>
                                 <div className='item'>
                                     <input type="text" name='site' className='input-item' value={formData.site} onChange={handleChange} />
+                                    <p className='error_message'>{validation.site_error}</p>
                                 </div>
                             </div>
                         </div>

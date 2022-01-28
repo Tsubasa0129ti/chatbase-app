@@ -5,6 +5,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faComment,faEdit} from '@fortawesome/free-solid-svg-icons';
 
 import { HandleError, Code401, Code500 } from '../module/errorHandler';
+import { isLength } from '../module/validation';
 
 import '../../styles/components/atoms/profileComment.scss';
 
@@ -27,10 +28,10 @@ function ProfileComment(props){
         const value = target.value;
 
         if(name === 'intro'){
-            if(value.length > 100){
-                setMessage('コメントは100字以内に設定してください。');
-            }else{
+            if(isLength(value,{min:0,max:100})){
                 setMessage('');
+            }else{
+                setMessage('コメントは100字以内に設定してください。');
             }
         }
 
@@ -77,7 +78,6 @@ function ProfileComment(props){
     
 
     if(!edit){
-        console.log("aaa")
         return(
             <div className='comment'>
                 <div className='comment-top'>
@@ -96,7 +96,6 @@ function ProfileComment(props){
             </div>
         )  
     }else{
-        console.log('abc')
         return(
             <div className='comment'>
                 <div className='comment-top'>
@@ -112,7 +111,7 @@ function ProfileComment(props){
 
                 <div className='change-intro'>
                     <p className='error_code'>{message}</p>
-                    <textarea name="intro" className='intro-form' value={intro} onChange={handleChange}></textarea>
+                    <textarea name="intro" className='intro-form' value={intro} maxLength='100' onChange={handleChange}></textarea>
                     <input type="submit" className='toCancel' value='Cancel' onClick={cancel}  />
                     <input type="submit" className='toUpdate' value='Update' onClick={update} />
                 </div>

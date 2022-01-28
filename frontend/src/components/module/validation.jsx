@@ -47,5 +47,42 @@ export function isContain(val,pattern){//特定のpatternが含まれるかど�
     return true;
 };
 
+export function isAddress(val){//アドレスかどうかの判定
+    var checker = val.match(/^\d{3}-\d{4}$/);
+    if(!checker){
+        return false;
+    }
+    return true; 
+};
+
+export function isURL(val) { //URLの判定を行う .なしでも判定を通ってしまう（サーバーサイドのバリデーションにはかかるが。。。）
+    console.log(val);
+    let pattern = /^(https?|ftp)(:\/\/[\w\/:%#\$&\?\(\)~\.=\+\-]+)/;
+    const checker = val.match(pattern);
+    if(!checker){
+        return false;
+    }
+    return true;
+}
+
+export function isInt(val,{min,max}){ //数値のチェックを行う　小数点のチェックと値の範囲の決定
+    var int = Number.isInteger(parseFloat(val));
+    if(int){
+        if(val>=min && max>=val){
+            return true;
+        }else{
+            return false;
+        }
+    }else{
+        return false;
+    }
+};
+
+export function isEmpty(val){ //profile用に、、空の時にはエラーとならないように
+    if(val){
+        return false;
+    }
+    return true;
+}
+
 //今回のケースでは、validationを通過する場合はreturn true、逆にエラーを取得するときはfalseを返す　
-//ちなみにprofileにおいては、or条件を使ってみたい

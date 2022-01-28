@@ -204,10 +204,6 @@ function Mypage(props){
                                         <input type="text" className='item' value={user.profile.professional} disabled />
                                     </div>
                                     <div className='content'>
-                                        <label htmlFor="belongings" className='label'>Belongings　:</label>
-                                        <input type="text" className='item' value={user.profile.belongings} disabled />
-                                    </div>
-                                    <div className='content'>
                                         <label htmlFor="site" className='label'>Site　:</label>
                                         <input type="text" className='item' value={user.profile.site} disabled />
                                     </div>

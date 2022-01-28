@@ -8,7 +8,6 @@ function getProfile(body) {
         country : body.country,
         address : body.address,
         professional : body.professional,
-        belongings : body.belongings,
         site : body.site,
         gender : body.gender,
         age : body.age,
@@ -64,7 +63,7 @@ module.exports = {
             .isLength({min:0,max:100}).withMessage("メッセージの文字数は100文字以内に設定してください。"),
         check("site")
             .if(check("site").notEmpty())
-            .isURL().withMessage("正しいURLを記入してください。"),
+            .isURL({require_protocol:true}).withMessage("正しいURLを記入してください。"),
         check("gender")
             .isIn(["","male","female","no-answer"]).withMessage("正しく記入してください。"),
         check("age")
