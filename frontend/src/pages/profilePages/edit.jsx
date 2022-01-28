@@ -202,10 +202,9 @@ function Edit(props){
                                 <label htmlFor="gender" className='label'>Gender</label>
                                 <div className='item'>
                                     <select name="gender" className='input-item' value={formData.gender}　onChange={handleChange}>
-                                        <option hidden>選択してください</option>
+                                        <option hidden vale="">選択してください</option>
                                         <option value="male">Male</option>
                                         <option value="female">Female</option>
-                                        <option value="others"> Others</option>
                                         <option value="no-answer">No Answer</option>
                                     </select>
                                 </div>

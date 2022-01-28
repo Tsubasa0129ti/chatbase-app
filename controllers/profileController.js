@@ -1,5 +1,6 @@
 var User = require("../models/user");
 var Profile = require("../models/profile");
+var {check,validationResult} = require("express-validator");
 
 function getProfile(body) {
     return {
@@ -41,31 +42,61 @@ module.exports = {
             next(err);
         }
     },
-    create : async(req,res,next) => {
+    existProfile : (req,res,next) => {
         try{
             const exist = res.locals.exist;
 
             if(!exist){
-                const user = req.user;
-                var userId = user._id;
-                var profileParams = getProfile(req.body);
-
-                const newProfile = await Profile.create(profileParams);
-                const updateUser = await User.findByIdAndUpdate(userId,{
-                    $addToSet : {
-                        profile : newProfile._id
-                    }
-                }).exec();
-                res.json({
-                    redirectPath : '/users/mypage'
-                });
+                next();
             }else{
                 res.status(303).json({
                     status : 303,
-                    redirectPath : '/profile/edit',
-                    message : 'You have alredy created your profile!'
+                    redirectPath : '/profile/new',
+                    message : "You havn't had your profile yet. If you want to create your profile, please create here."
                 });
             }
+        }catch(err){
+            next(err);
+        }
+    },
+    validation : [
+        check("intro")
+            .isLength({min:0,max:100}).withMessage("メッセージの文字数は100文字以内に設定してください。"),
+        check("site")
+            .if(check("site").notEmpty())
+            .isURL().withMessage("正しいURLを記入してください。"),
+        check("gender")
+            .isIn(["","male","female","no-answer"]).withMessage("正しく記入してください。"),
+        check("age")
+            .if(check("age").notEmpty())
+            .isInt({min:0,max:120}).withMessage("正しい年齢を記入してください。")
+    ],
+    validationCheck : (req,res,next) => {
+        try{
+            const err = validationResult(req);
+            if(!err.isEmpty()){
+                return next(err);
+            }
+            next();
+        }catch(err){
+            next(err);
+        }
+    },
+    create : async(req,res,next) => {
+        try{
+            const user = req.user;
+            var userId = user._id;
+            var profileParams = getProfile(req.body);
+
+            const newProfile = await Profile.create(profileParams);
+            const updateUser = await User.findByIdAndUpdate(userId,{
+                $addToSet : {
+                    profile : newProfile._id
+                }
+            }).exec();
+            res.json({
+                redirectPath : '/users/mypage'
+            });  
         }catch(err){
             next(err);
         }

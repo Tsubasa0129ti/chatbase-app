@@ -193,10 +193,9 @@ function New(props){
                                     <div className='content'>
                                         <label htmlFor="gender" className='label'>Gender　:</label>
                                         <select name="gender" className='item'　onChange={handleChange}>
-                                            <option hidden>選択してください</option>
+                                            <option hidden value="">選択してください</option>
                                             <option value="male">Male</option>
                                             <option value="female">Female</option>
-                                            <option value="others"> Others</option>
                                             <option value="no-answer">No Answer</option>
                                         </select>
                                     </div>
