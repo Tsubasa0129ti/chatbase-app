@@ -64,8 +64,8 @@ module.exports = {
             const loggedIn = req.isAuthenticated();
             if(loggedIn){
                 next();
-            }else{　//ここでnextに移行させるのはどうだろうか
-                var err = new createError.Unauthorized("please login to view this page"); //個々にエラーメッセージの記載をすることが可能（ただし、まとめられるものは全てまとめたい。とすると、共通しそうなものに関しては共通のエラー処理層にてこれを設定するのがいいかも）
+            }else{
+                var err = new createError.Unauthorized();
                 next(err);
             }
         }catch(err){
@@ -79,7 +79,7 @@ module.exports = {
         }
         next();
     },
-    createValidation : [
+    nameValidation : [
         check("name.first")
             .notEmpty().withMessage('input your first name!')
             .isAlpha().withMessage('please input with alphabet')
@@ -90,6 +90,8 @@ module.exports = {
             .isAlpha().withMessage('please input with alphabet')
             .isLength({min:2,max:10}).withMessage('must be at least 2 characters in length, and no more than 10 characters')
             .custom(startUpper),
+    ],
+    validation : [
         check("email")
             .notEmpty().withMessage()
             .isEmail().withMessage("input your email!")
@@ -109,12 +111,19 @@ module.exports = {
             .custom(startUpper)
             .isLength({min:8,max:16}).withMessage("must be at least 8 characters in length, and no more than 16 characters")
     ],
-    create : async(req,res,next) => { //これは後テストをする。目的は、エラーの分岐を増やす　改善の余地あり
+    validationCheck : (req,res,next) => {
         try{
-            const err = await validationResult(req);
+            const err = validationResult(req);
             if(!err.isEmpty()){
                 return next(err);
             }
+            next();
+        }catch(err){
+            next(err);
+        }
+    },
+    create : async(req,res,next) => { //これは後テストをする。目的は、エラーの分岐を増やす　改善の余地あり
+        try{
             var newUser = new User(req.body);
             User.register(newUser,req.body.password,(err,user) => {
                 if(err){
@@ -216,29 +225,12 @@ module.exports = {
             next(err)
         }
     },
-    updateValidation : [
-        check("name.first")
-            .notEmpty().withMessage('input your first name!')
-            .isAlpha().withMessage('please input with alphabet')
-            .isLength({min:2,max:10}).withMessage('must be at least 2 characters in length, and no more than 10 characters')
-            .custom(startUpper),
-        check("name.last")
-            .notEmpty().withMessage('input your last name!')
-            .isAlpha().withMessage('please input with alphabet')
-            .isLength({min:2,max:10}).withMessage('must be at least 2 characters in length, and no more than 10 characters')
-            .custom(startUpper)
-    ],
     update : async(req,res,next) => {
         try{
-            const err = await validationResult(req);
-            if(!err.isEmpty()){
-                return next(err);
-            }
-
             var currentUser = req.user;
             const promise = await User.findByIdAndUpdate(currentUser._id,{
                 $set : req.body
-            }); //exec必要じゃない？　エラーの際のpromiseを確認する
+            }).exec();
             console.log(promise);
             res.json({
                 redirectPath : '/users/mypage'
@@ -247,20 +239,20 @@ module.exports = {
             next(err);
         }
     },
-    delete : async(req,res,next) => {　//.exec()
+    delete : async(req,res,next) => {
         try{
             var userId = req.user._id;     
-            const promise = await User.findByIdAndDelete(userId);
+            const promise = await User.findByIdAndDelete(userId).exec();
             console.log(promise);
             next();
         }catch(err){
             next(err);
         }
     },
-    profileDelete : async(req,res,next) => { //.exec()
+    profileDelete : async(req,res,next) => {
         try{
             var profileId = req.user.profile;
-            const promise = await Profile.findByIdAndDelete(profileId);
+            const promise = await Profile.findByIdAndDelete(profileId).exec();
             console.log(promise);
             res.json({
                 redirectPath : "/"
