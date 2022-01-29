@@ -4,6 +4,9 @@ import {useHistory} from 'react-router-dom';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faComment,faEdit} from '@fortawesome/free-solid-svg-icons';
 
+import { HandleError, Code401, Code500 } from '../module/errorHandler';
+import { isLength } from '../module/validation';
+
 import '../../styles/components/atoms/profileComment.scss';
 
 function ProfileComment(props){
@@ -25,10 +28,10 @@ function ProfileComment(props){
         const value = target.value;
 
         if(name === 'intro'){
-            if(value.length > 100){
-                setMessage('コメントは100字以内に設定してください。');
-            }else{
+            if(isLength(value,{min:0,max:100})){
                 setMessage('');
+            }else{
+                setMessage('コメントは100字以内に設定してください。');
             }
         }
 
@@ -46,8 +49,6 @@ function ProfileComment(props){
         if(message){
             setMessage('エラーの修正をしてください。');
         }else{
-            const error = new Error();
-
             fetch('/api/profile/introUpdate',{
                 method : 'PUT',
                 headers : {
@@ -57,18 +58,9 @@ function ProfileComment(props){
                 body : JSON.stringify({
                     intro : intro
                 })
-            }).then((res) => {
-                if(!res.ok){
-                    console.error('res.ok:',res.ok);
-                    console.error('res.status',res.status);
-                    console.error('res.statusText:',res.statusText);
-
-                    error.status = res.status;
-                    error.message = res.statusText;
-                    throw error;
-                }
-                return res.json();
-            }).then((obj) => {
+            })
+            .then(HandleError)
+            .then((obj) => {
                 setEdit(false);
                 history.push({
                     pathname : obj.redirectPath,
@@ -76,17 +68,9 @@ function ProfileComment(props){
                 });
             }).catch((err) => {
                 if(err.status === 401){
-                    history.push({
-                        pathname : '/users/login',
-                        state : {message : `${err.status} : ログインしてください。`}
-                    });
-                }else if(err.status >= 500){
-                    setMessage(`${err.status} : ${err.message}`)
-                }else{
-                    history.push({
-                        pathname : '/users/mypage',
-                        stete : {message : err.message}
-                    });
+                    Code401(err,history);
+                }else if(err.status === 500){
+                    Code500(err,history);
                 }
             });
         }
@@ -94,7 +78,6 @@ function ProfileComment(props){
     
 
     if(!edit){
-        console.log("aaa")
         return(
             <div className='comment'>
                 <div className='comment-top'>
@@ -113,7 +96,6 @@ function ProfileComment(props){
             </div>
         )  
     }else{
-        console.log('abc')
         return(
             <div className='comment'>
                 <div className='comment-top'>
@@ -129,7 +111,7 @@ function ProfileComment(props){
 
                 <div className='change-intro'>
                     <p className='error_code'>{message}</p>
-                    <textarea name="intro" className='intro-form' value={intro} onChange={handleChange}></textarea>
+                    <textarea name="intro" className='intro-form' value={intro} maxLength='100' onChange={handleChange}></textarea>
                     <input type="submit" className='toCancel' value='Cancel' onClick={cancel}  />
                     <input type="submit" className='toUpdate' value='Update' onClick={update} />
                 </div>

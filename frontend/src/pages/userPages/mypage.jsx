@@ -1,6 +1,9 @@
 import React,{useState,useEffect} from 'react';
-import { useHistory,useLocation } from 'react-router';
+import { useHistory } from 'react-router';
+
 import Header from '../../components/block/header';
+import {HandleError,Code401,Code500} from '../../components/module/errorHandler';
+
 import AccountDelete from '../../components/ReactModal/accountDelete';
 import ProfileComment from '../../components/atoms/profileComment';
 
@@ -15,28 +18,13 @@ function Mypage(props){
     const [username,setUsername] = useState('');
     const [profile,setProfile] = useState(false);
     const [show,setShow] = useState(false);
-    const [message,setMessage] = useState('');
 
     const history = useHistory();
-    const location = useLocation();
 
     useEffect(() => {
-        const error = new Error();
-
         fetch('/api/users/mypage')
-        .then((res) => {
-            if(!res.ok){
-                console.error('res.ok:',res.ok);
-                console.error('res.status:',res.status);
-                console.error('res.statusText:',res.statusText);
-
-                error.message = res.statusText;
-                error.status = res.status;
-                throw error;
-            }
-            return res.json();
-        })
-        .then((obj) => {
+        .then(HandleError)
+        .then((obj) => {　//正直この部分は他のページとの共通するものとなり得ない。
             setUsername(obj.user.name.first + ' ' + obj.user.name.last);
             setUser(obj.user);
             if(obj.profile){
@@ -44,28 +32,11 @@ function Mypage(props){
             }
         }).catch((err) => {
             if(err.status === 401){
-                history.push({
-                    pathname : '/users/login',
-                    state : {message : `${err.status} : ログインしてください。`}
-                });
-            }else if(err.status >= 500){
-                history.push({
-                    pathname : '/users',
-                    state : {message : `${err.status} : ${err.message}`}
-                });
-            }else{
-                history.push({
-                    pathname : '/users',
-                    state : {message : err.message}
-                });
+                Code401(err,history);
+            }else if(err.status === 500){
+                Code500(err,history);
             }
         });
-    },[]);
-
-    useEffect(() => {
-        if(location.state){
-            setMessage(location.state.message);
-        }
     },[]);
 
     const cancel = () => {
@@ -73,8 +44,6 @@ function Mypage(props){
     };
 
     const deleteEvent = () => {
-        const error = new Error();
-
         fetch(`/api/users/mypage/delete`,{
             method : 'DELETE',
             headers : {
@@ -82,34 +51,17 @@ function Mypage(props){
                 'Content-Type': 'application/json'
             }
         })
-        .then((res) => {
-            if(!res.ok){
-                console.error('res.ok:',res.ok);
-                console.error('res.status:',res.status);
-                console.error('res.statusText:',res.statusText);
-
-                error.status = res.status;
-                error.message = res.statusText;
-                throw error;
-            }
-            return res.json();
-        })
+        .then(HandleError)
         .then((obj) => {
             history.push({
                 pathname : obj.redirectPath,
                 state : {message : 'アカウントの削除に成功しました。'}
             });
         }).catch((err) => {
-            if(err.status >= 500){
-                history.push({
-                    pathname : '/users/mypage',
-                    state : {message : `${err.status} : ${err.message}`}
-                });
-            }else{
-                history.push({
-                    pathname : '/users/mypage',
-                    state : {message : err.message}
-                });
+            if(err.status === 401){
+                Code401(err,history);
+            }else if(err.status === 500){
+                Code500(err,history);
             }
         });
     };
@@ -117,7 +69,7 @@ function Mypage(props){
     if(!profile) {
         return(
             <div className='mypage'>
-                <Header />
+                <Header loggedIn={true} />
                 <div className='users_mypage'>
                     <div className='mypage-top'>
                         <p　className='mypage-title'>My Page</p>
@@ -195,7 +147,7 @@ function Mypage(props){
     }else{
         return(
             <div className='mypage'>
-                <Header />
+                <Header loggedIn={true} />
                 <div class='container'>
                     <div className='aside'>
                         <div className='user-icon'>
@@ -250,10 +202,6 @@ function Mypage(props){
                                     <div className='content'>
                                         <label htmlFor="professional" className='label'>Professional</label>
                                         <input type="text" className='item' value={user.profile.professional} disabled />
-                                    </div>
-                                    <div className='content'>
-                                        <label htmlFor="belongings" className='label'>Belongings　:</label>
-                                        <input type="text" className='item' value={user.profile.belongings} disabled />
                                     </div>
                                     <div className='content'>
                                         <label htmlFor="site" className='label'>Site　:</label>

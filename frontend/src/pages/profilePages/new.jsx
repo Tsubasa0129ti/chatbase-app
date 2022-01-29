@@ -1,6 +1,9 @@
 import React,{useState,useEffect} from 'react';
 import { useHistory,useLocation } from 'react-router';
+
 import Header from '../../components/block/header';
+import { Code303, Code401, Code500, HandleError } from '../../components/module/errorHandler';
+import {isEmpty,isAddress,isURL,isInt,isLength} from '../../components/module/validation';
 
 import '../../styles/layouts/profiles/new.scss';
 
@@ -10,7 +13,6 @@ function New(props){
         country : '',
         address : '',
         professional : '',
-        belongings : '',
         site : '',
         gender : '',
         age : '',
@@ -18,53 +20,26 @@ function New(props){
     });
     const [message,setMessage] = useState('');
     const [validation,setValidation] = useState({
-        intro_error : '',
+        address_error : '',
+        site_error : '',
         age_error : '',
-        address_error : ''
+        intro_error : '',
     });
 
     const history = useHistory();
     const location = useLocation();
 
     useEffect(() => {
-        const error = new Error();
-
         fetch('/api/profile/new')
-        .then((res) => {
-            if(!res.ok){
-                console.error('res.ok:',res.ok);
-                console.error('res.status:',res.status);
-                console.error('res.statusText:',res.statusText);
-
-                error.status = res.status;
-                error.message = res.statusText;
-                throw error;
-            }
-            return res.json();
-        })
-        .then((obj) => {
-            if(obj.exist){
-                history.push({
-                    pathname : obj.redirectPath,
-                    state : {message : 'Profileは作成済みです。'}
-                });
-            }
-        }).catch((err) => {
-            if(err.status === 401){
-                history.push({
-                    pathname : '/users/login',
-                    state : {message : `${err.status} : ログインしてください。`}
-                });
-            }else if(err.status >= 500){
-                history.push({
-                    pathname : '/users/mypage',
-                    state : {message : `${err.status} : ${err.message}`}
-                });
-            }else{
-                history.push({
-                    pathname : '/users/mypage',
-                    state : {message : err.message}
-                });
+        .then(HandleError)
+        .then()
+        .catch((err) => {
+            if(err.status === 303){
+                Code303(err,history);
+            }else if(err.status === 401){
+                Code401(err,history);
+            }else if(err.status === 500){
+                Code500(err,history);
             }
         });
     },[]);
@@ -80,51 +55,59 @@ function New(props){
         const name = target.name;
         const value = target.value;
 
-        if(name === 'intro'){
-            if(value.length > 100){
-                setValidation({...validation,hasChanged:true,intro_error:'*Intro　: ひとことは100文字以内に設定してください。'});
+        if(name === 'address'){
+            if(isEmpty(value)){
+                setValidation({...validation,hasChanged:true,address_error:''});
             }else{
-                setValidation({...validation,hasChanged:true,intro_error:''});
+                if(isAddress(value)){
+                    setValidation({...validation,hasChanged:true,address_error:''});
+                }else{
+                    setValidation({...validation,hasChanged:true,address_error:'*ハイフンを含めた、正しい郵便番号を記入してください。'});
+                }
+            }
+        }
+
+        if(name === 'site'){
+            if(isEmpty(value)){
+                setValidation({...validation,hasChanged:true,site_error:''});
+            }else{
+                if(isURL(value)){
+                    setValidation({...validation,hasChanged:true,site_error:''});
+                }else{
+                    setValidation({...validation,hasChanged:true,site_error:'正しいURLを記入してください。'});
+                }
             }
         }
 
         if(name === 'age'){
-            if(value < 0 || value > 120){
-                setValidation({...validation,hasChanged:true,age_error:'*正しい年齢を記載してください。'});
-            }else{
+            if(isEmpty(value)){
                 setValidation({...validation,hasChanged:true,age_error:''});
+            }else{
+                if(isInt(value,{min:0,max:120})){
+                    setValidation({...validation,hasChanged:true,age_error:''});
+                }else{
+                    setValidation({...validation,hasChanged:true,age_error:'*正しい年齢を記載してください。'});
+                }
             }
         }
-
-        if(name === 'address'){
-            if(addressChecker(value)){
-                setValidation({...validation,hasChanged:true,address_error:'*ハイフンを含めた、正しい郵便番号を記入してください。'});
+        
+        if(name === 'intro'){
+            if(isLength(value,{min:0,max:100})){
+                setValidation({...validation,hasChanged:true,intro_error:''});
             }else{
-                setValidation({...validation,hasChanged:true,address_error:''});
+                setValidation({...validation,hasChanged:true,intro_error:'*Intro　: ひとことは100文字以内に設定してください。'});
             }
         }
-
-        function addressChecker(str) {
-            var checker = str.match(/^[0-9]{3}-[0-9]{4}$/);
-            if(checker || str===""){
-                return false;
-            }else{
-                return true;
-            }
-        };
-
+        
         setFormData({...formData,hasChanged:true,[name]:value});
-        console.log(formData);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if(validation.intro_error || validation.address_error || validation.age_error){
+        if(validation.intro_error || validation.address_error || validation.age_error || validation.site_error){
             setMessage('*エラーを修正してください。');
         }else{
-            const error = new Error();
-
             fetch('/api/profile/create',{
                 method : 'POST',
                 headers : {
@@ -136,50 +119,25 @@ function New(props){
                     country : formData.country,
                     address : formData.address,
                     professional : formData.professional,
-                    belongings : formData.belongings,
                     site : formData.site,
                     gender : formData.gender,
                     age : formData.age,
                     birthday : formData.birthday,
                 })
             })
-            .then((res) => {
-                if(!res.ok){
-                    console.error('res.ok:',res.ok);
-                    console.error('res.status:',res.status);
-                    console.error('res.statusText:',res.statusText);
-
-                    error.status = res.status;
-                    error.message = res.statusText;
-                    throw error;
-                }
-                return res.json();
-            })
-            .then((obj) => {
-                if(obj.exist){
-                    history.push({
-                        pathname : obj.redirectPath,
-                        state : {message : 'Profileは作成済みです。'}
-                    });
-                }else{
-                    history.push({
-                        pathname : obj.redirectPath,
-                        state : {message : 'プロフィールの作成に成功しました。'}
-                    });
-                }
+            .then(HandleError)
+            .then((obj) => { //ここでは成功時の処理しか扱わない
+                history.push({
+                    pathname : obj.redirectPath,
+                    state : {message : 'プロフィールの作成に成功しました。'}
+                });
             }).catch((err) => {
-                if(err.status === 401){
-                    history.push({
-                        pathname : '/users/login',
-                        state : {message : `${err.status} : ログインしてください。`}
-                    });
-                }else if(err.status >= 500){
-                    setMessage(`${err.status} : ${err.message}`);
-                }else{
-                    history.push({
-                        pathname : '/users/mypage',
-                        state : {message : err.message}
-                    });
+                if(err.status === 303){
+                    Code303(err,history);
+                }else if(err.status === 401){
+                    Code401(err,history);
+                }else if(err.status === 500){
+                    Code500(err,history);
                 }
             });
         }
@@ -187,7 +145,7 @@ function New(props){
 
     return(
         <div>
-            <Header />
+            <Header loggedIn={true} />
 
             <div className='main'>
                 <div className='main-top'>
@@ -231,12 +189,9 @@ function New(props){
                                         <input type="text" name='professional' className='item' onChange={handleChange} />
                                     </div>
                                     <div className='content'>
-                                        <label htmlFor="belongings" className='label'>Belongings　:</label>
-                                        <input type="text" name='belongings' className='item' onChange={handleChange} />
-                                    </div>
-                                    <div className='content'>
                                         <label htmlFor="site" className='label'>Site　:</label>
                                         <input type="text" name='site' className='item' onChange={handleChange} />
+                                        <p className='error-message'>{validation.site_error}</p>
                                     </div>
                                 </div>
 
@@ -245,10 +200,9 @@ function New(props){
                                     <div className='content'>
                                         <label htmlFor="gender" className='label'>Gender　:</label>
                                         <select name="gender" className='item'　onChange={handleChange}>
-                                            <option hidden>選択してください</option>
+                                            <option hidden value="">選択してください</option>
                                             <option value="male">Male</option>
                                             <option value="female">Female</option>
-                                            <option value="others"> Others</option>
                                             <option value="no-answer">No Answer</option>
                                         </select>
                                     </div>
@@ -288,5 +242,3 @@ function New(props){
 }
 
 export default New;
-
-//②usernameを無くしたので、サーバー側からも削除する

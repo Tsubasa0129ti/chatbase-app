@@ -1,6 +1,8 @@
 import React,{useState,useEffect} from 'react';
 import { useHistory,useLocation } from 'react-router';
+
 import Header from '../../components/block/header';
+import { HandleError,Code401,Code500 } from '../../components/module/errorHandler';
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faUser} from '@fortawesome/free-solid-svg-icons';
@@ -21,25 +23,14 @@ function Id(props){
         const pathname = location.pathname;
         var id = pathname.split('/')[3];
 
-        const error = new Error();
-
         fetch(`/api/profile/${id}`)
-        .then((res) => {
-            if(!res.ok){
-                console.error('res.ok:',res.ok);
-                console.error('res.status',res.status);
-                console.error('res.statusText:',res.statusText);
-
-                error.status = res.status;
-                error.message = res.statusText;
-                throw error;
-            }
-            return res.json();
-        }).then((obj) => {
-            if(obj.notExist){
+        .then(HandleError)
+        .then((obj) => {
+            console.log(obj)
+            if(!obj.profileExist){
                 setUserData({
-                    username : obj.username,
-                    email : obj.email
+                    username : obj.user.name.first + ' ' + obj.user.name.last,
+                    email : obj.user.email
                 });
             }else{
                 setUserData({
@@ -53,20 +44,9 @@ function Id(props){
             }
         }).catch((err) => {
             if(err.status === 401){
-                history.push({
-                    pathname : '/users/login',
-                    state : {message : `${err.status} : ログインしてください。`}
-                });
+                Code401(err,history);
             }else if(err.status >= 500){
-                history.push({
-                    pathname : '/users/mypage',
-                    state : {message : `${err.status} : ${err.message}`}
-                })
-            }else{
-                history.push({
-                    pathname : '/users',
-                    stete : {message : err.message}
-                });
+                Code500(err,history);
             }
         });
     },[]);
@@ -74,7 +54,7 @@ function Id(props){
 
     return(
         <div>
-            <Header />
+            <Header loggedIn={null} />
             <div className='main'>
                 <div className='profile-top'>
                     <div className='icon'>

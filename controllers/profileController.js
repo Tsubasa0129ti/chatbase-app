@@ -1,5 +1,6 @@
 var User = require("../models/user");
 var Profile = require("../models/profile");
+var {check,validationResult} = require("express-validator");
 
 function getProfile(body) {
     return {
@@ -7,7 +8,6 @@ function getProfile(body) {
         country : body.country,
         address : body.address,
         professional : body.professional,
-        belongings : body.belongings,
         site : body.site,
         gender : body.gender,
         age : body.age,
@@ -17,130 +17,155 @@ function getProfile(body) {
 
 module.exports = {
     profileCheck : (req,res,next) => {
-        const user = req.user;
-        if(user.profile === undefined){
+        try {
+            const user = req.user;
+            user.profile === undefined ? res.locals.exist = false : res.locals.exist = true;
             next();
-        }else{
-            res.json({
-                exist : true,
-                redirectPath : '/users/mypage'
-            });
+        }catch(err){
+            next(err);
         }
     },
-    new : (req,res) => {
-        res.json('success');
-    },
-    create : (req,res) => {
-        const user = req.user;
-        var profileParams = getProfile(req.body);
-        Profile.create(profileParams)
-        .then(profile => { 
-            var userId = user._id;
-            User.findByIdAndUpdate(userId,{
-                $addToSet : {
-                    profile : profile._id
-                }
-            })
-            .then(() => {
-                res.json({
-                    redirectPath : '/users/mypage'
+    new : (req,res,next) => {
+        try{
+            var exist = res.locals.exist;
+            if(!exist){
+                res.json(null);
+            }else{
+                res.status(303).json({
+                    status : 303,
+                    redirectPath : '/profile/edit',
+                    message : 'You have alredy created your profile!'
                 });
-            })
-            .catch((err) => {
-                next(err);
-            });
-        })
-        .catch(err => {
+            }
+        }catch(err){
             next(err);
-        });
-        
-    },
-    getProfile : (req,res,next) => {
-        var user = req.user;
-        if(user.profile !== undefined){
-            next();
-        }else{
-            res.json({
-                notExist : true,
-                redirectPath : '/profile/new'
-            });
         }
     },
-    edit : (req,res) => {
-        var currentUser = req.user;
-        User.findById(currentUser._id)
-        .populate("profile") 
-        .exec(function(err,user){
-            if(err){
-                next(err);
+    existProfile : (req,res,next) => {
+        try{
+            const exist = res.locals.exist;
+
+            if(!exist){
+                next();
+            }else{
+                res.status(303).json({
+                    status : 303,
+                    redirectPath : '/profile/new',
+                    message : "You havn't had your profile yet. If you want to create your profile, please create here."
+                });
             }
-            const email = user.email;
-            const profile = user.profile;
-            res.json({
-                email : email,
-                profile : profile
-            });
-            
-        });
+        }catch(err){
+            next(err);
+        }
     },
-    introUpdate : (req,res) => {
-        var id = req.user.profile;
-        Profile.findByIdAndUpdate(id,{
-            $set : {intro : req.body.intro}
-        }).then(profile => {
+    validation : [
+        check("intro")
+            .isLength({min:0,max:100}).withMessage("メッセージの文字数は100文字以内に設定してください。"),
+        check("site")
+            .if(check("site").notEmpty())
+            .isURL({require_protocol:true}).withMessage("正しいURLを記入してください。"),
+        check("gender")
+            .isIn(["","male","female","no-answer"]).withMessage("正しく記入してください。"),
+        check("age")
+            .if(check("age").notEmpty())
+            .isInt({min:0,max:120}).withMessage("正しい年齢を記入してください。")
+    ],
+    validationCheck : (req,res,next) => {
+        try{
+            const err = validationResult(req);
+            if(!err.isEmpty()){
+                return next(err);
+            }
+            next();
+        }catch(err){
+            next(err);
+        }
+    },
+    create : async(req,res,next) => {
+        try{
+            const user = req.user;
+            var userId = user._id;
+            var profileParams = getProfile(req.body);
+
+            const newProfile = await Profile.create(profileParams);
+            const updateUser = await User.findByIdAndUpdate(userId,{
+                $addToSet : {
+                    profile : newProfile._id
+                }
+            }).exec();
+            res.json({
+                redirectPath : '/users/mypage'
+            });  
+        }catch(err){
+            next(err);
+        }
+    },
+    edit : async(req,res,next) => {
+        try{
+            var exist = res.locals.exist;
+            if(exist){
+                var currentUser = req.user;
+                var user = await User.findById(currentUser._id).populate("profile").exec();
+                res.json({
+                    email : user.email,
+                    profile : user.profile
+                });
+            }else{
+                res.status(303).json({
+                    status : 303,
+                    redirectPath : '/profile/new',
+                    message : "You havn't had your profile yet. If you want to create your profile, please create here."
+                });
+            }
+        }catch(err){
+            next(err);
+        }
+    },
+    update : async(req,res,next) => {
+        try{
+            let profileParams = getProfile(req.body);
+            var id = req.user.profile;
+            var promise = await Profile.findByIdAndUpdate(id,{
+                $set : profileParams
+            }).exec();
             res.json({
                 redirectPath : '/users/mypage'
             });
-        }).catch(err => {
+        }catch(err){
             next(err);
-        })
+        }
     },
-    update : (req,res,next) => {
-        let profileParams = getProfile(req.body);
-        var id = req.user.profile;
-        Profile.findByIdAndUpdate(id,{
-            $set : profileParams
-        }).then(profile => {
+    introUpdate : async(req,res,next) => {
+        try{
+            var id = req.user.profile;
+            var promise = await Profile.findByIdAndUpdate(id,{
+                $set : {intro : req.body.intro}
+            }).exec();
             res.json({
                 redirectPath : '/users/mypage'
             });
-        }).catch(err => {
+        }catch(err){
             next(err);
-        });
+        }
     },
-    id : (req,res,next) => { //時々なのかはわからないが、userの検索ができなくなったことがあったので、エラー処理をするなどして、対処する必要がありそう
-        var userId = req.params.id;
-        User.findById(userId)
-        .then((user) => { //なるほど、結果がなくても検索自体は一応できてしまうのか
-            console.log(user);
+    id : async(req,res,next) => { //時々なのかはわからないが、userの検索ができなくなったことがあったので、エラー処理をするなどして、対処する必要がありそう
+        try{
+            var userId = req.params.id;
+            const user = await User.findById(userId).exec();
             if(user.profile){
-                console.log(`pass1:${user.profile}`);
-                User.findById(userId)
-                .populate('profile')
-                .exec((err,user) => {
-                    if(err){
-                        next(err);
-                    }
-                    res.json({
-                        profileExist : true,
-                        user : user
-                    });
+                const result = await User.findById(userId).populate('profile').exec();
+                res.json({
+                    profileExist : true,
+                    user : result
                 });
             }else{
                 console.log(`pass2:${user.profile}`);
                 res.json({
                     user : user
-                });
+                })
             }
-        }).catch((err) => {
-            console.log('pass3')
-            console.log('asasas')
-            console.log(err)
-            console.log(`message:${err.message}`);
-            console.log(`name:${err.name}`);
-            next(err); //ここだね。おそらくこのエラーが出たときに/mypageに飛ぶ
-
-
-        })
+        }catch(err){
+            next(err);
+        }
     }
 }

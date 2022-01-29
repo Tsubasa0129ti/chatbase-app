@@ -2,6 +2,8 @@ import React,{useState,useEffect} from 'react';
 import { useHistory,useLocation } from 'react-router';
 
 import Header from '../../components/block/header';
+import { Code401, Code500, HandleError } from '../../components/module/errorHandler';
+import {isUpper,isAlpha,isLength} from '../../components/module/validation';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
@@ -13,29 +15,19 @@ function Edit(props){
         first : '',
         last : ''
     });
-    const [first_error,setFirst_error] = useState('');
-    const [last_error,setLast_error] = useState('');
+    const [validation,setValidation] = useState({
+        first_error : '',
+        last_error : ''
+    });
+
     const [message,setMessage] = useState('');
 
     const history = useHistory();
     const location  = useLocation();
 
     useEffect(() => {
-        const error = new Error();
-
         fetch('/api/users/mypage/edit')
-        .then((res) => {
-            if(!res.ok){
-                console.error('res.ok:',res.ok);
-                console.error('res.status:',res.status);
-                console.error('res.statusText:',res.statusText);
-
-                error.status = res.status;
-                error.message = res.statusText;
-                throw error;
-            }
-            return res.json();
-        })
+        .then(HandleError)
         .then((obj) => {
             setFormData({
                 first : obj.name.first,
@@ -43,20 +35,9 @@ function Edit(props){
             });
         }).catch((err) => {
             if(err.status === 401){
-                history.push({
-                    pathname : '/users/login',
-                    state : {message : `${err.status} : ログインしてください。`}
-                });
-            }else if(err.status >= 500){
-                history.push({
-                    pathname : '/users/mypage',
-                    state : {message : `${err.status} : ${err.message}`}
-                });
-            }else{
-                history.push({
-                    pathname : '/users',
-                    state : {message : err.message}
-                });
+                Code401(err,history);
+            }else if(err.status === 500){
+                Code500(err,history);
             }
         });
     },[]);
@@ -74,47 +55,46 @@ function Edit(props){
 
         //first_errorの出力
         if(name === 'first'){
-            if(nameChecker(value)){
-                setFirst_error('First Name : 1文字目は、大文字で設定してください。')
-            }else{
-                if(value.length <= 3 || value.length >= 8){
-                    setFirst_error('First Name : 名前は4~7文字で記入してください。')
+            if(isAlpha(value)){
+                if(isUpper(value)){
+                    if(isLength(value,{min:2,max:10})){
+                        setValidation({...validation,hasChanged:true,first_error:''});
+                    }else{
+                        setValidation({...validation,hasChanged:true,first_error:'First Name : 2文字以上10文字以内で記入してください。'});
+                    }
                 }else{
-                    setFirst_error('')
+                    setValidation({...validation,hasChanged:true,first_error:'First Name : 一文字目は大文字で記入してください。'});
                 }
+            }else{
+                setValidation({...validation,hasChanged:true,first_error:'First Name : アルファベットで記入してください。'});
             }
         }
 
-        //last_errorの出力
+        //lastのエラー作成
         if(name === 'last'){
-            if(nameChecker(value)){
-                setLast_error('Last Name : 1文字目は、大文字で設定してください。');
-            }else{
-                if(value.length <= 3 || value.length >= 8){
-                    setLast_error('Last Name : 名前は4~7文字で記入してください。');
+            if(isAlpha(value)){
+                if(isUpper(value)){
+                    if(isLength(value,{min:2,max:10})){
+                        setValidation({...validation,hasChanged:true,last_error:''});
+                    }else{
+                        setValidation({...validation,hasChanged:true,last_error:'Last Name : 2文字以上10文字以内で記入してください。'})
+                    }
                 }else{
-                    setLast_error('');
+                    setValidation({...validation,hasChanged:true,last_error:'Last Name : 一文字目は大文字で記入してください。'})
                 }
+            }else{
+                setValidation({...validation,hasChanged:true,last_error:'Last Name : アルファベットで記入してください。'})
             }
         }
-
-        function nameChecker(str){
-            var checker = str.match(/[A-Z]{1}[A-Za-z]*/);
-            if(!checker){
-                return true;
-            }
-        };
 
         setFormData({...formData,hasChanged:true,[name]:value});
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if(first_error || last_error){
+        if(validation.first_error || validation.last_error){
             setMessage('エラーの修正をしてください。');
         }else{
-            const error = new Error();
-
             fetch('/api/users/mypage/update',{　
                 method : 'PUT',
                 headers : {
@@ -128,37 +108,22 @@ function Edit(props){
                     }
                 })
             })
-            .then((res) => {
-                if(!res.ok){
-                    console.error('res.ok:',res.ok);
-                    console.error('res.status:',res.status);
-                    console.error('res.statusText:',res.statusText);
-
-                    error.message = res.statusText;
-                    error.status = res.status;
-                    throw error;
-                }
-                return res.json();
-            })
+            .then(HandleError)
             .then((obj) => {
                 setMessage('');
                 history.push({
                     pathname : obj.redirectPath,
-                    state : {message : 'アカウントの変更をしました。'}
+                    state : {message : 'アカウント名の修正をしました。'}
                 });
             }).catch((err) => {
-                if(err.status === 401){
-                    history.push({
-                        pathname : '/users/login',
-                        state : {message : `${err.status} : ログインしてください。`}
-                    });
-                }else if(err.status >= 500){
-                    setMessage(`${err.status} : ${err.message}`);
-                }else{
-                    history.push({
-                        pathname : '/users/mypage',
-                        state : {message : err.message}
-                    });
+                if(err.status === 400){
+                    setMessage(`${err.status}_${err.type} : ${err.message}`);
+                }else if(err.status === 401){
+                    Code401(err,history);
+                }else if(err.status === 422){
+                    setMessage(`${err.status} : ${err.type}`);
+                }else if(err.status  === 500){
+                    Code500(err,history);
                 }
             });
         }
@@ -166,7 +131,7 @@ function Edit(props){
 
     return(
         <div>
-            <Header />
+            <Header loggedIn={true} />
             <div className='userEdit_page'>
                 <div className='edit-top'>
                     <p className='edit-icon'>
@@ -179,12 +144,12 @@ function Edit(props){
                     <div className='firstName_block'>
                         <label htmlFor="firstName" className='label'>First Name</label>
                         <input type="text" name='first' className='edit_input' value={formData.first} onChange={handleChange} />
-                        <p className='error_message'>{first_error}</p>
+                        <p className='error_message'>{validation.first_error}</p>
                     </div>
                     <div className='lastName_block'>
                         <label htmlFor="lastName" className='label'>Last Name</label>
                         <input type='text' name='last' className='edit_input' value={formData.last} onChange={handleChange} />
-                        <p className='error_message'>{last_error}</p>
+                        <p className='error_message'>{validation.last_error}</p>
                     </div>
                     <input type='submit' value='Edit Account' className='edit-submit' />
                 </form>
@@ -195,4 +160,3 @@ function Edit(props){
 }
 
 export default Edit;
-//これに関する不足点　①サーバー全般　②バリデーション機能(フロント部分は完了)

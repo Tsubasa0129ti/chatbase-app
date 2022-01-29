@@ -15,9 +15,6 @@ var profileSchema = new Schema(
         professional : {
             type : String
         },
-        belongings : {
-            type : String,
-        },
         site : {
             type :String
         },

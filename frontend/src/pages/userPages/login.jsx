@@ -1,6 +1,8 @@
 import React, {useState,useEffect} from 'react';
-import { useHistory,useLocation } from 'react-router';
+import { useHistory } from 'react-router';
+
 import Header from '../../components/block/header';
+import { HandleError, Code303 , Code500 } from '../../components/module/errorHandler';
 
 import 'font-awesome/css/font-awesome.min.css';
 import '../../styles/layouts/users/login.scss';
@@ -11,52 +13,21 @@ function Login(props) {
         password : ''
     });
     const [message,setMessage] = useState('');
+    console.log(props)
 
     const history = useHistory();
-    const location = useLocation();
 
     useEffect(() => {
-        const error = new Error();
-
-        fetch('/api/users/previousCheck')
-        .then((res) => {
-            if(!res.ok){
-                console.error('res.ok:',res.ok);
-                console.error('res. status:',res.status);
-                console.error('res.statusText:',res.statusText);
-
-                error.status = res.status;
-                error.message = res.statusText;
-                throw error;
-            }
-            return res.json();
-        })
-        .then((obj) => {
-            if(obj.result === 'Authenticated'){
-                history.push({
-                    pathname : obj.redirectPath,
-                    state : {message : 'You are already authenticated'}
-                });
-            }
-        }).catch((err) => {
-            if(err.status){
-                history.push({
-                    pathname : '/users',
-                    state : {message : `${err.status} : ${err.message}`}
-                });
-            }else{
-                history.push({
-                    pathname : '/users',
-                    state : {message : err.message}
-                });
+        fetch('/api/users/loginCheck')
+        .then(HandleError)
+        .then()
+        .catch((err) => {
+            if(err.status　=== 303){
+                Code303(err,history);
+            }else if(err.status === 500){ //ここも同様　function 500
+                Code500(err,history);
             }
         }); 
-    },[]);
-
-    useEffect(() => {
-        if(location.state){
-            setMessage(location.state.message);
-        }
     },[]);
 
     const handleChange = (e) => {
@@ -69,7 +40,6 @@ function Login(props) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const error = new Error();
 
         fetch('/api/users/auth',{
             method : 'POST',
@@ -82,42 +52,24 @@ function Login(props) {
                 password : formData.password
             })
         })
-        .then((res) => {
-            if(!res.ok){
-                console.error('res.ok:',res.ok);
-                console.error('res.status:',res.status);
-                console.error('res.statusText:',res.statusText);
-
-                error.status = res.status;
-                error.message = res.statusText;
-                throw error;
-            }
-            return res.json();
-        })
-        .then((obj) => {
+        .then(HandleError)
+        .then((obj) => { //createも同様にリダイレクトがあるな　これに関しては303だけど、返還されるのは201 サーバー側での指示ではなく、クライアント側からの指示ということか
             history.push({
                 pathname : obj.redirectPath,
                 state : {message : 'ログイン成功しました。'}
-            });  
+            });
         }).catch((err) => {
-            if(err.status === 400){
-                setMessage(`${err.status} : ユーザー名もしくはパスワードを記入してください。`);
-            }else if(err.status === 401){
+            if(err.status === 401){
                 setMessage(`${err.status} : ユーザー名もしくはパスワードが異なります。`);
-            }else if(err.status >= 500){
-                setMessage(`${err.status} : ${err.message}`)
-            }else{
-                history.push({
-                    pathname : '/users',
-                    state : {message : err.message}
-                });
+            }else if(err.status === 500){
+                Code500(err,history);
             }
         });
     }
 
     return(
         <div>
-            <Header />
+            <Header loggedIn={false} />
             <div className='login_page'>
                 <form className='login-form' method='POST' onSubmit={handleSubmit}>
                     <p className="login-icon">

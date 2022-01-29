@@ -2,6 +2,8 @@ import React,{useState,useEffect} from 'react';
 import {useHistory} from 'react-router-dom';
 
 import Header from '../../components/block/header';
+import {isUpper,isAlpha,isLength,isEmail,isAscii,isContain} from '../../components/module/validation';
+import {HandleError,Code303,Code500} from '../../components/module/errorHandler';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
@@ -28,39 +30,14 @@ function New(props){
     const history = useHistory();
 
     useEffect(() => {
-        const error = new Error();
-
-        fetch('/api/users/previousCheck')
-        .then((res) => {
-            if(!res.ok){
-                console.error('res.ok:',res.ok);
-                console.error('res. status:',res.status);
-                console.error('res.statusText:',res.statusText);
-
-                error.status = res.status;
-                error.message = res.statusText;
-                throw error;
-            }
-            return res.json();
-        })
-        .then((obj) => {
-            if(obj.result === 'Authenticated'){
-                history.push({
-                    pathname : obj.redirectPath,
-                    state : {message : 'You are already authenticated'}
-                });
-            }
-        }).catch((err) => {
-            if(err.status){
-                history.push({
-                    pathname : '/users',
-                    state : {message : `${err.status} : ${err.message}`}
-                });
-            }else{
-                history.push({
-                    pathname : '/users',
-                    state : {message : err.message}
-                });
+        fetch('/api/users/loginCheck')
+        .then(HandleError)
+        .then()
+        .catch((err) => {
+            if(err.status　=== 303){
+                Code303(err,history);
+            }else if(err.status === 500){
+                Code500(err,history)
             }
         });
     },[]);
@@ -71,99 +48,73 @@ function New(props){
         const name = target.name;
 
         /* バリデーションの設定 */
-        //first_errorの出力
+        //firstのエラー作成
         if(name === 'first'){
-            if(nameChecker(value)){
-                setValidation({...validation,hasChanged:true,first_error:'First Name : 1文字目は、大文字で設定してください。'});
-            }else{
-                if(value.length <= 3 || value.length >= 8){
-                    setValidation({...validation,hasChanged:true,first_error:'First Name : 名前は4~7文字で記入してください。'});
+            if(isAlpha(value)){
+                if(isUpper(value)){
+                    if(isLength(value,{min:2,max:10})){
+                        setValidation({...validation,hasChanged:true,first_error:''});
+                    }else{
+                        setValidation({...validation,hasChanged:true,first_error:'First Name : 2文字以上10文字以内で記入してください。'});
+                    }
                 }else{
-                    setValidation({...validation,hasChanged:true,first_error:''});
+                    setValidation({...validation,hasChanged:true,first_error:'First Name : 一文字目は大文字で記入してください。'});
                 }
+            }else{
+                setValidation({...validation,hasChanged:true,first_error:'First Name : アルファベットで記入してください。'});
             }
         }
 
         //lastのエラー作成
         if(name === 'last'){
-            if(nameChecker(value)){
-                setValidation({...validation,hasChanged:true,last_error:'Last Name : 1文字目は、大文字で設定してください。'});
-            }else{
-                if(value.length <= 3 || value.length >= 8){
-                    setValidation({...validation,hasChanged:true,last_error:'Last Name : 名前は4~7文字で記入してください。'});
+            if(isAlpha(value)){
+                if(isUpper(value)){
+                    if(isLength(value,{min:2,max:10})){
+                        setValidation({...validation,hasChanged:true,last_error:''});
+                    }else{
+                        setValidation({...validation,hasChanged:true,last_error:'Last Name : 2文字以上10文字以内で記入してください。'})
+                    }
                 }else{
-                    setValidation({...validation,hasChanged:true,last_error:''});
+                    setValidation({...validation,hasChanged:true,last_error:'Last Name : 一文字目は大文字で記入してください。'})
                 }
+            }else{
+                setValidation({...validation,hasChanged:true,last_error:'Last Name : アルファベットで記入してください。'})
             }
         }
 
         //emailのエラー作成
         if(name === 'email'){
-            if(emailChecker(value)){
-                setValidation({...validation,hasChanged:true,email_error:'Email : 正しいメールアドレスを記入してください。'});
-            }else{
+            if(isEmail(value)){
                 setValidation({...validation,hasChanged:true,email_error:''});
+            }else{
+                setValidation({...validation,hasChanged:true,email_error:'Email : 正しいメールアドレスを記入してください。'});
             }
         }
 
         //passwordのエラー作成
         if(name === 'password'){
-            if(value.length>=8&&value.length<=16){
-                if(isUpper(value)){
-                    if(numIncluder(value)){
-                        if(strChecker(value)){
-                            setValidation({...validation,hasChanged:true,password_error:''});
-                        }else{//ここの確認も
-                            setValidation({...validation,hasChanged:true,password_error:'Password : 半角英数字で設定してください。'});
+            if(isAscii(value)){
+                if(isContain(value,/[A-Za-z]/)){
+                    if(isContain(value,/[0-9]/)){
+                        if(isUpper(value)){
+                            if(isLength(value,{min:8,max:16})){
+                                setValidation({...validation,hasChanged:true,password_error:''});
+                            }else{
+                                setValidation({...validation,hasChanged:true,password_error:'Password : 8文字以上16字以内で記入してください。'});
+                            }
+                        }else{
+                            setValidation({...validation,hasChanged:true,password_error:'Password : 1文字目は大文字で設定してください。'});
                         }
                     }else{
-                        setValidation({...validation,hasChanged:true,password_error:'Password : 数値も含めてください。'});
+                        setValidation({...validation,hasChanged:true,password_error:'Password : 数字を使用してください。'});
                     }
                 }else{
-                    setValidation({...validation,hasChanged:true,password_error:'Password : 最初の文字は大文字に設定してください。'});
+                    setValidation({...validation,hasCahnged:true,password_error:'Password : アルファベットを使用してください。'});
                 }
             }else{
-                setValidation({...validation,hasChanged:true,password_error:'Password : 文字数は8文字以上16文字以内に設定してください。'});
+                setValidation({...validation,hasChanged:true,password_error:'Password : パスワードに使用できない文字が含まれています。'});
             }
         }
-
-        /* functionの設定 */
-        //name確認用関数
-        function nameChecker(str){
-            var checker = str.match(/[A-Z]{1}[A-Za-z]*/);
-            if(!checker){
-                return true;
-            }
-        };
-
-        //email確認用関数
-        function emailChecker(str){
-            var checker = str.match(/^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]{1,}\.[A-Za-z0-9]{1,}$/);
-            if(!checker){
-                return true;
-            }
-        };
-
-        function isUpper(str){
-            var checker = str.match(/^[A-Z]/);
-            if(checker){
-                return true; 
-            }
-        };
-
-        function numIncluder(str){
-            var checker = str.search(/[0-9]/);
-            if(checker !== -1){
-                return true;
-            }
-        };
-
-        function strChecker(str){
-            var checker = str.match(/^[A-Za-z0-9]+$/);
-            if(checker){
-                return true;
-            }
-        };
 
         setFormData({...formData,hasChanged:true,[name]:value});
     }
@@ -179,8 +130,6 @@ function New(props){
         }else if(validation.first_error || validation.last_error || validation.email_error || validation.password_error){
             setMessage('エラーの修正をしてください。')
         }else{
-            const error = new Error();
-
             fetch('/api/users/create',{
                 method : 'POST',
                 headers : {
@@ -196,41 +145,36 @@ function New(props){
                     password : formData.password
                 })
             })
-            .then(res => {
-                if(!res.ok){
-                    console.error('res.ok:',res.ok);
-                    console.error('res.status:',res.status);
-                    console.error('res.statusText:',res.statusText);
-
-                    error.status = res.status;
-                    error.message = res.statusText;
-                    throw new Error();
-                }
-                return res.json();
-            })
+            .then(HandleError)
             .then(obj => {
                 history.push({
                     pathname : obj.redirectPath,
                     state : {message : 'ユーザーの作成に成功しました。'}
                 });
-            }).catch(err => {
-                if(err.status >= 500){
-                    setMessage(`${err.status} : ユーザーの作成に失敗しました。`)
-                }else{
-                    console.log(err.message);
-                    history.push({
-                        pathname : '/users',
-                        state : {message : err.message}
+            }).catch((err) => {
+                console.log(err);
+                if(err.status === 400){
+                    setMessage(`${err.status}_${err.type} : ${err.message}`);
+                }else if(err.status === 422){
+                    setMessage(`${err.status} : ${err.type}`); //まずはトップに状況を伝える
+
+                    err.messages.forEach((e) => {
+                        if(e.param === 'email'){
+                            setValidation({...validation,hasChanged:true,email_error:e.msg});
+                        }
                     });
+
+                }else if(err.status === 500){
+                    Code500(err.history);
                 }
-            });//usernameが存在する場合のエラーが取得できていない。err.messageが空になっているのが原因のようだ。最下層のエラーへとぶ
+            });
         }        
     }
 
 
     return(
         <div className='user_new'>
-            <Header />      
+            <Header loggedIn={false} />      
             <div className='create_page'>
                 <div className='empty'></div>
                 <div className='create-top'>
@@ -277,5 +221,3 @@ function New(props){
 }
 
 export default New;
-
-//email重複時のエラーの取得ができていない。あと、やはりuseEffectの問題があるっぽい。関数分離は行うかもしれない

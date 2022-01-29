@@ -5,6 +5,8 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faUser} from '@fortawesome/free-solid-svg-icons';
 
 import Header from '../../components/block/header';
+import {Code303, Code401, Code500, HandleError} from '../../components/module/errorHandler';
+import {isEmpty,isAddress,isURL,isInt} from '../../components/module/validation';
 
 import '../../styles/layouts/profiles/edit.scss';
 
@@ -14,7 +16,6 @@ function Edit(props){
         country : '',
         address : '',
         professional : '',
-        belongings : '',
         site : '',
         gender : '',
         age : '',
@@ -23,65 +24,35 @@ function Edit(props){
     });
     const [message,setMessage] = useState('');
     const [validation,setValidation] = useState({
-        age_error : '',
-        address_error : ''
+        address_error : '',
+        site_error : '',
+        age_error : ''
     });
 
     const history = useHistory();
 
     useEffect(() => {
-        const error = new Error();
-
         fetch('/api/profile/edit')
-        .then((res) => {
-            if(!res.ok){
-                console.error('res.ok:',res.ok);
-                console.error('res.status:',res.status);
-                console.error('res.statusText',res.statusText);
-
-                error.status = res.status;
-                error.statusText = res.statusText;
-                throw error;
-            }
-            return res.json();
-        })
+        .then(HandleError)
         .then((obj) => {
-            if(obj.notExist){
-                history.push({
-                    pathname : obj.redirectPath,
-                    state : {message : obj.result}
-                });
-            }else{
-                setEmail(obj.email);
-                setFormData({
-                    country :  obj.profile.country,
-                    address : obj.profile.address,
-                    professional : obj.profile.professional,
-                    belongings : obj.profile.belongings,
-                    site : obj.profile.site,
-                    gender : obj.profile.gender,
-                    age : obj.profile.age,
-                    birthday : obj.profile.birthday,
-                    intro : obj.profile.intro
-                });
-                console.log(email);
-            }
+            setEmail(obj.email);
+            setFormData({
+                country :  obj.profile.country,
+                address : obj.profile.address,
+                professional : obj.profile.professional,
+                site : obj.profile.site,
+                gender : obj.profile.gender,
+                age : obj.profile.age,
+                birthday : obj.profile.birthday,
+                intro : obj.profile.intro
+            });
         }).catch((err) => {
-            if(err.status === 401){
-                history.push({
-                    pathname : '/users/login',
-                    state : {message : `${err.status} : ログインしてください。`}
-                });
+            if(err.status === 303){
+                Code303(err,history);
+            }else if(err.status === 401){
+                Code401(err,history);
             }else if(err.status >= 500){
-                history.push({
-                    pathname : '/users/mypage',
-                    state : {message : `${err.status} : ${err.message}`}
-                });
-            }else{
-                history.push({
-                    pathname : '/users',
-                    state : {message : err.message}
-                });
+                Code500(err,history);
             }
         });
     },[]);
@@ -91,43 +62,51 @@ function Edit(props){
         const name = target.name;
         const value = target.value;
 
-        if(name === 'age'){
-            if(value < 0 || value > 120){
-                setValidation({...validation,hasChanged:true,age_error:'正しい年齢を記載してください。'});
-            }else{
-                setValidation({...validation,hasChanged:true,age_error:''});
-            }
-        }
-
         if(name === 'address'){
-            if(addressChecker(value)){
-                setValidation({...validation,hasChanged:true,address_error:'ハイフンを含めた、正しい郵便番号を記入してください。'});
-            }else{
+            if(isEmpty(value)){
                 setValidation({...validation,hasChanged:true,address_error:''});
+            }else{
+                if(isAddress(value)){
+                    setValidation({...validation,hasChanged:true,address_error:''});
+                }else{
+                    setValidation({...validation,hasChanged:true,address_error:'*ハイフンを含めた、正しい郵便番号を記入してください。'});
+                }
             }
         }
 
-        function addressChecker(str) {
-            var checker = str.match(/^[0-9]{3}-[0-9]{4}$/);
-            if(checker || str===""){
-                return false;
+        if(name === 'site'){
+            if(isEmpty(value)){
+                setValidation({...validation,hasChanged:true,site_error:''});
             }else{
-                return true;
+                if(isURL(value)){
+                    setValidation({...validation,hasChanged:true,site_error:''});
+                }else{
+                    setValidation({...validation,hasChanged:true,site_error:'正しいURLを記入してください。'});
+                }
             }
-        };
+        }
+
+        if(name === 'age'){
+            if(isEmpty(value)){
+                setValidation({...validation,hasChanged:true,age_error:''});
+            }else{
+                if(isInt(value,{min:0,max:120})){
+                    setValidation({...validation,hasChanged:true,age_error:''});
+                }else{
+                    setValidation({...validation,hasChanged:true,age_error:'*正しい年齢を記載してください。'});
+                }
+            }
+        }
 
         setFormData({...formData,hasChanged:true,[name]:value});
-        console.log(`name : ${name}/ value : ${value}`);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if(validation.address_error || validation.age_error){
+        if(validation.address_error || validation.site_error || validation.age_error){
             setMessage('エラーの修正をしてください。');
         }else{
-            const error = new Error();
-
             fetch('/api/profile/update',{
                 method : 'PUT',
                 headers : {
@@ -138,42 +117,24 @@ function Edit(props){
                     country : formData.country,
                     address : formData.address,
                     professional : formData.professional,
-                    belongings : formData.belongings,
                     site : formData.site,
                     gender : formData.gender,
                     age : formData.age,
                     birthday : formData.birthday,
                     intro : formData.intro
                 })
-            }).then((res) =>{
-                if(!res.ok){
-                    console.error('res.ok:',res.ok);
-                    console.error('res.status',res.status);
-                    console.error('res.statusText:',res.statusText);
-
-                    error.status = res.status;
-                    error.message = res.statusText;
-                    throw error;
-                }
-                return res.json();
-            }).then((obj) => {
+            })
+            .then(HandleError)
+            .then((obj) => {
                 history.push({
                     pathname : obj.redirectPath,
                     state : {message : 'プロフィールの更新に成功しました。'}
                 });
             }).catch((err) => {
                 if(err.status === 401){
-                    history.push({
-                        pathname : '/users/login',
-                        state : {message : `${err.status} : ログインしてください。`}
-                    });
-                }else if(err.status >= 500){
-                    setMessage(`${err.status} : ${err.message}`)
-                }else{
-                    history.push({
-                        pathname : '/users/mypage',
-                        stete : {message : err.message}
-                    });
+                    Code401(err,history);
+                }else if(err.status === 500){
+                    Code500(err,history);
                 }
             });
         }
@@ -181,7 +142,7 @@ function Edit(props){
 
     return(
         <div>
-            <Header />
+            <Header loggedIn={true} />
            
             <div className='main'>
                 <div className='page-top'>  
@@ -232,15 +193,10 @@ function Edit(props){
                                 </div>
                             </div>
                             <div className='content'>
-                                <label htmlFor="belongings" className='label'>Belongings</label>
-                                <div className='item'>
-                                    <input type="text" name='belongings' className='input-item' value={formData.belongings} onChange={handleChange} />
-                                </div>
-                            </div>
-                            <div className='content'>
                                 <label htmlFor="site" className='label'>Site</label>
                                 <div className='item'>
                                     <input type="text" name='site' className='input-item' value={formData.site} onChange={handleChange} />
+                                    <p className='error_message'>{validation.site_error}</p>
                                 </div>
                             </div>
                         </div>
@@ -250,10 +206,9 @@ function Edit(props){
                                 <label htmlFor="gender" className='label'>Gender</label>
                                 <div className='item'>
                                     <select name="gender" className='input-item' value={formData.gender}　onChange={handleChange}>
-                                        <option hidden>選択してください</option>
+                                        <option hidden vale="">選択してください</option>
                                         <option value="male">Male</option>
                                         <option value="female">Female</option>
-                                        <option value="others"> Others</option>
                                         <option value="no-answer">No Answer</option>
                                     </select>
                                 </div>

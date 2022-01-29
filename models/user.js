@@ -9,18 +9,15 @@ var userSchema = new Schema(
         name : {
             first : {
                 type : String,
-                trim : true,
-                required : [true,"名字を入力してください。"]
+                trim : true
             },
             last : {
                 type : String,
-                trim : true,
-                required : [true,"名前を入力してください。"]
+                trim : true
             }       
         },
         email : {
             type : String,
-            required : [true,"E-mailを記入してください。"],
             unique : true
         },
         profile : {
