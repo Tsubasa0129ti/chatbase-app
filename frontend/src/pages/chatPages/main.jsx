@@ -1,53 +1,42 @@
-import React from 'react';
+import {useState,useEffect} from 'react';
+import {useHistory} from 'react-router';
 import queryString from 'query-string';
 
 import ChatHeader from '../../components/block/chatHeader';
 import AddChannel from '../../components/module/addChannel';
 
-class ChatPage extends React.Component{
-    constructor(props){
-        super(props);
-        this.state = {
-            message : '',
-            isLoggedIn : false,
-            username : '',
-            search : false,
-            add : false,
-            count : '',
-            channel : []
-        }
-        this.popup = this.popup.bind(this);
-    }
-    
-    componentDidMount(){
-        //初期のページの表示をする
-        const error = new Error();
-        var search = this.props.location.search;
-        var query = queryString.parse(search);
-        console.log(query.page);
+function ChatPage(props){
+    const [isLoggedIn,setIsLoggedIn] = useState(false); //chatHeaderに送っているが、もしかしたら分離するかも
+    const [username,setUsername] = useState('');
+    const [add,setAdd] = useState(false);
+    const [count,setCount] = useState('');
+    const [channel,setChannel] = useState([]);
 
-        fetch(`/api/chat?page=${query.page}`)
+    const history = useHistory();
+
+    useEffect(() => {
+        var search = props.location.search;
+        var query = queryString.parse(search);
+
+        fetch(`/api/chat?page=${query.page}`) //fetch内部の処理については、今は後回し。
         .then((res) => {
             if(!res.ok){
                 console.error('res.ok:',res.ok);
                 console.error('res.status:',res.status);
                 console.error('res.statusText:',res.statusText);
                 
-                error.status = res.status;
-                error.message = res.statusText;
-                throw error;
+                throw new Error();
             }
             return res.json();
         }).then((obj) => {
-            this.setState({
-                isLoggedIn : obj.isLoggedIn,
-                username : obj.username,
-                channel : obj.channel,
-                count : obj.count,
-            });
+            setIsLoggedIn(obj.isLoggedIn);
+            setUsername(obj.username);
+            setChannel(obj.channel);
+            setCount(obj.count);
+
         }).catch((err) => {
             if(err.status === 401){
-                this.props.history.push({
+                history.push({
                     pathname : '/users/login',
                     state : {message : `${err.status} : ログインしてください。`}
                 });
@@ -57,67 +46,58 @@ class ChatPage extends React.Component{
                 console.error(err.message);
             }
         });
-    }
+    },[]);
 
-    popup(e){
+    const popup = (e) => {
         e.preventDefault();
-        this.setState({
-            add : true
-        });
-        console.log(this.state.add);
-    }
+        setAdd(true);
+    };
 
-    cancel(e){
+    const cancel = (e) => {
         e.preventDefault();
-        this.setState({
-            add : false
-        });
-    }
+        setAdd(false);
+    };
 
-    render(){
-        const {channel} = this.state;     
-        if(!channel){
-            return null
+    if(!channel){
+        return null;
+    }else{
+        if(count === 0){
+            return(
+                <div>
+                    <ChatHeader isLoggedIn={isLoggedIn} username={username} />
+                    <p>チャンネルが存在しません。</p>
+                    <p>作成ページより、チャンネルの作成をしてください。</p>
+                    {/* <Guide />
+                    <AddChannel /> */}
+                </div>
+            )
         }else{
-            if(this.state.count === 0){
-                return(
+            const items = [];
+            for(var i=0;i<channel.length;i++){
+                items.push(
                     <div>
-                        <ChatHeader isLoggedIn={this.state.isLoggedIn} username={this.state.username} />
-                        <p>チャンネルが存在しません。</p>
-                        <p>作成ページより、チャンネルの作成をしてください。</p>
-                        {/* <Guide />
-                        <AddChannel /> */}
+                        <a href={'/chat/page/' + channel[i]._id}>{channel[i].channelName}</a>
+                        <p>更新日　：　{channel[i].updatedAt}</p>
+                        <p>チャンネル詳細　：　{channel[i].channelDetail}</p>
+                        <p>チャンネル作成者　：　{channel[i].createdBy}</p>
                     </div>
                 )
-            }else{
-                const channel = this.state.channel;
-                const items = [];
-                for(var i=0;i<channel.length;i++){
-                    items.push(
-                        <div>
-                            <a href={'/chat/page/' + channel[i]._id}>{channel[i].channelName}</a>
-                            <p>更新日　：　{channel[i].updatedAt}</p>
-                            <p>チャンネル詳細　：　{channel[i].channelDetail}</p>
-                            <p>チャンネル作成者　：　{channel[i].createdBy}</p>
-                        </div>
-                    )
-                }
+            }
 
-                return(
-                    <div>
-                        <ChatHeader isLoggedIn={this.state.isLoggedIn} username={this.state.username} />
-                        <div className='new_channel'>
-                            <p>チャンネル件数　：　{this.state.count}件</p>
-                            {items}
-                            <div className='paging'></div>
-                        </div>
-                        {/* <Guide /> */}
-                        <a href="/" onClick={this.popup}>+</a>
-                        <AddChannel add={this.state.add} onEventCallback={this.cancel.bind(this)} />
+            return(
+                <div>
+                    <ChatHeader isLoggedIn={isLoggedIn} username={username} />
+                    <div className='new_channel'>
+                        <p>チャンネル件数　：　{count}件</p>
+                        {items}
+                        <div className='paging'></div>
                     </div>
-                )
-            }    
-        }  
+                    {/* <Guide /> */}
+                    <a href="/" onClick={popup}>+</a>
+                    <AddChannel add={add} onEventCallback={(e) => {cancel(e)}} />
+                </div>
+            )
+        }
     }
 }
 

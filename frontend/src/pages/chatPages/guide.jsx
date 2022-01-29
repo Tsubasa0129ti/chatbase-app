@@ -1,24 +1,17 @@
-import React from 'react';
+import {useState,useEffect} from 'react';
 
-class Guide extends React.Component {
-    constructor(props){
-        super(props);
-        this.state = {
-            message : ''
-        }
-    }
+function Guide(props){
+    const [message,setMessage] = useState('');
 
-    componentDidMount(){
-        //ログインチェックを行う
-    }
+    useEffect(() => {
+        console.log('pass');
+    },[]);
 
-    render(){
-        return(
-            <div>
-                <p>Guide Page</p>
-            </div>
-        ) 
-    }
+    return(
+        <div>
+            <p>Guide Page</p>
+        </div>
+    )
 }
 
 export default Guide;
