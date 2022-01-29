@@ -1,5 +1,6 @@
 
 .overray {
+    z-index: 9999;
     position: fixed;
     top: 0;
     left: 0;
@@ -15,7 +16,6 @@
         
         text-align: center;
         background-color: white;
-        z-index: 3;
         width: 50%;
         height: 30%;
         border: 1px solid black;
@@ -28,19 +28,21 @@
         }
 
         .delete {
-            font-size: 24px;
+            font-size: 32px;
             font-weight: bold;
+            font-family: fantasy;
             margin: 10px 0;
              //under-line
         }
 
         .delete-message {
             font-weight: bolder;
-            font-size: 18px;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 21px;
         }
 
         button {
-            margin-top: 30px;
+            margin-top: 5px;
             border-radius: 5px;
             font-size: 24px;
             width: 160px;

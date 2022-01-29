@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState,useEffect} from 'react';
 import {useHistory} from 'react-router-dom';
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
@@ -22,61 +22,50 @@ function ProfileComment(props){
         setEdit(true);
     };
 
-    const handleChange = (e) => {
-        const target = e.target;
-        const name = target.name;
-        const value = target.value;
-
-        if(name === 'intro'){
-            if(isLength(value,{min:0,max:100})){
-                setMessage('');
-            }else{
-                setMessage('コメントは100字以内に設定してください。');
-            }
-        }
-
-        setIntro(value);
-    }
-
     const cancel = (e) => {
         e.preventDefault();
+        setMessage('');
         setEdit(false);
     }
 
     const update = (e) => {
         e.preventDefault();
+        var input = document.getElementById('intro-form-inner').textContent;
 
-        if(message){
-            setMessage('エラーの修正をしてください。');
+        if(isLength(input,{min:0,max:100})){
+            setIntro(input); //introを更新すると、下のuseEffectが呼び出される。
         }else{
-            fetch('/api/profile/introUpdate',{
-                method : 'PUT',
-                headers : {
-                    'Accept': 'application/json,text/plain, */*',
-                    'Content-Type': 'application/json'
-                },
-                body : JSON.stringify({
-                    intro : intro
-                })
-            })
-            .then(HandleError)
-            .then((obj) => {
-                setEdit(false);
-                history.push({
-                    pathname : obj.redirectPath,
-                    state : {message : 'プロフィールの更新に成功しました。'}
-                });
-            }).catch((err) => {
-                if(err.status === 401){
-                    Code401(err,history);
-                }else if(err.status === 500){
-                    Code500(err,history);
-                }
-            });
+            setMessage('コメントは100字以内に設定してください。');
         }
     }
-    
 
+    useEffect(() => {
+        fetch('/api/profile/introUpdate',{
+            method : 'PUT',
+            headers : {
+                'Accept': 'application/json,text/plain, */*',
+                'Content-Type': 'application/json'
+            },
+            body : JSON.stringify({
+                intro : intro
+            })
+        })
+        .then(HandleError)
+        .then((obj) => {
+            setEdit(false);
+            history.push({
+                pathname : obj.redirectPath,
+                state : {message : 'プロフィールの更新に成功しました。'}
+            });
+        }).catch((err) => {
+            if(err.status === 401){
+                Code401(err,history);
+            }else if(err.status === 500){
+                Code500(err,history);
+            }
+        });
+    },[intro])
+    
     if(!edit){
         return(
             <div className='comment'>
@@ -96,6 +85,7 @@ function ProfileComment(props){
             </div>
         )  
     }else{
+        console.log(intro);
         return(
             <div className='comment'>
                 <div className='comment-top'>
@@ -111,9 +101,13 @@ function ProfileComment(props){
 
                 <div className='change-intro'>
                     <p className='error_code'>{message}</p>
-                    <textarea name="intro" className='intro-form' value={intro} maxLength='100' onChange={handleChange}></textarea>
-                    <input type="submit" className='toCancel' value='Cancel' onClick={cancel}  />
-                    <input type="submit" className='toUpdate' value='Update' onClick={update} />
+                    <div className='intro-form'>
+                        <p name="intro" id='intro-form-inner' className='intro-form-inner' contenteditable="true">{intro}</p>
+                    </div>
+                    <div className='button'>
+                        <input type="submit" className='toCancel' value='Cancel' onClick={cancel}  />
+                        <input type="submit" className='toUpdate' value='Update' onClick={update} />
+                    </div>
                 </div>
             </div>
         )

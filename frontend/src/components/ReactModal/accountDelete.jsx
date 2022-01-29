@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'; 
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faExclamationTriangle} from "@fortawesome/free-solid-svg-icons";
@@ -15,7 +15,7 @@ function AccountDelete(props) {
                 <div className='deleteModal'>
                     <FontAwesomeIcon icon={faExclamationTriangle} size='3x' className='warn-icon' />
                     <p className='delete'>Delete Account</p>
-                    <p className='delete-message'>you will permanently lose your profile.</p>
+                    <p className='delete-message'>*you will permanently lose your profile*</p>
                     <button className='cancel-button' onClick={props.onCancelCallback} >Cancel</button>
                     <button className='delete-button' onClick={props.onDeleteCallback} >Delete</button>
                 </div>
