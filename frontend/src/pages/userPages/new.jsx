@@ -115,6 +115,8 @@ function New(props){
             }else{
                 setValidation({...validation,hasChanged:true,password_error:'Password : パスワードに使用できない文字が含まれています。'});
             }
+
+            setValidation({...validation,hasChanged:true,passCheck_error:''});
         }
 
         //passCheckのバリデーションの一時解除
