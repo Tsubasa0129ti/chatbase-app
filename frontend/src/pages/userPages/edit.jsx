@@ -4,6 +4,7 @@ import { useHistory,useLocation } from 'react-router';
 import Header from '../../components/block/header';
 import { Code401, Code500, HandleError } from '../../components/module/errorHandler';
 import {isUpper,isAlpha,isLength} from '../../components/module/validation';
+import { objCheck } from '../../components/module/objCheck';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
@@ -92,7 +93,7 @@ function Edit(props){
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if(validation.first_error || validation.last_error){
+        if(objCheck(validation)){
             setMessage('エラーの修正をしてください。');
         }else{
             fetch('/api/users/mypage/update',{　

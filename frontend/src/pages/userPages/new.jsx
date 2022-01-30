@@ -4,6 +4,7 @@ import {useHistory} from 'react-router-dom';
 import Header from '../../components/block/header';
 import {isUpper,isAlpha,isLength,isEmail,isAscii,isContain} from '../../components/module/validation';
 import {HandleError,Code303,Code500} from '../../components/module/errorHandler';
+import { objCheck } from '../../components/module/objCheck';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
@@ -132,7 +133,7 @@ function New(props){
         if(pass !== passCheck){
             setMessage('エラーの修正をしてください。');
             setValidation({...validation,hasChanged:true,passCheck_error:'Password Confirm : 確認の値が異なっています。'});
-        }else if(validation.first_error || validation.last_error || validation.email_error || validation.password_error){
+        }else if(objCheck(validation)){
             setMessage('エラーの修正をしてください。')
         }else{
             fetch('/api/users/create',{

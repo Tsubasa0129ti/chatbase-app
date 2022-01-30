@@ -4,6 +4,7 @@ import { useHistory,useLocation } from 'react-router';
 import Header from '../../components/block/header';
 import { Code303, Code401, Code500, HandleError } from '../../components/module/errorHandler';
 import {isEmpty,isAddress,isURL,isInt,isLength} from '../../components/module/validation';
+import { objCheck } from '../../components/module/objCheck';
 
 import '../../styles/layouts/profiles/new.scss';
 
@@ -105,7 +106,9 @@ function New(props){
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if(validation.intro_error || validation.address_error || validation.age_error || validation.site_error){
+        if(!objCheck(formData)){
+            setMessage('*Formを記入してください。');
+        }else if(objCheck(validation)){
             setMessage('*エラーを修正してください。');
         }else{
             fetch('/api/profile/create',{

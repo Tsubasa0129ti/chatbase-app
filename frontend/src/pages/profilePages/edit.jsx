@@ -7,6 +7,7 @@ import {faUser} from '@fortawesome/free-solid-svg-icons';
 import Header from '../../components/block/header';
 import {Code303, Code401, Code500, HandleError} from '../../components/module/errorHandler';
 import {isEmpty,isAddress,isURL,isInt} from '../../components/module/validation';
+import {objCheck} from '../../components/module/objCheck';
 
 import '../../styles/layouts/profiles/edit.scss';
 
@@ -104,7 +105,7 @@ function Edit(props){
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if(validation.address_error || validation.site_error || validation.age_error){
+        if(objCheck(validation)){
             setMessage('エラーの修正をしてください。');
         }else{
             fetch('/api/profile/update',{
