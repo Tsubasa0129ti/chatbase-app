@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from 'react';
+import {useState,useEffect} from 'react';
 import { useHistory,useLocation } from 'react-router';
 
 import Header from '../../components/block/header';
@@ -96,7 +96,7 @@ function Edit(props){
         if(objCheck(validation)){
             setMessage('エラーの修正をしてください。');
         }else{
-            fetch('/api/users/mypage/update',{　
+            fetch('/api/users/mypage/update',{
                 method : 'PUT',
                 headers : {
                     'Accept': 'application/json,text/plain, */*',

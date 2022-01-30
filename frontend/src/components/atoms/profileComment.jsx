@@ -85,7 +85,6 @@ function ProfileComment(props){
             </div>
         )  
     }else{
-        console.log(intro);
         return(
             <div className='comment'>
                 <div className='comment-top'>

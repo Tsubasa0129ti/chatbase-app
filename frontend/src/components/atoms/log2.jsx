@@ -27,4 +27,4 @@ function Log(props){
     }
 }
 
-export default Log;
+export default Log; //chatHeaderの修正時に消す

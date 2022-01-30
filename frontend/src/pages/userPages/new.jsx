@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from 'react';
+import {useState,useEffect} from 'react';
 import {useHistory} from 'react-router-dom';
 
 import Header from '../../components/block/header';
@@ -35,7 +35,7 @@ function New(props){
         .then(HandleError)
         .then()
         .catch((err) => {
-            if(err.status　=== 303){
+            if(err.status === 303){
                 Code303(err,history);
             }else if(err.status === 500){
                 Code500(err,history)

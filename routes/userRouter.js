@@ -9,7 +9,7 @@ router.get("/setLoggedIn",userControllers.setLoggedIn);
 router.post("/create",userControllers.checkBody,userControllers.nameValidation,userControllers.validation,userControllers.validationCheck,userControllers.create);
 
 router.post("/auth",userControllers.auth,userControllers.regenerateSessionId);
-router.get("/logout",userControllers.logout);　
+router.get("/logout",userControllers.logout);
 
 router.get("/mypage",userControllers.loginCheck,userControllers.mypageView);
 
