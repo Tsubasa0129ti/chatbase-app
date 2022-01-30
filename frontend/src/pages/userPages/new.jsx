@@ -116,6 +116,11 @@ function New(props){
             }
         }
 
+        //passCheckのバリデーションの一時解除
+        if(name === 'passCheck'){
+            setValidation({...validation,hasChanged:true,passCheck_error:''});
+        }
+
         setFormData({...formData,hasChanged:true,[name]:value});
     }
 
@@ -152,7 +157,6 @@ function New(props){
                     state : {message : 'ユーザーの作成に成功しました。'}
                 });
             }).catch((err) => {
-                console.log(err);
                 if(err.status === 400){
                     setMessage(`${err.status}_${err.type} : ${err.message}`);
                 }else if(err.status === 422){
@@ -165,7 +169,7 @@ function New(props){
                     });
 
                 }else if(err.status === 500){
-                    Code500(err.history);
+                    Code500(err,history);
                 }
             });
         }        
