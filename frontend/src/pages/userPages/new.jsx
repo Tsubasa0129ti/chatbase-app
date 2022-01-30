@@ -110,7 +110,7 @@ function New(props){
                         setValidation({...validation,hasChanged:true,password_error:'Password : 数字を使用してください。'});
                     }
                 }else{
-                    setValidation({...validation,hasCahnged:true,password_error:'Password : アルファベットを使用してください。'});
+                    setValidation({...validation,hasChanged:true,password_error:'Password : アルファベットを使用してください。'});
                 }
             }else{
                 setValidation({...validation,hasChanged:true,password_error:'Password : パスワードに使用できない文字が含まれています。'});

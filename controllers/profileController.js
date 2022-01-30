@@ -1,6 +1,7 @@
 var User = require("../models/user");
 var Profile = require("../models/profile");
 var {check,validationResult} = require("express-validator");
+var createError = require("http-errors");
 
 function getProfile(body) {
     return {
@@ -56,6 +57,21 @@ module.exports = {
             }
         }catch(err){
             next(err);
+        }
+    },
+    objCheck : (req,res,next) => {
+        var array = Object.values(req.body);
+
+        for(var i=0;i<array.length;i++){
+            var value = array[i];
+            if(value){
+                return next();
+            }else{
+                if(i === array.length -1){
+                    var err = createError.BadRequest();
+                    return next(err);
+                }
+            }
         }
     },
     validation : [

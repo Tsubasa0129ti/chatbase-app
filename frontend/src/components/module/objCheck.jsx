@@ -2,7 +2,7 @@ export function objCheck(obj){ //オブジェクトの中身が存在するの�
     if(obj.hasChanged){
         delete obj.hasChanged
     }
-    console.log(obj)
+    
     var array = Object.values(obj);
     for(var i=0;i<array.length;i++){
         var value = array[i];

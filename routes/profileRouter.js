@@ -11,6 +11,7 @@ router.post(
     userController.loginCheck,
     profileController.profileCheck,
     profileController.existProfile,
+    profileController.objCheck,
     profileController.validation,
     profileController.validationCheck,
     profileController.create

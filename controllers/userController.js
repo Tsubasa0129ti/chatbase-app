@@ -72,12 +72,46 @@ module.exports = {
             next(err);
         }
     },
-    checkBody : (req,res,next) => { //これの改良をする必要がある。いずれかの値がからの時と言うふうに（authのも使えるようにしたい）
-        if(isEmpty(req.body)){
-            var err = new createError.BadRequest();
-            return next(err);
+    checkBody : (req,res,next) => {
+        try{           
+            var err = new createError.BadRequest(); 
+
+            if(isEmpty(req.body)){
+                return next(err);
+            }
+            
+            var array = Object.values(req.body);
+
+            for(var i=0;i<array.length;i++){
+                var value = array[i];
+                
+                if(value){
+                    if(typeof(value) === 'object'){
+                        var newArray = Object.values(value);
+
+                        for(var j=0;j<newArray.length;j++){
+                            var newValue = newArray[j];
+
+                            if(newValue){
+                                return next();
+                            }else{
+                                if(i === array.length-1 && j === newArray.length-1){
+                                    return next(err);
+                                }
+                            }
+                        }
+                    }else{
+                        return next();
+                    }
+                }else{
+                    if(i === array.length -1){
+                        return next(err);
+                    }
+                }
+            }
+        }catch(err){
+            next(err);
         }
-        next();
     },
     nameValidation : [
         check("name.first")
