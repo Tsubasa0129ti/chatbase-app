@@ -1,15 +1,15 @@
 import React,{useState,useEffect} from 'react';
-import {withRouter,useHistory} from 'react-router-dom';
+import {useHistory} from 'react-router-dom';
 
-import { HandleError } from '../module/errorHandler';
+import { HandleError, Code500 } from '../module/errorHandler';
 
 import Log from '../atoms/log';
 
 import '../../styles/components/block/header.scss';
 
 function Header(props){
-    const history = useHistory();
     const [loggedIn,setLoggedIn] = useState(false);
+    const history = useHistory();
 
     useEffect(() => {
         if(props.loggedIn === null){
@@ -23,32 +23,11 @@ function Header(props){
                 }
             }).catch((err) => {
                 if(err.status === 500){
-                    history.push({
-                        pathname : '/error/500',
-                        state : {message : `${err.status} : ${err.message}`}
-                    });
+                    Code500(err,history);
                 }
             });
         }
     },[]);
-
-    const logout = () => {
-        fetch('/api/users/logout')
-        .then(HandleError)
-        .then((obj) => {
-            history.push({
-                pathname : obj.redirectPath,
-                state : {message : 'ログアウトしました。'}
-            });
-        }).catch((err) => {
-            if(err.status === 500){
-                history.push({
-                    pathname : '/error/500',
-                    state : {message : `${err.status} : ${err.message}`}
-                });
-            }
-        });
-    }
 
     return(
         <div className='header'>
@@ -65,16 +44,7 @@ function Header(props){
                     </ul>
                 </nav>
                 <div className='header-right'>
-                    <Log 
-                        className='btn log-btn'
-                        isLoggedIn={props.loggedIn || loggedIn}
-                        login={() => {
-                            history.push('/users/login');
-                        }}
-                        logout={() => {
-                            logout();
-                        }} 
-                    />
+                    <Log className='btn log-btn' isLoggedIn={props.loggedIn || loggedIn} />
                     <button 
                         className='btn signup-btn'
                         onClick={() => {history.push('/users/new')}}
@@ -88,4 +58,4 @@ function Header(props){
     )
 }
 
-export default withRouter(Header);
+export default Header;

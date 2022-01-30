@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from 'react';
+import {useState,useEffect} from 'react';
 import { useHistory } from 'react-router';
 
 import Header from '../../components/block/header';
@@ -24,7 +24,7 @@ function Mypage(props){
     useEffect(() => {
         fetch('/api/users/mypage')
         .then(HandleError)
-        .then((obj) => {　//正直この部分は他のページとの共通するものとなり得ない。
+        .then((obj) => {
             setUsername(obj.user.name.first + ' ' + obj.user.name.last);
             setUser(obj.user);
             if(obj.profile){
@@ -43,36 +43,13 @@ function Mypage(props){
         setShow(false);
     };
 
-    const deleteEvent = () => {
-        fetch(`/api/users/mypage/delete`,{
-            method : 'DELETE',
-            headers : {
-                'Accept': 'application/json,text/plain, */*',
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(HandleError)
-        .then((obj) => {
-            history.push({
-                pathname : obj.redirectPath,
-                state : {message : 'アカウントの削除に成功しました。'}
-            });
-        }).catch((err) => {
-            if(err.status === 401){
-                Code401(err,history);
-            }else if(err.status === 500){
-                Code500(err,history);
-            }
-        });
-    };
-
     if(!profile) {
         return(
             <div className='mypage'>
                 <Header loggedIn={true} />
                 <div className='users_mypage'>
                     <div className='mypage-top'>
-                        <p　className='mypage-title'>My Page</p>
+                        <p className='mypage-title'>My Page</p>
                         <div className='mypage-menu'>
                             <button 
                                 className='menu-button'
@@ -114,11 +91,11 @@ function Mypage(props){
                             <p className='title-content'>ユーザー情報</p>
                         </div>
                         <div className='username-record user-record'>
-                            <label htmlFor="username" className='label'>username:</label>
+                            <label htmlFor="username" className='label'>username :</label>
                             <input type="text" className='username-value user-value' value={username} readOnly />
                         </div>
                         <div className='email-record user-record'>
-                            <label htmlFor="email" className='label'>Email:</label>
+                            <label htmlFor="email" className='label'>Email :</label>
                             <input type="text" className='email-value user-value' value={user.email} readOnly />
                         </div>
                     </div>
@@ -137,11 +114,7 @@ function Mypage(props){
                         </button>
                     </div>
                 </div>
-                <AccountDelete
-                    show={show}
-                    onCancelCallback={() => {cancel()}}
-                    onDeleteCallback={() => {deleteEvent()}}
-                />
+                <AccountDelete show={show} onCancelCallback={() => {cancel()}} />
             </div>
         )
     }else{
@@ -188,38 +161,38 @@ function Mypage(props){
                                 <div className='contact-info'>
                                     <p>Contact Information</p>
                                     <div className='content'>
-                                        <label htmlFor="email" className='label'>Email　:</label>
+                                        <label htmlFor="email" className='label'>Email :</label>
                                         <input type="text" className='item' value={user.email} disabled />
                                     </div>
                                     <div className='content'>
-                                        <label htmlFor="country" className='label'>Country　:</label>
+                                        <label htmlFor="country" className='label'>Country :</label>
                                         <input type="text" className='item' value={user.profile.country} disabled />
                                     </div>
                                     <div className='content'>
-                                        <label htmlFor="Address" className='label'>Address　:</label>
+                                        <label htmlFor="Address" className='label'>Address :</label>
                                         <input type="text" className='item' value={user.profile.address} disabled />
                                     </div>
                                     <div className='content'>
-                                        <label htmlFor="professional" className='label'>Professional</label>
+                                        <label htmlFor="professional" className='label'>Professional :</label>
                                         <input type="text" className='item' value={user.profile.professional} disabled />
                                     </div>
                                     <div className='content'>
-                                        <label htmlFor="site" className='label'>Site　:</label>
+                                        <label htmlFor="site" className='label'>Site :</label>
                                         <input type="text" className='item' value={user.profile.site} disabled />
                                     </div>
                                 </div>
                                 <div className='basic-info'>
                                     <p>Basic Information</p>
                                     <div className='content'>
-                                        <label htmlFor="gender" className='label'>Gender　:</label>
+                                        <label htmlFor="gender" className='label'>Gender :</label>
                                         <input type="text" className='item' value={user.profile.gender} disabled />
                                     </div>
                                     <div className='content'>
-                                        <label htmlFor="age" className='label'>Age　:</label>
+                                        <label htmlFor="age" className='label'>Age :</label>
                                         <input type="text" className='item' value={user.profile.age} disabled />
                                     </div>
                                     <div className='content'>
-                                        <label htmlFor="birthday" className='label'>Birthday　:</label>
+                                        <label htmlFor="birthday" className='label'>Birthday :</label>
                                         <input type="text" className='item' value={user.profile.birthday} disabled />
                                     </div>
                                 </div>
@@ -227,11 +200,7 @@ function Mypage(props){
                         </div>
                     </div>
                 </div>
-                <AccountDelete
-                    show={show}
-                    onCancelCallback={() => {cancel()}}
-                    onDeleteCallback={() => {deleteEvent()}}
-                />
+                <AccountDelete show={show} onCancelCallback={() => {cancel()}} />
             </div>
         )
     }
