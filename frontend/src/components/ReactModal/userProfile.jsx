@@ -12,7 +12,7 @@ function UserProfile(props){
                     <div className='content'>
                         <div className='content-top'>
                             <p>Profile</p>
-                            <button onClick={props.onCloseCallback}>×</button>
+                            <button onClick={props.onCloseCallback}>X</button>
                         </div>
                         <div className='content-main'>
                             <div className='profile-head'>
@@ -28,11 +28,11 @@ function UserProfile(props){
             )
         }else{
             return(
-                <div　className='overray'>
+                <div className='overray'>
                     <div className='content'>
                         <div className='content-top'>
                             <p>Profile</p>
-                            <button onClick={props.onCloseCallback}>×</button>
+                            <button onClick={props.onCloseCallback}>X</button>
                         </div> 
                         <div className='content-main'>
                             <div className='profile-head'>
