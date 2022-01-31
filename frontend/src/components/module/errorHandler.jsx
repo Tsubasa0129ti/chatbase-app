@@ -47,7 +47,7 @@ export function Code401(err,history){
 
 export function Code500(err,history){
     history.push({
-        pathname : '/500',
+        pathname : '/error/internalServerError',
         state : {message : `${err.status}_${err.type} : ${err.message}`}
     });
 };

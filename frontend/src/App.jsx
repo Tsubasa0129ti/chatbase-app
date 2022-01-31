@@ -5,6 +5,7 @@ import Home from './pages/homePages/index';
 import Users from './pages/userPages/index';
 import Profile from './pages/profilePages/index';
 import Chat from './pages/chatPages/index';
+import Error from './pages/errorPages/internalServerError';
 import NotFound from './pages/errorPages/notFound';
 
 function App() {
@@ -29,8 +30,13 @@ function App() {
           render = {({match : {url}}) => (
             <Chat url={url} />
           )}
-        />  
+        />
+        <Route 
+          path="/error/internalServerError"
+          exact component={Error}
+        />
         <Route exact component={NotFound} />
+        
       </Switch>
     </BrowserRouter>
   )
