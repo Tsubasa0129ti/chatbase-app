@@ -24,7 +24,7 @@ class MessageEdit extends React.Component{
             <div className='message_edit'>
                 <input type="text" name='edit' onChange={this.handleChange} value={this.state.edit} />
                 <input type="submit" value='キャンセル' onClick={this.props.onCancelCallback} />
-                <input type="submit" value='編集する'　onClick={this.props.onEditCallback} />
+                <input type="submit" value='編集する' onClick={this.props.onEditCallback} />
             </div>
         )
     }
