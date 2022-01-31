@@ -56,7 +56,6 @@ export function isAddress(val){//アドレスかどうかの判定
 };
 
 export function isURL(val) { //URLの判定を行う .なしでも判定を通ってしまう（サーバーサイドのバリデーションにはかかるが。。。）
-    console.log(val);
     let pattern = /^(https?|ftp)(:\/\/[\w/:%#$&?()~.=+-]+)/;
     const checker = val.match(pattern);
     if(!checker){

@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from 'react';
+import {useState,useEffect} from 'react';
 import { useHistory,useLocation } from 'react-router';
 
 import Header from '../../components/block/header';
@@ -96,7 +96,7 @@ function New(props){
             if(isLength(value,{min:0,max:100})){
                 setValidation({...validation,hasChanged:true,intro_error:''});
             }else{
-                setValidation({...validation,hasChanged:true,intro_error:'*Intro　: ひとことは100文字以内に設定してください。'});
+                setValidation({...validation,hasChanged:true,intro_error:'*Intro: ひとことは100文字以内に設定してください。'});
             }
         }
         
@@ -129,7 +129,7 @@ function New(props){
                 })
             })
             .then(HandleError)
-            .then((obj) => { //ここでは成功時の処理しか扱わない
+            .then((obj) => {
                 history.push({
                     pathname : obj.redirectPath,
                     state : {message : 'プロフィールの作成に成功しました。'}
@@ -139,6 +139,8 @@ function New(props){
                     Code303(err,history);
                 }else if(err.status === 401){
                     Code401(err,history);
+                }else if(err.status === 422){
+                    setMessage(`${err.type} : ${err.messages[0].msg}`);
                 }else if(err.status === 500){
                     Code500(err,history);
                 }
@@ -179,20 +181,20 @@ function New(props){
                                 <div className='contact-information'>
                                     <p>Contact Information</p>
                                     <div className='content'>
-                                        <label htmlFor="country" className='label'>Country　:</label>
+                                        <label htmlFor="country" className='label'>Country :</label>
                                         <input type="text" name='country' className='item' onChange={handleChange} />
                                     </div>
                                     <div className='content'>
-                                        <label htmlFor="Address" className='label'>Address　:</label>
+                                        <label htmlFor="Address" className='label'>Address :</label>
                                         <input type="text" name='address' className='item' onChange={handleChange} />
                                         <p className='error-message'>{validation.address_error}</p>
                                     </div>
                                     <div className='content'>
-                                        <label htmlFor="professional" className='label'>Professional　:</label>
+                                        <label htmlFor="professional" className='label'>Professional :</label>
                                         <input type="text" name='professional' className='item' onChange={handleChange} />
                                     </div>
                                     <div className='content'>
-                                        <label htmlFor="site" className='label'>Site　:</label>
+                                        <label htmlFor="site" className='label'>Site :</label>
                                         <input type="text" name='site' className='item' onChange={handleChange} />
                                         <p className='error-message'>{validation.site_error}</p>
                                     </div>
@@ -201,8 +203,8 @@ function New(props){
                                 <div className='basic-information'>
                                     <p>Basic Information</p>
                                     <div className='content'>
-                                        <label htmlFor="gender" className='label'>Gender　:</label>
-                                        <select name="gender" className='item'　onChange={handleChange}>
+                                        <label htmlFor="gender" className='label'>Gender :</label>
+                                        <select name="gender" className='item' onChange={handleChange}>
                                             <option hidden value="">選択してください</option>
                                             <option value="male">Male</option>
                                             <option value="female">Female</option>
@@ -210,12 +212,12 @@ function New(props){
                                         </select>
                                     </div>
                                     <div className='content'>
-                                        <label htmlFor="age" className='label'>Age　:</label>
+                                        <label htmlFor="age" className='label'>Age :</label>
                                         <input type="number" name='age' className='item' onChange={handleChange} />
                                         <p className='error-message'>{validation.age_error}</p>
                                     </div>
                                     <div className='content'>
-                                        <label htmlFor="birthday" className='label'>Birthday　:</label>
+                                        <label htmlFor="birthday" className='label'>Birthday :</label>
                                         <input type="date" name='birthday' className='item' onChange={handleChange} />
                                     </div>
                                 </div>
@@ -223,7 +225,7 @@ function New(props){
                                 <div className='comment'>
                                     <p>Comment</p>
                                     <div className='content'>
-                                        <label htmlFor="intro" className='label'>Introduction　:</label>
+                                        <label htmlFor="intro" className='label'>Introduction :</label>
                                         <textarea name='intro' className='item' maxLength='100' onChange={handleChange} />
                                         <p className='error-message'>{validation.intro_error}</p>
                                     </div>

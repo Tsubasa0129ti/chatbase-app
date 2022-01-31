@@ -1,10 +1,7 @@
-//想定としては、完全なexport用のファイルとして、fetchが行われたときに呼び出されるもの
 import {useHistory} from 'react-router-dom';
 
-//①に関しては、各ページで行い、②はまとめてしまう、③はまとめてしまう、④は各ページに委ね、⑤はある程度まとめてしまう。（特別なものは、各ページにし、該当がなければここで行う）
-
 //基礎処理 ここに関しては問題なく動作しているが、その他の処理に関してはいまいち　エラーの処理の方法を見直す必要があり、app.jsの修正をした。
-export function HandleError(res){ //関数１　ここに関する問題点　①サーバー側のエラーを適切に受け取ること（全てinternal server errorになってしまうのを防ぐ）
+export function HandleError(res){
     if(!res.ok){
         console.error('res.ok:',res.ok);
         console.error('res.status:',res.status);
@@ -55,15 +52,6 @@ export function Code500(err,history){
     });
 };
 
-//上記二つのエラーハンドラーを煮詰めれば、全体に適用することができそうだ　多分users や　porfileなどでエラーの遷移先を変える必要がある　とすると、これに分離する
-
-/* 分析
-    遷移先を今から決める
-
-    とりあえず、サーバー側のエラーの設定は完了した。なので、fetchのコンポーネント化に移行する。一応、エラー処理がだいぶ変わってしまうので、
-    users.profile.chatでそれぞれ処理を変えることを検討する。ちなみに、users mypageと分岐するかもしれない
-    そして、headerなどのコンポーネントもハンドラーを使用するので、そこも柔軟に対応できるようにする必要がある。
-*/
 
 /* 取得されうるステータスコードとそれに応じた対処を決めておく
 

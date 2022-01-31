@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from 'react';
+import {useState,useEffect} from 'react';
 import { useHistory } from 'react-router';
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
@@ -134,6 +134,8 @@ function Edit(props){
             }).catch((err) => {
                 if(err.status === 401){
                     Code401(err,history);
+                }else if(err.status === 422){
+                    setMessage(`${err.type} : ${err.messages[0].msg}`);
                 }else if(err.status === 500){
                     Code500(err,history);
                 }
@@ -206,7 +208,7 @@ function Edit(props){
                             <div className='content'>
                                 <label htmlFor="gender" className='label'>Gender</label>
                                 <div className='item'>
-                                    <select name="gender" className='input-item' value={formData.gender}　onChange={handleChange}>
+                                    <select name="gender" className='input-item' value={formData.gender} onChange={handleChange}>
                                         <option hidden vale="">選択してください</option>
                                         <option value="male">Male</option>
                                         <option value="female">Female</option>
