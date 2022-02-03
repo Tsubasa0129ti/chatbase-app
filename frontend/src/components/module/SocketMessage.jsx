@@ -1,8 +1,8 @@
-import React from 'react';
+import React,{useState,useEffect} from 'react';
 
-import ChatPopup from '../../components/module/chatPopup';
+import ChatPopup from './chatPopup';
 
-class ChannelSocket extends React.Component{
+/* class SocketMessage extends React.Component{
     constructor(props){
         super(props);
         this.state={
@@ -10,8 +10,8 @@ class ChannelSocket extends React.Component{
             self : false,
             userId : this.props.userId
         }
-        this.mouseenterEvent = this.mouseenterEvent.bind(this);
-        this.mouseleaveEvent = this.mouseleaveEvent.bind(this);
+        //this.mouseenterEvent = this.mouseenterEvent.bind(this);
+        //this.mouseleaveEvent = this.mouseleaveEvent.bind(this);
     }
 
     mouseenterEvent(e){
@@ -43,7 +43,9 @@ class ChannelSocket extends React.Component{
     }
 
     render(){
-        if(!this.props.socket){
+        console.log(this.props.socket);
+
+        if(!this.props.socket){ //これないと初期レンダリングでエラーが発生する
             return null;
         }else{
             var socket = this.props.socket;
@@ -56,7 +58,7 @@ class ChannelSocket extends React.Component{
                 socketItems.push(
                     <div>
                         <div>
-                            <p>{socket[j].date}</p>{/* popupの出現のためにこれを別の方法で出力させるかも */}
+                            <p>{socket[j].date}</p>
                         </div>
                         <div 
                             className='bbb_test'
@@ -89,6 +91,57 @@ class ChannelSocket extends React.Component{
             )
         }
     }
+} */
+
+//export default ChannelSocket;
+
+function SocketMessage(props){
+    const [item,setItem] = useState([]);
+
+    const Content = (message) => {
+        const content = [];
+        content.push(
+            <div>
+                <a href={`/profile/account/${message.userId}`}>
+                    {message.username}
+                </a>
+                <p>{message.time}</p>
+                <p>{message.text}</p>
+                <input type='hidden' value={message.customId} />
+            </div>
+        );
+        return content;
+    }
+
+
+    useEffect(() => { //stateを設定する段階で必ず呼び出されてしまう
+        var socket = props.socket;
+        if(socket){
+            socket.forEach((message) => {
+                if(!message.date){
+                    var newItem = (
+                        <div>
+                            {Content(message)}
+                        </div>
+                    );
+                }else{
+                    var newItem = (
+                        <div>
+                            <p>{message.date}</p>
+                            {Content(message)}
+                        </div>
+                    );
+                }
+                setItem([...item,newItem]);
+            });            
+        }
+    },[props.socket]);  
+    
+    return(
+        <div className='socket_message'>
+            {item}
+        </div>
+    )
 }
 
-export default ChannelSocket;
+export default SocketMessage;

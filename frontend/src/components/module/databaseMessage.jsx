@@ -1,8 +1,8 @@
-import React from 'react';
+import React,{useState,useEffect} from 'react';
 
-import ChatPopup from '../../components/module/chatPopup';
+import ChatPopup from './chatPopup';
 
-class ChannelDB extends React.Component{
+/* class ChannelDB extends React.Component{
     constructor(props){
         super(props);
         this.state={
@@ -10,8 +10,8 @@ class ChannelDB extends React.Component{
             self : false,
             userId : this.props.userId
         }
-        this.mouseenterEvent = this.mouseenterEvent.bind(this);
-        this.mouseleaveEvent = this.mouseleaveEvent.bind(this);
+        //this.mouseenterEvent = this.mouseenterEvent.bind(this);
+        //this.mouseleaveEvent = this.mouseleaveEvent.bind(this);
     }
 
     mouseenterEvent(e){
@@ -99,6 +99,49 @@ class ChannelDB extends React.Component{
             </div>
         )
     }
+} */
+
+
+function DatabaseMessage(props){
+    const [item,setItem] = useState("");
+
+    const Content = (element) => {
+        var content = [];
+        element.messages.forEach((message) => {
+            content.push(
+                <div>
+                    <a href={`/profile/account/${message.userId}`}>
+                        {message.username}
+                    </a>
+                    <p>{message.time}</p>
+                    <p>{message.text}</p>
+                    <input type='hidden' value={message.customId} />
+                </div>
+            );
+        });
+        return content;
+    }
+
+    useEffect(() => {
+        var chatData = props.chatData;
+        if(chatData){
+            chatData.forEach((element) => {
+                var newItem = (
+                    <div className='oneDayMessage'>
+                        <p>{element.date}</p>
+                        {Content(element)}
+                    </div>
+                );
+                setItem(oldItem => [...oldItem,newItem]); //コールバックにしたらできた。理由は不明
+            });
+        }
+    },[props.chatData]);    
+
+    return(
+        <div className='database_message'>
+            {item}
+        </div>
+    )
 }
 
-export default ChannelDB;
+export default DatabaseMessage; //とりあえず、チャットのデータの表示には成功した。強いて言えば、ファイル名と保管箇所の変更をするかも
