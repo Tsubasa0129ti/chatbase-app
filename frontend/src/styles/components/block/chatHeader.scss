@@ -1,54 +1,60 @@
-.chat_header {
-    .header_box {
-        border: solid 1px black;
-        .header_top {
-            display: flex;
-            justify-content: center;
-            p {
-                font-size: 36px;
-                margin: 15px 0 8px 0 ;
-            }
+$pc : 960px;
+$tab : 520px;
+
+@mixin pc {
+    @media(min-width: ($pc)){
+        @content;
+    }
+}
+
+@mixin tab {
+    @media(max-width : ($tab)){
+        @content;
+    }
+}
+
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 24px;
+
+    .header-title {
+        a {
+            display: block;
+            margin: 15px 0;
+            font-size: 28px;
+            font-family: cursive;
+            text-decoration: none;
+            background: linear-gradient( to right,  rgba(69,179,224,1) 25%, rgba(102,51,153,1) 75% );
+            -webkit-background-clip: text;
+            color: transparent;
         }
-        .header_middle {
-            
-            .search {
-                float: left;
-                .search_button {
-                    border: solid 1px black;
-                    .search_icon {
-                        height: 50px;
-                        width: 50px;
-                    }
+
+    }
+    .header-main {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .search-box {
+            margin: 10px 20px;
+        }
+
+        .navigation {
+            display: flex;
+            align-items: center;
+
+            .toMypage {
+                color: rgb(62, 96, 209);
+                font-weight: lighter;
+
+                &:hover {
+                    color: rgb(78, 219, 219);
                 }
 
             }
-            .navigation {
-                display: flex;
-                justify-content: center;
-            }
-            .log {
-                float: right;
-                display: flex;
-                justify-content: center;
-                text-align: center;
-                
-            }
-            .clear {
-               
+            .log-btn {
+                margin-left: 20px;
             }
         }
-        .middle_border {
-            border-bottom: solid 1px black;
-            width: 56%;
-            margin: 0 22%;
-        }
-        .header_bottom {
-            display: flex;
-            justify-content: center;
-        }
-    }
-    
-    .header_message {
-
     }
 }

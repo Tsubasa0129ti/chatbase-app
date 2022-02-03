@@ -1,0 +1,45 @@
+$pc : 960px;
+$tab : 520px;
+
+@mixin pc {
+    @media(min-width: ($pc)){
+        @content;
+    }
+}
+
+@mixin tab {
+    @media(max-width : ($tab)){
+        @content;
+    }
+}
+
+.search-window {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 420px;
+    height: 21px;
+    border: 1px solid black;
+    border-radius: 16px;
+    padding: 5px 10px;
+
+    .search-form {
+        width: 380px;
+        border: none;
+        outline: none;
+
+        font-size: 15px;
+    }
+    .submit {   
+       border: none;
+       background-color: white;
+       font-weight: 900;
+       color: #999;
+
+       &:hover {
+           color: #333;
+           cursor: pointer;
+       }
+    }
+}
+
