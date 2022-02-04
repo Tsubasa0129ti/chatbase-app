@@ -1,6 +1,7 @@
 import React,{useState,useEffect} from 'react';
 
 import ChatPopup from './chatPopup';
+import {mouseEnter,mouseLeave} from './mouseMove';
 
 /* class ChannelDB extends React.Component{
     constructor(props){
@@ -109,13 +110,17 @@ function DatabaseMessage(props){
         var content = [];
         element.messages.forEach((message) => {
             content.push(
-                <div>
-                    <a href={`/profile/account/${message.userId}`}>
+                <div onMouseEnter={mouseEnter} onMouseLeave={mouseLeave}>
+                    <a 
+                        href={`/profile/account/${message.userId}`}
+                        data-user={message.userId}
+                    >
                         {message.username}
                     </a>
                     <p>{message.time}</p>
                     <p>{message.text}</p>
                     <input type='hidden' value={message.customId} />
+                    <ChatPopup userId={props.userId} />
                 </div>
             );
         });
@@ -132,10 +137,10 @@ function DatabaseMessage(props){
                         {Content(element)}
                     </div>
                 );
-                setItem(oldItem => [...oldItem,newItem]); //コールバックにしたらできた。理由は不明
+                setItem(oldItem => [...oldItem,newItem]);
             });
         }
-    },[props.chatData]);    
+    },[props.chatData]);
 
     return(
         <div className='database_message'>

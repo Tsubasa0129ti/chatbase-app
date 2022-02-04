@@ -1,6 +1,8 @@
-import React from 'react';
-import {withRouter} from 'react-router-dom';
+import React, { useState,useEffect,useRef } from 'react';
 import socketIOClient from 'socket.io-client';
+
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faSmile,faReply,faEdit,faEraser} from '@fortawesome/free-solid-svg-icons';
 
 import MessageEdit from '../../components/atoms/messageEdit';
 
@@ -9,7 +11,7 @@ import {showContext} from '../../context/showContext';
 const ENDPOINT = 'http://localhost:3001';
 const socket = socketIOClient(ENDPOINT);
 
-class ChatPopup extends React.Component{
+/* class ChatPopup extends React.Component{
     constructor(props){
         super(props);
         this.forEdit = this.forEdit.bind(this);
@@ -65,6 +67,7 @@ class ChatPopup extends React.Component{
     }
 
     render(){ //この下のコンポーネントは、クリック時の処理　こちらはdisplayのnoneとshowの状態下で繰り返し読み込まれるもの（ただ、おそらくそこまでの負荷はないはず）
+        console.log(this.props.popup);
         if(!this.props.show){
             return null;
         }else{
@@ -93,6 +96,7 @@ class ChatPopup extends React.Component{
                     </div>
                 )
             }else{
+                console.log('aaa')
                 return(
                     <div>
                         <a href="/" className='reaction_button' onClick={this.reaction}>
@@ -109,15 +113,82 @@ class ChatPopup extends React.Component{
     }
 }
 
-ChatPopup.contextType = showContext;
+ChatPopup.contextType = showContext; */
 
-export default withRouter(ChatPopup);
 
-//displayの適用を親コンポーネントと子コンポーネントの双方で変化させる必要があるかもしれない　
-//displayが双方にある場合であっても、親が変化しても子要素はそのまま変化しない
+function ChatPopup(props){
+    const [content,setContent] = useState('');
+    const el = useRef(null);
 
-//想定は、ここの中で編集用popupを可視化し、この下のコンポーネントのcancelとeditでpopupを解除する予定
+    const reaction = (e) => {
+        e.preventDefault();
+        console.log('reaction');
+    }
 
-/* chatPopup内部において、受け取ったcontextをイベントにむすびつける（） */
+    const reply = (e) => {
+        e.preventDefault();
+        console.log('replay');
+    }
 
-/* 理想としては、削除ボタンクリック時にそのデータの情報を取得 */
+    const update = (e) => {
+        e.preventDefault();
+        console.log('update');
+    }
+
+    const erase = (e) => {
+        e.preventDefault();
+        console.log('erase');
+    }
+
+    useEffect(() => {
+        var current = el.current;
+        console.log(current);
+        var parent = current.parentNode; //ここがたまにエラーになってしまうparentNodeがエラーになるのならば、currentが受け取れrていない可能性もあるかも
+        var userId = parent.children[0].dataset.user;
+
+        if(props.userId === userId){
+            var popup = (
+                <div className='popup_box'>
+                    <div className='reaction_button'>
+                        <a href="/" onClick={reaction}><FontAwesomeIcon icon={faSmile} /></a>
+                    </div>
+                    <div className='reply_button'>
+                        <a href="/" onClick={reply}><FontAwesomeIcon icon={faReply} /></a>
+                    </div>
+                    <div className='edit_button'>
+                        <a href="/" onClick={update}><FontAwesomeIcon icon={faEdit} /></a>
+                    </div>
+                    <div className='delete_button'>
+                        <a href="/" onClick={erase}><FontAwesomeIcon icon={faEraser} /></a>
+                    </div>
+                </div>
+            )
+        }else{
+            var popup = (
+                <div className='popup_box'>
+                    <div className='reaction_button'>
+                        <a href="/" onClick={reaction}><FontAwesomeIcon icon={faSmile} /></a>
+                    </div>
+                    <div className='reply_button'>
+                        <a href="/" onClick={reply}><FontAwesomeIcon icon={faReply} /></a>
+                    </div>
+                </div>
+            )
+        }
+        setContent(popup);
+    },[]);
+
+    if(content === ''){
+        return (
+            <div ref={el}></div>
+        );
+    }else{
+        return (
+            <div style={{display:'none'}}>{content}</div>
+        )
+    }
+}
+
+export default ChatPopup;
+
+//初期ロードの時にcurrentが読み取れない時がある。useRefの取得できるタイミングを知る必要性があるか

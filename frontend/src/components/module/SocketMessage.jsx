@@ -1,6 +1,7 @@
 import React,{useState,useEffect} from 'react';
 
 import ChatPopup from './chatPopup';
+import {mouseEnter,mouseLeave} from './mouseMove';
 
 /* class SocketMessage extends React.Component{
     constructor(props){
@@ -101,20 +102,24 @@ function SocketMessage(props){
     const Content = (message) => {
         const content = [];
         content.push(
-            <div>
-                <a href={`/profile/account/${message.userId}`}>
+            <div onMouseEnter={mouseEnter} onMouseLeave={mouseLeave}>
+                <a 
+                    href={`/profile/account/${message.userId}`}
+                    data-user={message.userId}
+                >
                     {message.username}
                 </a>
                 <p>{message.time}</p>
                 <p>{message.text}</p>
                 <input type='hidden' value={message.customId} />
+                <ChatPopup userId={props.userId}  />
             </div>
         );
         return content;
     }
 
 
-    useEffect(() => { //stateを設定する段階で必ず呼び出されてしまう
+    useEffect(() => {
         var socket = props.socket;
         if(socket){
             socket.forEach((message) => {
