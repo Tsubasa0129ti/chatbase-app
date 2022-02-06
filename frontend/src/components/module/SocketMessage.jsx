@@ -1,10 +1,21 @@
-import React,{useState,useEffect} from 'react';
+import React,{useState,useEffect,useContext} from 'react';
 
 import ChatPopup from './chatPopup';
 import {mouseEnter,mouseLeave} from './mouseMove';
+import {ProfileStore} from './store';
 
 function SocketMessage(props){
     const [item,setItem] = useState([]);
+    const {state,dispatch} = useContext(ProfileStore);
+
+    const profileShow = (e) => {
+        e.preventDefault();
+
+        var target = e.target;
+        var id = target.dataset.user;
+
+        dispatch({type:'popup',id:id});
+    }
 
     const Content = (message) => {
         const content = [];
@@ -13,6 +24,7 @@ function SocketMessage(props){
                 <a 
                     href={`/profile/account/${message.userId}`}
                     data-user={message.userId}
+                    onClick={profileShow}
                 >
                     {message.username}
                 </a>

@@ -6,7 +6,7 @@ import Guide from './guide';
 import Channel from './channel';
 import NotFound from '../errorPages/notFound';
 
-import {Provider} from '../../components/module/store'
+import {DeleteProvider,ProfileProvider} from '../../components/module/store'
 
 function Chat(props) {
     return(
@@ -14,9 +14,11 @@ function Chat(props) {
             <Route path={`${props.url}`} exact component={ChatPage} />
             <Route path={`${props.url}/search`} exact={true} component={Search} />
             <Route path={`${props.url}/guide`} exact component={Guide} />
-            <Provider>
-                <Route path={`${props.url}/page/:id`} exact component={Channel} />
-            </Provider>
+            <DeleteProvider>
+                <ProfileProvider>
+                    <Route path={`${props.url}/page/:id`} exact component={Channel} />
+                </ProfileProvider>    
+            </DeleteProvider>
             <Route component={NotFound} />
         </Switch>  
     )

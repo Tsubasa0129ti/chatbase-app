@@ -1,13 +1,13 @@
 import React, { useState,useEffect} from 'react';
+import { useLocation, useHistory } from 'react-router-dom';
 import socketIOClient from 'socket.io-client';
 import uuid from 'react-uuid';
-import { useLocation, useHistory } from 'react-router-dom';
 
 import ChatHeader from '../../components/block/chatHeader'; //ここに関しては、header単体の修正をする。
-import DatabaseMessage from '../../components/module/databaseMessage'; //大方問題なし
-import SocketMessage from '../../components/module/SocketMessage'; //大方問題無し
-import MessageDelete from '../../components/ReactModal/messageDelete'; //OK
-import UserProfile from '../../components/ReactModal/userProfile';//一旦放置
+import DatabaseMessage from '../../components/module/databaseMessage';
+import SocketMessage from '../../components/module/SocketMessage';
+import MessageDelete from '../../components/ReactModal/messageDelete';
+import UserProfile from '../../components/ReactModal/userProfile';
 
 import {HandleError,Code401,Code500} from '../../components/module/errorHandler';
 
@@ -109,11 +109,6 @@ const socketIO = socketIOClient(ENDPOINT);
         
     }
 } */
-
-
-
-//messageDeleteとuserProfileに関しては、コンポーネントへのイベントの移行ができそう。ただ先にDatabaseMessageとchannelSocketの大きなイベントの対処から行うべきか
-//form送信層を作ってしまうのはありかもしれない。ここで（プラスでupdateとdelete）socketとの接続を限定的に行うようにすることも可能なはず。かなりコンパクトになるかもしれない
 
 function Channel(props){
     const [userId,setUserId] = useState(''); //これはsessionが適用され次第削除したい。
@@ -223,6 +218,7 @@ function Channel(props){
                     <input type="submit" value='送信' />
                 </form>
                 <MessageDelete />
+                <UserProfile />
             </div>
         </div>
     )

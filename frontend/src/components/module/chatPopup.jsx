@@ -4,14 +4,14 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faSmile,faReply,faEdit,faEraser} from '@fortawesome/free-solid-svg-icons';
 
 import MessageUpdate from '../atoms/messageUpdate';
-import {Store} from '../../components/module/store';
+import {DeleteStore} from '../../components/module/store';
 
 function ChatPopup(props){
     const [content,setContent] = useState('');
     const el = useRef(null);
     const box = useRef(null);
 
-    const {state,dispatch} = useContext(Store);
+    const {state,dispatch} = useContext(DeleteStore);
 
     const reaction = (e) => {
         e.preventDefault();

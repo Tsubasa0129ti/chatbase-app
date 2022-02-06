@@ -2,14 +2,14 @@ import { useContext } from 'react';
 import {useLocation} from 'react-router-dom'
 import socketIOClient from 'socket.io-client';
 
-import {Store} from '../module/store';
+import {DeleteStore} from '../module/store';
 import '../../styles/components/ReactModal/messageDelete.scss';
 
 const ENDPOINT = 'http://localhost:3001';
 const socketIO = socketIOClient(ENDPOINT);
 
 function MessageDelete(props){
-    const {state,dispatch} = useContext(Store);
+    const {state,dispatch} = useContext(DeleteStore);
     const location = useLocation();
 
     const Cancel = (e) => {

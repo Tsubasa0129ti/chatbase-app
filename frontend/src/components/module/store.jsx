@@ -1,18 +1,31 @@
 import { useReducer,createContext } from "react";
-import reducer from "./reducer";
+import {reducer_deleteModal,reducer_profileModal} from "./reducer";
 
 
-const initialState = {
+const deleteState = {
     show : false,
     deleteData : '',
     block : ''
 }
 
-const Store = createContext();
+const DeleteStore = createContext();
 
-const Provider = ({children}) => {
-    const [state,dispatch] = useReducer(reducer,initialState);
-    return <Store.Provider value={{state,dispatch}}>{children}</Store.Provider>
+const DeleteProvider = ({children}) => { //これの名前の変更もしつつ
+    const [state,dispatch] = useReducer(reducer_deleteModal,deleteState);
+    return <DeleteStore.Provider value={{state,dispatch}}>{children}</DeleteStore.Provider>
 }
 
-export {Store,Provider};
+//ここからまだ実験段階
+const ProfileStore = createContext();
+
+const profileState = {
+    show : false,
+    id : ''
+}
+
+const ProfileProvider = ({children}) => { //storeに関しては再利用可能なのか
+    const [state,dispatch] = useReducer(reducer_profileModal,profileState);
+    return <ProfileStore.Provider value={{state,dispatch}}>{children}</ProfileStore.Provider>
+}
+
+export {DeleteStore,DeleteProvider,ProfileStore,ProfileProvider};

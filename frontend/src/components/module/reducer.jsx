@@ -1,4 +1,4 @@
-const reducer = (state={},action) => {
+const reducer_deleteModal = (state={},action) => {
     switch(action.type){
         case 'popup':
             return {
@@ -19,4 +19,23 @@ const reducer = (state={},action) => {
     }
 }
 
-export default reducer;
+const reducer_profileModal = (state={},action) => {
+    switch(action.type){
+        case 'popup':
+            return {
+                ...state,
+                show : true,
+                id : action.id
+            }
+        case 'close':
+            return {
+                ...state,
+                show :false,
+                id : ''
+            }
+        default:
+            return state
+    }
+}
+ 
+export {reducer_deleteModal,reducer_profileModal};
