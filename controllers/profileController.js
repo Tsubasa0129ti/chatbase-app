@@ -167,19 +167,28 @@ module.exports = {
     id : async(req,res,next) => { //時々なのかはわからないが、userの検索ができなくなったことがあったので、エラー処理をするなどして、対処する必要がありそう
         try{
             var userId = req.params.id;
+            console.log(userId);
             const user = await User.findById(userId).exec();
-            if(user.profile){
-                const result = await User.findById(userId).populate('profile').exec();
-                res.json({
-                    profileExist : true,
-                    user : result
-                });
+            console.log(user);
+
+            if(!user){
+                var err = createError.Gone();
+                return next(err);
             }else{
-                console.log(`pass2:${user.profile}`);
-                res.json({
-                    user : user
-                })
+                if(user.profile){
+                    const result = await User.findById(userId).populate('profile').exec();
+                    res.json({
+                        profile : true,
+                        user : result
+                    });
+                }else{
+                    console.log(`pass2:${user.profile}`);
+                    res.json({
+                        user : user
+                    })
+                }
             }
+            
         }catch(err){
             next(err);
         }
