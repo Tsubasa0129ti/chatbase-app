@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import socketIOClient from 'socket.io-client';
 
 const ENDPOINT = 'http://localhost:3001';
-const socket = socketIOClient(ENDPOINT);
+const socketIO = socketIOClient(ENDPOINT);
 
 function MessageUpdate(props){
     const [value,setValue] = useState('');
@@ -56,9 +56,9 @@ function MessageUpdate(props){
             newMsg : value
         }
 
-        socket.emit('update',message);
+        socketIO.emit('update',message);
 
-        socket.once('update',(data) => {
+        socketIO.once('update',(data) => {
             block.children[2].textContent = data.text;
         });
 

@@ -2,7 +2,6 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faUser} from '@fortawesome/free-solid-svg-icons';
 
 function UserProfile(props){
-    console.log(props);
     if(!props.show){
         return null;
     }else{
