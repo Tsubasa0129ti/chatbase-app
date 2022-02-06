@@ -1,31 +1,17 @@
-import { useState,useEffect,useRef} from 'react';
+import { useState, useEffect, useRef, useContext } from 'react';
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faSmile,faReply,faEdit,faEraser} from '@fortawesome/free-solid-svg-icons';
 
 import MessageUpdate from '../atoms/messageUpdate';
-
-import {showContext} from '../../context/showContext'; //deleteをどのように行なっていたのかについてふりかえりつつ...
-
-/* class ChatPopup extends React.Component{
-    render(){
-        return(
-            <div>
-                <a href='/' className='delete_button' onClick={this.context.showEvent}>
-                    <img src='delete_icon' alt='delete_icon' />削除ボタン
-                </a>
-            </div>  
-        )
-    }
-}
-
-ChatPopup.contextType = showContext; */
-
+import {Store} from '../../components/module/store';
 
 function ChatPopup(props){
     const [content,setContent] = useState('');
     const el = useRef(null);
     const box = useRef(null);
+
+    const {state,dispatch} = useContext(Store);
 
     const reaction = (e) => {
         e.preventDefault();
@@ -53,7 +39,30 @@ function ChatPopup(props){
 
     const erase = (e) => {
         e.preventDefault();
-        console.log('erase');
+
+        var target = e.currentTarget;
+        var block = target.parentNode.parentNode.parentNode.parentNode;
+
+        if(block.closest('.database_message')){
+            var date = block.parentNode.firstChild.textContent;
+        }else{
+            if(block.previousElementSibling){
+                var date = block.previousElementSibling.textContent;
+            }else{
+                var socketMessage = block.closest('.socket_message');
+                var date = socketMessage.previousElementSibling.lastChild.firstChild.textContent;
+            }
+        }
+
+        var deleteData = {
+            username : block.children[0].textContent,
+            time : block.children[1].textContent,
+            text : block.children[2].textContent,
+            customId : block.children[3].value,
+            date : date
+        }
+
+        dispatch({type : 'popup',deleteData : deleteData,block:block});
     }
 
     useEffect(() => {
@@ -109,4 +118,3 @@ function ChatPopup(props){
 }
 
 export default ChatPopup;
-//参考　useRef createRefの二つのパターンがあり、前者はレンダリング時の結果を返すのに対して、後者は常に最新のものを返す
