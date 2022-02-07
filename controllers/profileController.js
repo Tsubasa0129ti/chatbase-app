@@ -16,6 +16,10 @@ function getProfile(body) {
     }
 };
 
+const isEmpty = (obj) => {
+    return !Object.keys(obj).length;
+};
+
 module.exports = {
     profileCheck : (req,res,next) => {
         try {
@@ -52,7 +56,7 @@ module.exports = {
                 res.status(303).json({
                     status : 303,
                     redirectPath : '/profile/new',
-                    message : "You havn't had your profile yet. If you want to create your profile, please create here."
+                    message : "You have already had your profile. If you want to revise your profile, please revise at update page."
                 });
             }
         }catch(err){
@@ -60,6 +64,12 @@ module.exports = {
         }
     },
     objCheck : (req,res,next) => {
+        var err = new createError.BadRequest();
+
+        if(isEmpty(req.body)){
+            return next(err);
+        }
+
         var array = Object.values(req.body);
 
         for(var i=0;i<array.length;i++){
@@ -68,7 +78,6 @@ module.exports = {
                 return next();
             }else{
                 if(i === array.length -1){
-                    var err = new createError.BadRequest();
                     return next(err);
                 }
             }
