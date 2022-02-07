@@ -188,7 +188,7 @@ module.exports = {
         }
 
         if(promise.user){
-            passport.authenticate('local')(req,res,function(){　
+            passport.authenticate('local')(req,res,function(){
                 next();
             });
         }

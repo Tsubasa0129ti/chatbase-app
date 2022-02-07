@@ -68,7 +68,7 @@ module.exports = {
                 return next();
             }else{
                 if(i === array.length -1){
-                    var err = createError.BadRequest();
+                    var err = new createError.BadRequest();
                     return next(err);
                 }
             }
@@ -172,7 +172,7 @@ module.exports = {
             console.log(user);
 
             if(!user){
-                var err = createError.Gone();
+                var err = new createError.Gone();
                 return next(err);
             }else{
                 if(user.profile){
