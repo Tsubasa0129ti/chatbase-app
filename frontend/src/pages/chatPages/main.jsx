@@ -1,62 +1,63 @@
 import {useState,useEffect} from 'react';
-import {useHistory} from 'react-router';
+import {useHistory,useLocation} from 'react-router';
 import queryString from 'query-string';
 
 import ChatHeader from '../../components/block/chatHeader';
 import AddChannel from '../../components/module/addChannel';
 
+import {HandleError,Code401,Code500} from '../../components/module/errorHandler';
+
 function ChatPage(props){
-    const [isLoggedIn,setIsLoggedIn] = useState(false); //chatHeaderに送っているが、もしかしたら分離するかも
-    const [username,setUsername] = useState('');
-    const [add,setAdd] = useState(false);
     const [count,setCount] = useState('');
     const [channel,setChannel] = useState([]);
+    const [show,setShow] = useState(false);
 
     const history = useHistory();
+    const location = useLocation();
 
     useEffect(() => {
-        var search = props.location.search;
+        var search = location.search;
         var query = queryString.parse(search);
 
-        fetch(`/api/chat?page=${query.page}`) //fetch内部の処理については、今は後回し。
-        .then((res) => {
-            if(!res.ok){
-                console.error('res.ok:',res.ok);
-                console.error('res.status:',res.status);
-                console.error('res.statusText:',res.statusText);
-                
-                throw new Error();
-            }
-            return res.json();
-        }).then((obj) => {
-            setIsLoggedIn(obj.isLoggedIn);
-            setUsername(obj.username);
+        fetch(`/api/chat?page=${query.page}`)
+        .then(HandleError)
+        .then((obj) => { //ここでstateが2回更新されてしまうので、どうにかしたい。
             setChannel(obj.channel);
             setCount(obj.count);
-
         }).catch((err) => {
             if(err.status === 401){
-                history.push({
-                    pathname : '/users/login',
-                    state : {message : `${err.status} : ログインしてください。`}
-                });
-            }else if(err.status >= 500){
-                console.error(`${err.status} : ${err.message}`);
-            }else{
-                console.error(err.message);
+                Code401(err,history);
+            }else if(err.status === 500){
+                Code500(err,history);
             }
         });
     },[]);
 
     const popup = (e) => {
         e.preventDefault();
-        setAdd(true);
+        setShow(true);
     };
 
     const cancel = (e) => {
         e.preventDefault();
-        setAdd(false);
+        setShow(false);
     };
+
+    const Content = (element) => {
+        const items = [];
+
+        element.forEach((channel) => {
+            items.push(
+                <div>
+                    <a href={`/chat/page/${channel._id}`}>{channel.channelName}</a>
+                    <p>更新日 : {channel.updatedAt}</p>
+                    <p>チャンネル詳細 : {channel.channelDetail}</p>
+                    <p>チャンネル作成者 : {channel.createdBy}</p>
+                </div>
+            )
+        });
+        return items;
+    }
 
     if(!channel){
         return null;
@@ -64,37 +65,23 @@ function ChatPage(props){
         if(count === 0){
             return(
                 <div>
-                    <ChatHeader isLoggedIn={isLoggedIn} username={username} />
+                    <ChatHeader />
                     <p>チャンネルが存在しません。</p>
                     <p>作成ページより、チャンネルの作成をしてください。</p>
-                    {/* <Guide />
-                    <AddChannel /> */}
+                    <AddChannel show={show} cancel={cancel} />
                 </div>
             )
         }else{
-            const items = [];
-            for(var i=0;i<channel.length;i++){
-                items.push(
-                    <div>
-                        <a href={'/chat/page/' + channel[i]._id}>{channel[i].channelName}</a>
-                        <p>更新日　：　{channel[i].updatedAt}</p>
-                        <p>チャンネル詳細　：　{channel[i].channelDetail}</p>
-                        <p>チャンネル作成者　：　{channel[i].createdBy}</p>
-                    </div>
-                )
-            }
-
             return(
                 <div>
-                    <ChatHeader isLoggedIn={isLoggedIn} username={username} />
+                    <ChatHeader />
                     <div className='new_channel'>
-                        <p>チャンネル件数　：　{count}件</p>
-                        {items}
+                        <p>チャンネル件数 : {count}件</p>
+                        {Content(channel)}
                         <div className='paging'></div>
                     </div>
-                    {/* <Guide /> */}
                     <a href="/" onClick={popup}>+</a>
-                    <AddChannel add={add} onEventCallback={(e) => {cancel(e)}} />
+                    <AddChannel show={show} cancel={cancel} />
                 </div>
             )
         }
@@ -102,5 +89,4 @@ function ChatPage(props){
 }
 
 export default ChatPage;
-
-//この後やること、、、　③ページングの適用(ページのリンクにクエリ情報の付与/ 存在しないページの場合の分岐も考える）　④ページ変換ごとに、サーバーへの接続　⑤addpopupとそのほかのUI
+//後は、ページングの適用とaddChannelの適用か
