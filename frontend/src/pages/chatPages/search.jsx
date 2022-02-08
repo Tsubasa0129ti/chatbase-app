@@ -1,49 +1,51 @@
-import React,{useState,useEffect} from 'react';
-import { useHistory } from 'react-router';
+import {useState,useEffect} from 'react';
+import { useHistory,useLocation } from 'react-router';
 import queryString from 'query-string';
 
 import ChatHeader from '../../components/block/chatHeader';
+import AddChannel from '../../components/module/addChannel';
+import {HandleError,Code401,Code500} from '../../components/module/errorHandler';
 
 function Search(props){
-    const [isLoggedIn,setIsLoggedIn] = useState(false); //統一もしくは名前を変える
-    const [username,setUsername] = useState('');
     const [count,setCount] = useState('');
     const [channel,setChannel] = useState([]);
 
     const history  = useHistory();
+    const location = useLocation();
 
     useEffect(() => {
-        var search = props.location.search
+        var search = location.search
         var query = queryString.parse(search);
 
         fetch(`/api/chat/search?q=${query.q}&sort=${query.sort}&page=${query.page}`)
-        .then((res) => {
-            if(!res.ok){
-                console.error('res.ok:',res.ok);
-                console.error('res.status:',res.status);
-                console.error('res.statusText:',res.statusText);
-
-                throw new Error();
-            }
-            return res.json();
-        }).then((obj) => {  
-            setIsLoggedIn(obj.isLoggedIn); //ここ冗長な感じがするな　mainともども統一するかも
-            setUsername(obj.username);
+        .then(HandleError)
+        .then((obj) => {  
             setCount(obj.count);
             setChannel(obj.channel);
         }).catch((err) => {
             if(err.status === 401){
-                history.push({
-                    pathname : '/users/login',
-                    state : {message : `${err.status} : ログインしてください。`}
-                });
-            }else if(err.status >= 500){
-                console.error(`${err.status} : ${err.message}`);
-            }else{
-                console.error(err.message);
+                Code401(err,history);
+            }else if(err.status === 500){
+                Code500(err,history);
             }
         });
     },[]);
+
+    const Content = (element) => {
+        const items = [];
+
+        element.forEach((channel) => {
+            items.push(
+                <div>
+                    <a href={`/chat/page/${channel._id}`}>{channel.channelName}</a>
+                    <p>更新日 : {channel.updatedAt}</p>
+                    <p>チャンネル詳細 : {channel.channelDetail}</p>
+                    <p>チャンネル作成者 : {channel.createdBy}</p>
+                </div>
+            )
+        });
+        return items;
+    }
 
     if(!channel){
         return null;
@@ -51,37 +53,23 @@ function Search(props){
         if(count === 0){
             return(
                 <div>
-                    <ChatHeader isLoggedIn={isLoggedIn} username={username} />
-                    <p>検索結果　：　 {count}件</p>
+                    <ChatHeader />
+                    <p>検索結果 :  {count}件</p>
                     <p>チャンネルが見つかりません。</p>
                     <p>検索し直してください。</p>
-                    {/* <Guide />
-                    <AddChannel /> */}
+                    <AddChannel />
                 </div>
             )
         }else{
-            const items = [];
-            for(var i=0;i<channel.length;i++){
-                items.push(
-                    <div>
-                        <a href={'/chat/page/' + channel[i]._id}>{channel[i].channelName}</a>
-                        <p>更新日　：　{channel[i].updatedAt}</p>
-                        <p>チャンネル詳細　：　{channel[i].channelDetail}</p>
-                        <p>チャンネル作成者　：　{channel[i].createdBy}</p>
-                    </div>
-                )
-            }
-
             return(
                 <div>
-                    <ChatHeader isLoggedIn={isLoggedIn} username={username} />
+                    <ChatHeader />
                     <div className='new_channel'>
-                        <p>チャンネル件数　：　{count}件</p>
-                        {items}
+                        <p>チャンネル件数 : {count}件</p>
+                        {Content(channel)}
                         <div className='paging'></div>
                     </div>
-                    {/* <Guide />
-                    <AddChannel /> */}
+                    <AddChannel />
                 </div>
             )
         }
