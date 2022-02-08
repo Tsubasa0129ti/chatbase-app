@@ -26,6 +26,7 @@ function SearchWindow(props){
             pathname : '/chat/search',
             search : `?q=${q}`
         });
+        history.go();
     };
 
     return(

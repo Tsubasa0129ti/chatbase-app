@@ -6,8 +6,7 @@ import SearchWindow from '../atoms/searchWindow';
 
 import '../../styles/components/block/chatHeader.scss';
 
-function ChatHeader(props){ //この中にイベントを定義する必要はないかもしれない
-
+function ChatHeader(props){
     return(
         <div className='chat-header'>
             <div className='header-title'>
