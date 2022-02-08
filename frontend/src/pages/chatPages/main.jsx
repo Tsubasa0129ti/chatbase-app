@@ -68,6 +68,7 @@ function ChatPage(props){
                     <ChatHeader />
                     <p>チャンネルが存在しません。</p>
                     <p>作成ページより、チャンネルの作成をしてください。</p>
+                    <a href="/" onClick={popup}>+</a>
                     <AddChannel show={show} cancel={cancel} />
                 </div>
             )

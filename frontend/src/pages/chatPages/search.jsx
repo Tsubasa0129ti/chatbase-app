@@ -9,6 +9,7 @@ import {HandleError,Code401,Code500} from '../../components/module/errorHandler'
 function Search(props){
     const [count,setCount] = useState('');
     const [channel,setChannel] = useState([]);
+    const [show,setShow] = useState(false);
 
     const history  = useHistory();
     const location = useLocation();
@@ -47,6 +48,16 @@ function Search(props){
         return items;
     }
 
+    const popup = (e) => {
+        e.preventDefault();
+        setShow(true);
+    }
+
+    const cancel = (e) => {
+        e.preventDefault();
+        setShow(false);
+    }
+
     if(!channel){
         return null;
     }else{
@@ -57,7 +68,8 @@ function Search(props){
                     <p>検索結果 :  {count}件</p>
                     <p>チャンネルが見つかりません。</p>
                     <p>検索し直してください。</p>
-                    <AddChannel />
+                    <a href="/" onClick={popup}>+</a>
+                    <AddChannel show={show} cancel={cancel} />
                 </div>
             )
         }else{
@@ -69,7 +81,8 @@ function Search(props){
                         {Content(channel)}
                         <div className='paging'></div>
                     </div>
-                    <AddChannel />
+                    <a href="/" onClick={popup}>+</a>
+                    <AddChannel show={show} cancel={cancel} />
                 </div>
             )
         }
