@@ -3,8 +3,8 @@ import { useState, useEffect, useRef, useContext } from 'react';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faSmile,faReply,faEdit,faEraser} from '@fortawesome/free-solid-svg-icons';
 
-import MessageUpdate from '../atoms/messageUpdate';
-import {DeleteStore} from '../../components/module/store';
+import MessageUpdate from './messageUpdate';
+import {DeleteStore} from '../module/store';
 
 function ChatPopup(props){
     const [content,setContent] = useState('');

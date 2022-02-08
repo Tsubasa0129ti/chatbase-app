@@ -3,7 +3,7 @@ import { useHistory,useLocation } from 'react-router';
 import queryString from 'query-string';
 
 import ChatHeader from '../../components/block/chatHeader';
-import AddChannel from '../../components/module/addChannel';
+import AddChannel from '../../components/ReactModal/addChannel';
 import {HandleError,Code401,Code500} from '../../components/module/errorHandler';
 
 function Search(props){

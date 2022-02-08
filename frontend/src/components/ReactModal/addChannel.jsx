@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {useHistory} from 'react-router-dom';
-import {HandleError,Code401,Code500} from './errorHandler';
+import {HandleError,Code401,Code500} from '../module/errorHandler';
 
 import '../../styles/components/ReactModal/addChannel.scss';
 

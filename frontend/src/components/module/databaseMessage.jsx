@@ -1,6 +1,6 @@
 import React,{useState,useEffect,useContext} from 'react';
 
-import ChatPopup from './chatPopup';
+import ChatPopup from '../atoms/chatPopup';
 import {mouseEnter,mouseLeave} from './mouseMove';
 import {ProfileStore} from '../module/store';
 
