@@ -4,6 +4,7 @@ import queryString from 'query-string';
 
 import ChatHeader from '../../components/block/chatHeader';
 import AddChannel from '../../components/ReactModal/addChannel';
+import Pagination from '../../components/atoms/pagination';
 import {HandleError,Code401,Code500} from '../../components/module/errorHandler';
 
 function Search(props){
@@ -14,8 +15,9 @@ function Search(props){
     const history  = useHistory();
     const location = useLocation();
 
+    var search = location.search;
+
     useEffect(() => {
-        var search = location.search
         var query = queryString.parse(search);
 
         fetch(`/api/chat/search?q=${query.q}&sort=${query.sort}&page=${query.page}`)
@@ -30,7 +32,7 @@ function Search(props){
                 Code500(err,history);
             }
         });
-    },[]);
+    },[search]);
 
     const Content = (element) => {
         const items = [];
@@ -83,6 +85,7 @@ function Search(props){
                     </div>
                     <a href="/" onClick={popup}>+</a>
                     <AddChannel show={show} cancel={cancel} />
+                    <Pagination pageCount={Math.ceil(count/5)} />
                 </div>
             )
         }

@@ -4,6 +4,7 @@ import queryString from 'query-string';
 
 import ChatHeader from '../../components/block/chatHeader';
 import AddChannel from '../../components/ReactModal/addChannel';
+import Pagination from '../../components/atoms/pagination';
 
 import {HandleError,Code401,Code500} from '../../components/module/errorHandler';
 
@@ -15,8 +16,9 @@ function ChatPage(props){
     const history = useHistory();
     const location = useLocation();
 
-    useEffect(() => {
-        var search = location.search;
+    var search = location.search;
+
+    useEffect(() => { //ブラウザバックしたとしても、再度APIキル
         var query = queryString.parse(search);
 
         fetch(`/api/chat?page=${query.page}`)
@@ -31,7 +33,7 @@ function ChatPage(props){
                 Code500(err,history);
             }
         });
-    },[]);
+    },[search]);
 
     const popup = (e) => {
         e.preventDefault();
@@ -83,6 +85,7 @@ function ChatPage(props){
                     </div>
                     <a href="/" onClick={popup}>+</a>
                     <AddChannel show={show} cancel={cancel} />
+                    <Pagination pageCount={Math.ceil(count/5)} />
                 </div>
             )
         }

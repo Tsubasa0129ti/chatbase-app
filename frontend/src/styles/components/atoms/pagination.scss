@@ -1,0 +1,62 @@
+@mixin anchor {
+    cursor: pointer;
+
+    &:hover {
+        color: blue;
+        text-decoration: underline;
+    }
+}
+
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+
+    margin: 10px 0;
+    padding: 0;
+
+    .previous-page {
+
+        .previous-link {
+            @include anchor();
+        }
+    }
+
+    .page-item {
+        margin: 0 10px;
+        .page-link {
+            @include anchor();
+        }
+    }
+
+    .active {
+        font-weight: bolder;
+
+        .page-link {
+            cursor: text;
+            &:hover {
+                color: black; 
+                text-decoration: none;
+            }
+        }
+    }
+
+    .break {
+
+        .break-link {
+
+        }
+    }
+
+    .next-page {
+
+        .next-link {
+            @include anchor();
+        }
+    }
+
+    .disabled { //ページ移動ができない際に付与されるクラス名
+        display : none;
+    }
+}
