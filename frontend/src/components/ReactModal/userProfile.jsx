@@ -9,19 +9,11 @@ import {ProfileStore} from '../module/store';
 
 
 function UserProfile(props){
-    const [userData,setUserData] = useState({
-        username : '',
-        email : '',
-        intro : '',
-        country : '',
-        professional : '',
-        birthday : ''
-    });
+    const [userData,setUserData] = useState({});
     const [profile,setProfile] = useState(false);
     const [error,setError] = useState(false);
     const {state,dispatch} = useContext(ProfileStore);
     const history = useHistory();
-    
 
     useEffect(() => {
         const id = state.id;
@@ -33,14 +25,7 @@ function UserProfile(props){
                 if(obj.profile){
                     setProfile(true);
                 }
-                setUserData({
-                    username : obj.user.name.first + '_' + obj.user.name.last,
-                    email : obj.user.email,
-                    intro : obj.user.profile.intro,
-                    country : obj.user.profile.country,
-                    professional : obj.user.profile.professional,
-                    birthday : obj.user.profile.birthday
-                });
+                setUserData(obj.user);
             }).catch((err) => {
                 if(err.status === 401){
                     Code401(err,history);
@@ -62,8 +47,7 @@ function UserProfile(props){
     if(!state.show){
         return null;
     }else{
-        console.log(userData.name)
-        if(error){
+        if(error || !userData.name){ //初期レンダリング時はこちらをレンダリングさせている。
             return(
                 <div className='overray'>
                     <div className='content'>
@@ -88,7 +72,7 @@ function UserProfile(props){
                             </div>
                             <div className='content-main'>
                                 <div className='profile-head'>
-                                    <p>{userData.username}</p>
+                                    <p>{userData.name.first + ' ' + userData.name.last}</p>
                                 </div>
                                 <div className='profile-list'>
                                     <label htmlFor="email">Email</label>
@@ -111,20 +95,20 @@ function UserProfile(props){
                                     <div className='icon'>
                                         <FontAwesomeIcon icon={faUser} size='10x' className='icon' />
                                     </div>
-                                    <p className='username'>名前</p>
+                                    <p className='username'>{userData.name.first + ' ' + userData.name.last}</p>
                                     <div className='comment'>
-                                        <input type="text" className='user-comment' value={userData.intro} />
+                                        <input type="text" className='user-comment' value={userData.profile.intro} />
                                     </div>
                                 </div>
                                 <div className='profile-list'>
                                     <div className='profile-block'>
                                         <label htmlFor="country">Country</label>
-                                        <input type="text" className='profile-item' value={userData.country} disabled />
+                                        <input type="text" className='profile-item' value={userData.profile.country} disabled />
                                     </div>
                                     <div className='profile-block'>
                                         <label htmlFor="professional">
                                             <label htmlFor="professional">Professional</label>
-                                            <input type="text" className='profile-item' value={userData.professional} disabled />
+                                            <input type="text" className='profile-item' value={userData.profile.professional} disabled />
                                         </label>
                                     </div>
                                     <div className='profile-block'>
@@ -133,7 +117,7 @@ function UserProfile(props){
                                     </div>
                                     <div className='profile-block'>
                                         <label htmlFor="birthday">Birthday</label>
-                                        <input type="text" className='profile-item' value={userData.birthday} disabled />
+                                        <input type="text" className='profile-item' value={userData.profile.birthday} disabled />
                                     </div>
                                 </div>
                             </div>

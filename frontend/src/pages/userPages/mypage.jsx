@@ -15,7 +15,6 @@ import '../../styles/layouts/users/mypage.scss';
 
 function Mypage(props){
     const [user,setUser] = useState({});
-    const [username,setUsername] = useState('');
     const [profile,setProfile] = useState(false);
     const [show,setShow] = useState(false);
 
@@ -25,7 +24,6 @@ function Mypage(props){
         fetch('/api/users/mypage')
         .then(HandleError)
         .then((obj) => {
-            setUsername(obj.user.name.first + ' ' + obj.user.name.last);
             setUser(obj.user);
             if(obj.profile){
                 setProfile(true);
@@ -43,167 +41,173 @@ function Mypage(props){
         setShow(false);
     };
 
-    if(!profile) {
-        return(
-            <div className='mypage'>
-                <Header loggedIn={true} />
-                <div className='users_mypage'>
-                    <div className='mypage-top'>
-                        <p className='mypage-title'>My Page</p>
-                        <div className='mypage-menu'>
-                            <button 
-                                className='menu-button'
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    var popup = e.currentTarget.nextElementSibling;
-                                    if(popup.className === 'prevPopup'){
-                                        popup.classList.replace('prevPopup','popup-menu');
-                                    }else{
-                                        popup.classList.replace('popup-menu','prevPopup');
-                                    }
-                                }}
-                            >
-                                <FontAwesomeIcon icon={faCog} size='3x' className='cog-icon' />
-                            </button>
-                            <div className='prevPopup'>
+    if(!user.name){
+        return null;
+    }else{
+        if(!profile) {
+            return(
+                <div className='mypage'>
+                    <Header loggedIn={true} />
+                    <div className='users_mypage'>
+                        <div className='mypage-top'>
+                            <p className='mypage-title'>My Page</p>
+                            <div className='mypage-menu'>
                                 <button 
-                                    className='toEdit'
-                                    onClick={() => history.push('/users/mypage/edit')}
+                                    className='menu-button'
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        var popup = e.currentTarget.nextElementSibling;
+                                        if(popup.className === 'prevPopup'){
+                                            popup.classList.replace('prevPopup','popup-menu');
+                                        }else{
+                                            popup.classList.replace('popup-menu','prevPopup');
+                                        }
+                                    }}
                                 >
-                                    <FontAwesomeIcon icon={faEdit} /> Edit Account
+                                    <FontAwesomeIcon icon={faCog} size='3x' className='cog-icon' />
                                 </button>
-                                <button
-                                    className='toDelete'
+                                <div className='prevPopup'>
+                                    <button 
+                                        className='toEdit'
+                                        onClick={() => history.push('/users/mypage/edit')}
+                                    >
+                                        <FontAwesomeIcon icon={faEdit} /> Edit Account
+                                    </button>
+                                    <button
+                                        className='toDelete'
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            setShow(true);
+                                        } }
+                                    >
+                                        <FontAwesomeIcon icon={faTrashAlt} /> Delete Account
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <p className='welcome-msg'>Welcome back {user.name.first + ' ' + user.name.last}</p>
+                        </div>
+                        <div className='user-info'>
+                            <div className='userInfo-title'>
+                                <p className='title-content'>ユーザー情報</p>
+                            </div>
+                            <div className='username-record user-record'>
+                                <label htmlFor="username" className='label'>username :</label>
+                                <input type="text" className='username-value user-value' value={user.name.first + ' ' + user.name.last} readOnly />
+                            </div>
+                            <div className='email-record user-record'>
+                                <label htmlFor="email" className='label'>Email :</label>
+                                <input type="text" className='email-value user-value' value={user.email} readOnly />
+                            </div>
+                        </div>
+                        <div className='toCreateProfile'>
+                            <p className='profileDesc'>プロフィールを作成すると、自身の自己紹介などを設定することができます。</p>
+                            <button
+                                className='toProfile' 
+                                onClick={
+                                    (e) => {
+                                        e.preventDefault();
+                                        history.push('/profile/new');
+                                    }
+                                }
+                            >
+                                <FontAwesomeIcon icon={faAddressCard} /> Create Profile
+                            </button>
+                        </div>
+                    </div>
+                    <AccountDelete show={show} onCancelCallback={() => {cancel()}} />
+                </div>
+            )
+        }else{
+            return(
+                <div className='mypage'>
+                    <Header loggedIn={true} />
+                    <div class='container'>
+                        <div className='aside'>
+                            <div className='user-icon'>
+                                <FontAwesomeIcon icon={faUser} size='10x' className='icon' />
+                            </div>
+                            <div className='setting'>
+                                <div className='text-line'>
+                                    <p><FontAwesomeIcon icon={faCog} /> Setting</p>
+                                </div>
+                                <a href="/users/mypage/edit"><FontAwesomeIcon icon={faEdit} /> Edit Account</a>
+                                <a href="/profile/edit"><FontAwesomeIcon icon={faIdCard} /> Edit Profile</a>
+                                <a 
+                                    href='/' 
                                     onClick={(e) => {
                                         e.preventDefault();
                                         setShow(true);
-                                    } }
+                                    }}
                                 >
-                                    <FontAwesomeIcon icon={faTrashAlt} /> Delete Account
-                                </button>
+                                    <FontAwesomeIcon icon={faTrashAlt} /> Delete
+                                </a>
                             </div>
-                        </div>
-                        
-                        <p className='welcome-msg'>Welcome back {username}</p>
-                    </div>
-                    <div className='user-info'>
-                        <div className='userInfo-title'>
-                            <p className='title-content'>ユーザー情報</p>
-                        </div>
-                        <div className='username-record user-record'>
-                            <label htmlFor="username" className='label'>username :</label>
-                            <input type="text" className='username-value user-value' value={username} readOnly />
-                        </div>
-                        <div className='email-record user-record'>
-                            <label htmlFor="email" className='label'>Email :</label>
-                            <input type="text" className='email-value user-value' value={user.email} readOnly />
-                        </div>
-                    </div>
-                    <div className='toCreateProfile'>
-                        <p className='profileDesc'>プロフィールを作成すると、自身の自己紹介などを設定することができます。</p>
-                        <button
-                            className='toProfile' 
-                            onClick={
-                                (e) => {
-                                    e.preventDefault();
-                                    history.push('/profile/new');
-                                }
-                            }
-                        >
-                            <FontAwesomeIcon icon={faAddressCard} /> Create Profile
-                        </button>
-                    </div>
-                </div>
-                <AccountDelete show={show} onCancelCallback={() => {cancel()}} />
-            </div>
-        )
-    }else{
-        return(
-            <div className='mypage'>
-                <Header loggedIn={true} />
-                <div class='container'>
-                    <div className='aside'>
-                        <div className='user-icon'>
-                            <FontAwesomeIcon icon={faUser} size='10x' className='icon' />
-                        </div>
-                        <div className='setting'>
-                            <div className='text-line'>
-                                <p><FontAwesomeIcon icon={faCog} /> Setting</p>
-                            </div>
-                            <a href="/users/mypage/edit"><FontAwesomeIcon icon={faEdit} /> Edit Account</a>
-                            <a href="/profile/edit"><FontAwesomeIcon icon={faIdCard} /> Edit Profile</a>
-                            <a 
-                                href='/' 
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    setShow(true);
-                                }}
-                            >
-                                <FontAwesomeIcon icon={faTrashAlt} /> Delete
-                            </a>
-                        </div>
-                        <div className='application'>
-                            <div className='text-line'>
-                              <p><FontAwesomeIcon icon={faChartLine} /> Application</p>  
-                            </div>
-                            <a href="/chat"><FontAwesomeIcon icon={faComments} /> Chat Page</a>
-                            <a href="/blog"><FontAwesomeIcon icon={faBlog} /> Blog Page</a>
-                        </div>
-                    </div>
-                    <div className='main'>
-                        <div className='profile-header'>
-                            <p className='username'>Welcome back, {username}</p>
-                            <ProfileComment intro={user.profile.intro} />
-                        </div>
-                        <div className='profile-detail'>
-                            <div className='about'>
-                                <p className='about-top'><FontAwesomeIcon icon={faUser} /> About</p>
-                                <div className='contact-info'>
-                                    <p>Contact Information</p>
-                                    <div className='content'>
-                                        <label htmlFor="email" className='label'>Email :</label>
-                                        <input type="text" className='item' value={user.email} disabled />
-                                    </div>
-                                    <div className='content'>
-                                        <label htmlFor="country" className='label'>Country :</label>
-                                        <input type="text" className='item' value={user.profile.country} disabled />
-                                    </div>
-                                    <div className='content'>
-                                        <label htmlFor="Address" className='label'>Address :</label>
-                                        <input type="text" className='item' value={user.profile.address} disabled />
-                                    </div>
-                                    <div className='content'>
-                                        <label htmlFor="professional" className='label'>Professional :</label>
-                                        <input type="text" className='item' value={user.profile.professional} disabled />
-                                    </div>
-                                    <div className='content'>
-                                        <label htmlFor="site" className='label'>Site :</label>
-                                        <input type="text" className='item' value={user.profile.site} disabled />
-                                    </div>
+                            <div className='application'>
+                                <div className='text-line'>
+                                <p><FontAwesomeIcon icon={faChartLine} /> Application</p>  
                                 </div>
-                                <div className='basic-info'>
-                                    <p>Basic Information</p>
-                                    <div className='content'>
-                                        <label htmlFor="gender" className='label'>Gender :</label>
-                                        <input type="text" className='item' value={user.profile.gender} disabled />
+                                <a href="/chat"><FontAwesomeIcon icon={faComments} /> Chat Page</a>
+                                <a href="/blog"><FontAwesomeIcon icon={faBlog} /> Blog Page</a>
+                            </div>
+                        </div>
+                        <div className='main'>
+                            <div className='profile-header'>
+                                <p className='username'>Welcome back, {user.name.first + ' ' + user.name.last}</p>
+                                <ProfileComment intro={user.profile.intro} />
+                            </div>
+                            <div className='profile-detail'>
+                                <div className='about'>
+                                    <p className='about-top'><FontAwesomeIcon icon={faUser} /> About</p>
+                                    <div className='contact-info'>
+                                        <p>Contact Information</p>
+                                        <div className='content'>
+                                            <label htmlFor="email" className='label'>Email :</label>
+                                            <input type="text" className='item' value={user.email} disabled />
+                                        </div>
+                                        <div className='content'>
+                                            <label htmlFor="country" className='label'>Country :</label>
+                                            <input type="text" className='item' value={user.profile.country} disabled />
+                                        </div>
+                                        <div className='content'>
+                                            <label htmlFor="Address" className='label'>Address :</label>
+                                            <input type="text" className='item' value={user.profile.address} disabled />
+                                        </div>
+                                        <div className='content'>
+                                            <label htmlFor="professional" className='label'>Professional :</label>
+                                            <input type="text" className='item' value={user.profile.professional} disabled />
+                                        </div>
+                                        <div className='content'>
+                                            <label htmlFor="site" className='label'>Site :</label>
+                                            <input type="text" className='item' value={user.profile.site} disabled />
+                                        </div>
                                     </div>
-                                    <div className='content'>
-                                        <label htmlFor="age" className='label'>Age :</label>
-                                        <input type="text" className='item' value={user.profile.age} disabled />
+                                    <div className='basic-info'>
+                                        <p>Basic Information</p>
+                                        <div className='content'>
+                                            <label htmlFor="gender" className='label'>Gender :</label>
+                                            <input type="text" className='item' value={user.profile.gender} disabled />
+                                        </div>
+                                        <div className='content'>
+                                            <label htmlFor="age" className='label'>Age :</label>
+                                            <input type="text" className='item' value={user.profile.age} disabled />
+                                        </div>
+                                        <div className='content'>
+                                            <label htmlFor="birthday" className='label'>Birthday :</label>
+                                            <input type="text" className='item' value={user.profile.birthday} disabled />
+                                        </div>
                                     </div>
-                                    <div className='content'>
-                                        <label htmlFor="birthday" className='label'>Birthday :</label>
-                                        <input type="text" className='item' value={user.profile.birthday} disabled />
-                                    </div>
-                                </div>
-                            </div> 
+                                </div> 
+                            </div>
                         </div>
                     </div>
+                    <AccountDelete show={show} onCancelCallback={() => {cancel()}} />
                 </div>
-                <AccountDelete show={show} onCancelCallback={() => {cancel()}} />
-            </div>
-        )
+            )
+        }
     }
+
+    
 }
 
 export default Mypage;
