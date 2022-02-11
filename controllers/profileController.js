@@ -125,13 +125,14 @@ module.exports = {
             next(err);
         }
     },
-    edit : async(req,res,next) => {
+    account : async(req,res,next) => {
         try{
             var exist = res.locals.exist;
             if(exist){
                 var currentUser = req.user;
                 var user = await User.findById(currentUser._id).populate("profile").exec();
                 res.json({
+                    user : user,
                     email : user.email,
                     profile : user.profile
                 });

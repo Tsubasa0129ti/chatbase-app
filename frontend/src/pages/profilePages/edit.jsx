@@ -33,7 +33,7 @@ function Edit(props){
     const history = useHistory();
 
     useEffect(() => {
-        fetch('/api/profile/edit')
+        fetch('/api/profile/account')
         .then(HandleError)
         .then((obj) => {
             setEmail(obj.email);

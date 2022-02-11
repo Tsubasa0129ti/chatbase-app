@@ -17,7 +17,7 @@ router.post(
     profileController.create
 );
 
-router.get('/edit',userController.loginCheck,profileController.profileCheck,profileController.edit);
+router.get('/account',userController.loginCheck,profileController.profileCheck,profileController.account);
 router.put(
     '/update',
     userController.loginCheck,
@@ -34,6 +34,7 @@ router.put(
     profileController.introUpdate
 );
 
+router.get('/account',userController.loginCheck,profileController.profileCheck,profileController.account);
 router.get('/:id',userController.loginCheck,profileController.id);
 
 module.exports = router;
