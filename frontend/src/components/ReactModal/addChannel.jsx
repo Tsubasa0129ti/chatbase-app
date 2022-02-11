@@ -1,6 +1,7 @@
 import {useState} from 'react';
 import {useHistory} from 'react-router-dom';
-import {HandleError,Code401,Code500} from '../module/errorHandler';
+import {HandleError,Code401,Code500,AddChannelValidation} from '../module/errorHandler';
+import {isLength} from '../../components/module/validation';
 
 import '../../styles/components/ReactModal/addChannel.scss';
 
@@ -10,6 +11,10 @@ function AddChannel(props) {
         channelDetail : ''
     });
     const [message,setMessage] = useState('');
+    const [validation,setValidation] = useState({
+        channelName_error : '',
+        channelDetail_error : ''
+    });
     const history = useHistory();
 
     const handleChange = (e) => {
@@ -17,6 +22,23 @@ function AddChannel(props) {
         const target = e.target;
         const name = target.name;
         const value = target.value;
+
+        /* バリデーションの実行 */
+        if(name === 'channelName'){
+            if(isLength(value,{min:1,max:30})){
+                setValidation({...validation,hasChanged:true,channelName_error:''});
+            }else{
+                setValidation({...validation,hasChanged:true,channelName_error:'1文字以上30文字以内で設定してください。'});
+            }
+        }
+
+        if(name === 'channelDetail'){
+            if(isLength(value,{max:100})){
+                setValidation({...validation,hasChanged:true,channelDetail_error:''});
+            }else{
+                setValidation({...validation,hasChanged:true,channelDetail_error:'100文字以内で設定してください。'});
+            }
+        }
 
         setNewChannel({...newChannel,hasChanged:true,[name]:value});
     }
@@ -45,8 +67,12 @@ function AddChannel(props) {
             if(err.status === 401){
                 Code401(err,history);
             }else if(err.status === 422){
+                var error = AddChannelValidation(err);
                 setMessage(`${err.status} : ${err.type}`);
-                console.log(err);
+                setValidation({
+                    channelName_error : error[0],
+                    channelDetail_error : error[1]
+                });
             }else if(err.status === 500){
                 Code500(err,history);
             }
@@ -73,11 +99,13 @@ function AddChannel(props) {
                     <div className='channel_name'>
                         <label htmlFor="channelName">チャンネル名</label>
                         <input type="text" className='channelName' name='channelName' required onChange={handleChange} />
+                        <p className='validation'>{validation.channelName_error}</p>
                     </div>
                     <div className='detail'>
                         <label htmlFor="channel_detail">
                             <label htmlFor="channelDetail">チャンネル詳細</label>
-                            <input type="text" className='channelDetail' name='channelDetail' required onChange={handleChange} />
+                            <input type="text" className='channelDetail' name='channelDetail' onChange={handleChange} />
+                            <p className='validation'>{validation.channelDetail_error}</p>
                         </label>
                     </div>
                     <input type="submit" value='作成' />
@@ -89,3 +117,8 @@ function AddChannel(props) {
 }
 
 export default AddChannel;
+
+//不足点
+/* 
+②cancelの実行時にエラーを削除する。もしくはpopup時にでも構わない
+*/

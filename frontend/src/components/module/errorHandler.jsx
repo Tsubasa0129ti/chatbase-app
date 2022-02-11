@@ -17,19 +17,16 @@ export function HandleError(res){
 
 
 //成功時の処理
-export function OnLoggedIn(obj){ //LoginCheckの成功時の処理　（new.jsxとlogin.jsx） 問題発生　historyを使用してはいけないらしい
+export function OnLoggedIn(obj){
     const history = useHistory();
     console.log('onLoggedIn')
     history.push({
         pathname : '/users',
         state : {message : 'You are already authenticated!'}
     });
-    //こんな感じでページの遷移を行いたいけど、history.pushは使用できないかも
 }
 
-
-
-//失敗時の処理 これはやっていいものなのだろうか（historyを引数にのせる）
+//失敗時の処理
 export function Code303(err,history) {
     history.push({
         pathname : err.redirectPath,
@@ -53,78 +50,83 @@ export function Code500(err,history){
 };
 
 
-/* 取得されうるステータスコードとそれに応じた対処を決めておく
+//若干冗長な気がするので、ここは最善主が見つかれば修正をする予定
+export function UserValidation(err){
+    console.log(error);
+    var params = [];
+    var error = [];
 
-    fetchが存在する場所
-    ①new.jsx 
-        /api/users/loginCheck OK
-        /api/users/create POST OK
+    err.messages.forEach((e) => { //これで注意しなければいけないことは再利用が可能かどうかということ。2回目バリデーションにかかった時に配列が空になってなければ、、、
+        switch(e.param){
+            case 'name.first' :
+                if(!params[0]){
+                    error[0] = e.msg;
+                    params[0] = true;
+                }
+                break;
+            case 'name.last' :
+                if(!params[1]){
+                    error[1] = e.msg;
+                    params[1] = true;
+                }
+                break;
+            case 'email' :
+                if(!params[2]){
+                    error[2] = e.msg
+                    params[2] = true
+                }
+                break;
+            case 'password' : 
+                if(!params[3]){
+                    error[3] = e.msg;
+                    params[3] = true
+                }
+                break;
+            default : 
+                console.log('');
+        }
+    });
+    return error;
+}
 
-    ②login.jsx
-        /api/users/loginCheck OK
-        /api/users/auth OK
-    
-    ③mypage.jsx
-        /api/users/mypage OK
-        /api/users/mypage/delete DELETE (これに関してはイベントにしてしまう)
-    
-    ④edit.jsx
-        /api/users/mypage/edit
-        /api/users/mypage/update
+export function ProfileValidation(err){
+    var error = [];
 
-    ⑤header.jsx 一応これも入れておく
-        /api/users/loginCheck OK
-        /api/users/logout
+    err.messages.forEach((e) => {
+        switch(e.param){
+            case 'age' :
+                error[0] = e.msg;
+                break;
+            case 'site' :
+                error[1] = e.msg;
+            default :
+                console.log('');
+        }
+    });
+    return error;
+}
 
-    もう一つの手段として、apiのパスで決定してしまうというものもある。
-    →/api/users/createの時のエラー処理みたいな形で... 割とありだな
+export function AddChannelValidation(err){
+    var error = [];
+    var params = [];
 
-    ①/loginCheck　（login と　newのdidMount）
-    →これで取得されうるエラーは401もしくは500　そして、それ以外ということにする。（timeoutやgoneなどもあるが一旦無視する。）
-    401の時は、loginへのリダイレクト + エラーの取得
-    →少なくともusersに関しては、loginCheckを行った時には、エラーが出るのが通常状態らしいので、ページごとに決めるのが良さそう
-    500の時は、500への遷移でいいのではないか
-    その他のエラー時には、、、
-
-    ②/api/users/create OK
-    →これで取得されうるエラーは400 422 500
-    400の時は、ページの遷移はなしにできる。→そのままエラーメッセージの取得
-    422の時はバリデーションエラーなので上記と同様の扱い。（若干変える予定ではあるが）
-    500の時は、500に飛ばす
-
-    ③/api/users/auth
-    400の時はエラーメッセージの取得
-    401の時は上記と同様
-    500の時は、500へ
-
-    ④/api/users/mypage OK
-    401の時は、リダイレクト　/users/loginへ
-    500 は500へ
-
-    ⑤/api/users/mypage/edit
-    401のときは、リダイレクト　/users/loginへ
-    500の時は　500
-
-    ⑥/api/users/mypage/update
-    400の時は、エラーメッセージの創出
-    401の時はリダイレクト　/users/loginへ
-    422の時は、エラーメッセージの創出
-    500の時は500へ
-
-    ⑦/api/users/mypage/delete OK
-    401　リダイレクト 
-    500 
-
-    ⑧/api/users/logout
-    500
-
-    401に関しては二つのパターンに分けるのもありかもしれない。
-    500に関しては統一が可能。
-    400も同様
-    422に関しては、各ページに任せるのが現実的
-
-    なるほど、全てステータスコードのみでの分岐をしたかった。しかし、401の時は少なくとも全てページ遷移というわけにはいかない。500に関しては統一することは可能だとしても
-    422もアル程度統一することはかのうかも　400はどちらも遷移なしなので、エラーを受け取り、これを返すという形がベスト500は統一
-*/
-
-/* 一旦飛ばす　hookがイベント関数で使用することができないかも　あまり、まとめることに向いていないかもしれない */
+    err.messages.forEach((e) => {
+        switch(e.param){
+            case 'channelName' : 
+                if(!params[0]){
+                    error[0] = e.msg;
+                    params[0] = true;
+                }
+                break;
+            case 'channelDetail' : 
+                if(!params[1]){
+                    error[1] = e.msg;
+                    params[1] = true;
+                }
+                break;
+            default :
+                console.log('');
+        }
+    });
+    return error;
+}

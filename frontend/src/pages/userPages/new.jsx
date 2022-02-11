@@ -3,7 +3,7 @@ import {useHistory} from 'react-router-dom';
 
 import Header from '../../components/block/header';
 import {isUpper,isAlpha,isLength,isEmail,isAscii,isContain} from '../../components/module/validation';
-import {HandleError,Code303,Code500} from '../../components/module/errorHandler';
+import {HandleError,Code303,Code500,UserValidation} from '../../components/module/errorHandler';
 import { objCheck } from '../../components/module/objCheck';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -115,8 +115,6 @@ function New(props){
             }else{
                 setValidation({...validation,hasChanged:true,password_error:'Password : パスワードに使用できない文字が含まれています。'});
             }
-
-            setValidation({...validation,hasChanged:true,passCheck_error:''});
         }
 
         //passCheckのバリデーションの一時解除
@@ -163,12 +161,14 @@ function New(props){
                 if(err.status === 400){
                     setMessage(`${err.status}_${err.type} : ${err.message}`);
                 }else if(err.status === 422){
-                    setMessage(`${err.status} : ${err.type}`); //まずはトップに状況を伝える
+                    var error = UserValidation(err);
 
-                    err.messages.forEach((e) => {
-                        if(e.param === 'email'){
-                            setValidation({...validation,hasChanged:true,email_error:e.msg});
-                        }
+                    setMessage(`${err.status} : ${err.type}`);
+                    setValidation({
+                        first_error : error[0],
+                        last_error : error[1],
+                        email_error : error[2],
+                        password_error : error[3]
                     });
 
                 }else if(err.status === 500){

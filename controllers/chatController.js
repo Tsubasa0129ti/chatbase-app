@@ -66,7 +66,7 @@ module.exports = {
     validation : [
         check("channelName")
             .notEmpty().withMessage('チャンネル名を記入してください。')
-            .isLength({min:1,max:30}).withMessage('チャンネル名は1文字以上３０字以内で設定してください。')
+            .isLength({min:1,max:30}).withMessage('チャンネル名は1文字以上30字以内で設定してください。')
             .custom(value => {
                 return Chat.findOne({channelName : value}).then(channel => {
                     if(channel){
@@ -76,7 +76,6 @@ module.exports = {
                 })
             }),
         check("channelDetail")
-            .notEmpty().withMessage('チャンネルの詳細を設定してください。')
             .isLength({min:0,max:100}).withMessage('チャンネル詳細は100文字以内で設定してください。'),
     ],
     valdiationCheck : (req,res,next) => {

@@ -5,7 +5,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faUser} from '@fortawesome/free-solid-svg-icons';
 
 import Header from '../../components/block/header';
-import {Code303, Code401, Code500, HandleError} from '../../components/module/errorHandler';
+import {Code303, Code401, Code500, ProfileValidation, HandleError} from '../../components/module/errorHandler';
 import {isEmpty,isAddress,isURL,isInt} from '../../components/module/validation';
 import {objCheck} from '../../components/module/objCheck';
 
@@ -135,7 +135,12 @@ function Edit(props){
                 if(err.status === 401){
                     Code401(err,history);
                 }else if(err.status === 422){
-                    setMessage(`${err.type} : ${err.messages[0].msg}`);
+                    var error = ProfileValidation(err);
+                    setMessage(`${err.type} : ${err.type}`);
+                    setValidation({
+                        age_error : error[0],
+                        site_error : error[1]
+                    });
                 }else if(err.status === 500){
                     Code500(err,history);
                 }

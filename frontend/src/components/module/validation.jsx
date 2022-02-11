@@ -83,5 +83,3 @@ export function isEmpty(val){ //profile用に、、空の時にはエラーと�
     }
     return true;
 }
-
-//今回のケースでは、validationを通過する場合はreturn true、逆にエラーを取得するときはfalseを返す　

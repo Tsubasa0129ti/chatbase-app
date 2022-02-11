@@ -2,7 +2,7 @@ import {useState,useEffect} from 'react';
 import { useHistory,useLocation } from 'react-router';
 
 import Header from '../../components/block/header';
-import { Code401, Code500, HandleError } from '../../components/module/errorHandler';
+import { Code401, Code500, UserValidation, HandleError } from '../../components/module/errorHandler';
 import {isUpper,isAlpha,isLength} from '../../components/module/validation';
 import { objCheck } from '../../components/module/objCheck';
 
@@ -122,7 +122,13 @@ function Edit(props){
                 }else if(err.status === 401){
                     Code401(err,history);
                 }else if(err.status === 422){
+                    var error = UserValidation(err);
+
                     setMessage(`${err.status} : ${err.type}`);
+                    setValidation({
+                        first_error : error[0],
+                        last_error : error[1]
+                    });
                 }else if(err.status  === 500){
                     Code500(err,history);
                 }
