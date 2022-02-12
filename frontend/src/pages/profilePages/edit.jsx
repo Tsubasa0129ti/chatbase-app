@@ -136,7 +136,7 @@ function Edit(props){
                     Code401(err,history);
                 }else if(err.status === 422){
                     var error = ProfileValidation(err);
-                    setMessage(`${err.type} : ${err.type}`);
+                    setMessage(`${err.status} : ${err.type}`);
                     setValidation({
                         age_error : error[0],
                         site_error : error[1]
