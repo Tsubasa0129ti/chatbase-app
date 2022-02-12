@@ -33,6 +33,12 @@ const reducer_profileModal = (state={},action) => {
                 show :false,
                 id : ''
             }
+        case 'error':
+            return {
+                ...state,
+                show : false,
+                message : '410 : 現在そのユーザーは使われておりません。'
+            }
         default:
             return state
     }
