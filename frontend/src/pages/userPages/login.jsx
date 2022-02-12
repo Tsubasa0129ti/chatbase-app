@@ -7,7 +7,7 @@ import { HandleError, Code303 , Code500 } from '../../components/module/errorHan
 import 'font-awesome/css/font-awesome.min.css';
 import '../../styles/layouts/users/login.scss';
 
-function Login(props) {
+function Login() {
     const [formData,setFormData] = useState({
         email : '',
         password : ''

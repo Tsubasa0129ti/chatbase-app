@@ -7,7 +7,7 @@ import { HandleError,Code303,Code401,Code500 } from '../../components/module/err
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faUser} from '@fortawesome/free-solid-svg-icons';
 
-function Id(props){
+function Id(){
     const [userData,setUserData] = useState({});
     const history = useHistory();
 

@@ -8,7 +8,7 @@ import { objCheck } from '../../components/module/objCheck';
 
 import '../../styles/layouts/profiles/new.scss';
 
-function New(props){
+function New(){
     const [formData,setFormData] = useState({
         intro : '',
         country : '',

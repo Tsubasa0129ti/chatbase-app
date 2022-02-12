@@ -7,7 +7,7 @@ import { faSms , faUserPlus , faUserLock } from "@fortawesome/free-solid-svg-ico
 
 import '../../styles/layouts/users/main.scss';
 
-function Index(props){
+function Index(){
     const [message,setMessage] = useState('');
     const location = useLocation();
     const history = useHistory();

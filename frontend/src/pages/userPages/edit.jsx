@@ -11,7 +11,7 @@ import { faPen } from "@fortawesome/free-solid-svg-icons";
 
 import '../../styles/layouts/users/edit.scss';
 
-function Edit(props){
+function Edit(){
     const [formData,setFormData] = useState({
         first : '',
         last : ''

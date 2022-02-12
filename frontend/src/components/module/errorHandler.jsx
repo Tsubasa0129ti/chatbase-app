@@ -1,6 +1,4 @@
-import {useHistory} from 'react-router-dom';
-
-//基礎処理 ここに関しては問題なく動作しているが、その他の処理に関してはいまいち　エラーの処理の方法を見直す必要があり、app.jsの修正をした。
+//基礎処理
 export function HandleError(res){
     if(!res.ok){
         console.error('res.ok:',res.ok);
@@ -14,17 +12,6 @@ export function HandleError(res){
     }
     return res.json();
 };
-
-
-//成功時の処理
-export function OnLoggedIn(obj){
-    const history = useHistory();
-    console.log('onLoggedIn')
-    history.push({
-        pathname : '/users',
-        state : {message : 'You are already authenticated!'}
-    });
-}
 
 //失敗時の処理
 export function Code303(err,history) {

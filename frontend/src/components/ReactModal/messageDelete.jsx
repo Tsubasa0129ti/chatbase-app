@@ -8,7 +8,7 @@ import '../../styles/components/ReactModal/messageDelete.scss';
 const ENDPOINT = 'http://localhost:3001';
 const socketIO = socketIOClient(ENDPOINT);
 
-function MessageDelete(props){
+function MessageDelete(){
     const {state,dispatch} = useContext(DeleteStore);
     const location = useLocation();
 

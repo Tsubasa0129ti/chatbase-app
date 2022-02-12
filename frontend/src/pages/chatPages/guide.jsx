@@ -1,8 +1,6 @@
 import {useState,useEffect} from 'react';
 
 function Guide(props){
-    const [message,setMessage] = useState('');
-
     useEffect(() => {
         console.log('pass');
     },[]);

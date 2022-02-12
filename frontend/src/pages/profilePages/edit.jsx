@@ -11,7 +11,7 @@ import {objCheck} from '../../components/module/objCheck';
 
 import '../../styles/layouts/profiles/edit.scss';
 
-function Edit(props){
+function Edit(){
     const [email,setEmail] = useState('');
     const [formData,setFormData] = useState({
         country : '',

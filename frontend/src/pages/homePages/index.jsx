@@ -1,32 +1,26 @@
-import React from 'react';
+import React,{useState,useEffect} from 'react';
+import {useLocation} from 'react-router-dom';
 import Header from '../../components/block/header';
 
-class Home extends React.Component{
-    constructor(props){
-        super(props);
-        this.state = {
-            message : ''
-        };
-    }
+function Home(){
+    const [message,setMessage] = useState('');
+    const location = useLocation();
 
-    componentDidMount(){
-        if(this.props.location.state){
-            this.setState({
-                message : this.props.location.state.message
-            });
+    useEffect(() => {
+        if(location.state){
+            setMessage(location.state.message);
         }
-    }
+    },[]);
 
-    render(){
-        return(
+    return(
+        <div>
+            <Header loggedIn={null} />
             <div>
-                <Header message={this.state.message} loggedIn={null} />
-                <div>
-                    <h2>Page</h2>
-                </div>
+                <h2>Page</h2>
+                <h3>{message}</h3>
             </div>
-        )
-    }
+        </div>
+    )
 }
 
 export default Home;

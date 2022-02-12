@@ -11,7 +11,7 @@ import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
 import '../../styles/layouts/users/new.scss';
 
 
-function New(props){
+function New(){
     const [message,setMessage] = useState('');
     const [formData,setFormData] = useState({
         first : '',

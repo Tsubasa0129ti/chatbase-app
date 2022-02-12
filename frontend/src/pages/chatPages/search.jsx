@@ -8,7 +8,7 @@ import Pagination from '../../components/atoms/pagination';
 import {HandleError,Code401,Code500} from '../../components/module/errorHandler';
 import {AddChannelStore} from '../../components/module/store';
 
-function Search(props){
+function Search(){
     const [count,setCount] = useState('');
     const [channel,setChannel] = useState([]);
 

@@ -1,4 +1,4 @@
-import React,{useState,useEffect,useContext} from 'react';
+import {useState,useEffect,useContext} from 'react';
 
 import ChatPopup from '../atoms/chatPopup';
 import {mouseEnter,mouseLeave} from './mouseMove';

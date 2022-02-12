@@ -9,7 +9,7 @@ import { AddChannelStore } from '../../components/module/store';
 
 import {HandleError,Code401,Code500} from '../../components/module/errorHandler';
 
-function ChatPage(props){
+function ChatPage(){
     const [count,setCount] = useState('');
     const [channel,setChannel] = useState([]);
 

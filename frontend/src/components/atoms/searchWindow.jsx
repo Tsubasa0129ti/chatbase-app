@@ -6,7 +6,7 @@ import {faSearch} from '@fortawesome/free-solid-svg-icons';
 
 import '../../styles/components/atoms/searchWindow.scss';
  
-function SearchWindow(props){
+function SearchWindow(){
     const [q,setQ] = useState('');
     const history = useHistory();
 
@@ -38,5 +38,3 @@ function SearchWindow(props){
 }
 
 export default SearchWindow;
-
-//検索時にurlの値は変わるがリダイレクト？というかリロードを行なっていないため、画面の切り替えが実行されない

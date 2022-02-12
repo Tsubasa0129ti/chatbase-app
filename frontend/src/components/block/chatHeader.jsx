@@ -6,7 +6,7 @@ import SearchWindow from '../atoms/searchWindow';
 
 import '../../styles/components/block/chatHeader.scss';
 
-function ChatHeader(props){
+function ChatHeader(){
     return(
         <div className='chat-header'>
             <div className='header-title'>

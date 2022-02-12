@@ -1,4 +1,4 @@
-import React, { useState,useEffect, useContext} from 'react';
+import { useState,useEffect, useContext} from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import socketIOClient from 'socket.io-client';
 import uuid from 'react-uuid';
@@ -15,7 +15,7 @@ import {HandleError,Code401,Code500} from '../../components/module/errorHandler'
 const ENDPOINT = 'http://localhost:3001';
 const socketIO = socketIOClient(ENDPOINT);
 
-function Channel(props){
+function Channel(){
     const [userId,setUserId] = useState(''); //これはsessionが適用され次第削除したい。
     const [username,setUsername] = useState(''); //同様
     const [text,setText] = useState('');
