@@ -1,4 +1,4 @@
-import {useState,useEffect} from 'react';
+import {useState,useEffect, useContext} from 'react';
 import { useHistory,useLocation } from 'react-router';
 import queryString from 'query-string';
 
@@ -6,11 +6,13 @@ import ChatHeader from '../../components/block/chatHeader';
 import AddChannel from '../../components/ReactModal/addChannel';
 import Pagination from '../../components/atoms/pagination';
 import {HandleError,Code401,Code500} from '../../components/module/errorHandler';
+import {AddChannelStore} from '../../components/module/store';
 
 function Search(props){
     const [count,setCount] = useState('');
     const [channel,setChannel] = useState([]);
-    const [show,setShow] = useState(false);
+
+    const {state,dispatch} = useContext(AddChannelStore);
 
     const history  = useHistory();
     const location = useLocation();
@@ -52,12 +54,7 @@ function Search(props){
 
     const popup = (e) => {
         e.preventDefault();
-        setShow(true);
-    }
-
-    const cancel = (e) => {
-        e.preventDefault();
-        setShow(false);
+        dispatch({type : 'popup'})
     }
 
     if(!channel){
@@ -71,7 +68,7 @@ function Search(props){
                     <p>チャンネルが見つかりません。</p>
                     <p>検索し直してください。</p>
                     <a href="/" onClick={popup}>+</a>
-                    <AddChannel show={show} cancel={cancel} />
+                    <AddChannel />
                 </div>
             )
         }else{
@@ -84,7 +81,7 @@ function Search(props){
                         <div className='paging'></div>
                     </div>
                     <a href="/" onClick={popup}>+</a>
-                    <AddChannel show={show} cancel={cancel} />
+                    <AddChannel />
                     <Pagination pageCount={Math.ceil(count/5)} />
                 </div>
             )

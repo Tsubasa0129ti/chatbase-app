@@ -1,17 +1,19 @@
-import {useState,useEffect} from 'react';
+import {useState,useEffect,useContext} from 'react';
 import {useHistory,useLocation} from 'react-router';
 import queryString from 'query-string';
 
 import ChatHeader from '../../components/block/chatHeader';
 import AddChannel from '../../components/ReactModal/addChannel';
 import Pagination from '../../components/atoms/pagination';
+import { AddChannelStore } from '../../components/module/store';
 
 import {HandleError,Code401,Code500} from '../../components/module/errorHandler';
 
 function ChatPage(props){
     const [count,setCount] = useState('');
     const [channel,setChannel] = useState([]);
-    const [show,setShow] = useState(false);
+
+    const {state,dispatch} = useContext(AddChannelStore);
 
     const history = useHistory();
     const location = useLocation();
@@ -37,12 +39,7 @@ function ChatPage(props){
 
     const popup = (e) => {
         e.preventDefault();
-        setShow(true);
-    };
-
-    const cancel = (e) => {
-        e.preventDefault();
-        setShow(false);
+        dispatch({type : 'popup'});
     };
 
     const Content = (element) => {
@@ -71,7 +68,7 @@ function ChatPage(props){
                     <p>チャンネルが存在しません。</p>
                     <p>作成ページより、チャンネルの作成をしてください。</p>
                     <a href="/" onClick={popup}>+</a>
-                    <AddChannel show={show} cancel={cancel} />
+                    <AddChannel />
                 </div>
             )
         }else{
@@ -84,7 +81,7 @@ function ChatPage(props){
                         <div className='paging'></div>
                     </div>
                     <a href="/" onClick={popup}>+</a>
-                    <AddChannel show={show} cancel={cancel} />
+                    <AddChannel />
                     <Pagination pageCount={Math.ceil(count/5)} />
                 </div>
             )
@@ -93,4 +90,3 @@ function ChatPage(props){
 }
 
 export default ChatPage;
-//後は、ページングの適用とaddChannelの適用か

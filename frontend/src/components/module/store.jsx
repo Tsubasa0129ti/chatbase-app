@@ -1,6 +1,5 @@
 import { useReducer,createContext } from "react";
-import {reducer_deleteModal,reducer_profileModal} from "./reducer";
-
+import {reducer_deleteModal,reducer_profileModal,reducer_addChannelModal} from "./reducer";
 
 const deleteState = {
     show : false,
@@ -28,4 +27,16 @@ const ProfileProvider = ({children}) => { //storeに関しては再利用可能�
     return <ProfileStore.Provider value={{state,dispatch}}>{children}</ProfileStore.Provider>
 }
 
-export {DeleteStore,DeleteProvider,ProfileStore,ProfileProvider};
+
+const AddChannelStore = createContext();
+
+const addChannelState = {
+    show : false
+}
+
+const AddChannelProvider = ({children}) => {
+    const [state,dispatch] = useReducer(reducer_addChannelModal,addChannelState);
+    return <AddChannelStore.Provider value={{state,dispatch}}>{children}</AddChannelStore.Provider>
+}
+
+export {DeleteStore,DeleteProvider,ProfileStore,ProfileProvider,AddChannelStore,AddChannelProvider};

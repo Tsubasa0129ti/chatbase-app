@@ -1,11 +1,12 @@
-import {useState} from 'react';
+import {useState,useContext} from 'react';
 import {useHistory} from 'react-router-dom';
 import {HandleError,Code401,Code500,AddChannelValidation} from '../module/errorHandler';
 import {isLength} from '../../components/module/validation';
+import {AddChannelStore} from '../../components/module/store';
 
 import '../../styles/components/ReactModal/addChannel.scss';
 
-function AddChannel(props) {
+function AddChannel() {
     const [newChannel,setNewChannel] = useState({
         channelName : '',
         channelDetail : ''
@@ -15,6 +16,7 @@ function AddChannel(props) {
         channelName_error : '',
         channelDetail_error : ''
     });
+    const {state,dispatch} = useContext(AddChannelStore);
     const history = useHistory();
 
     const handleChange = (e) => {
@@ -63,6 +65,7 @@ function AddChannel(props) {
                 pathname : obj.redirectPath,
                 state : {message : 'チャンネル作成に成功しました。'}
             });
+            dispatch({type:'close'});
         }).catch((err) => {
             if(err.status === 401){
                 Code401(err,history);
@@ -79,7 +82,15 @@ function AddChannel(props) {
         });
     }
 
-    if(!props.show){
+    const Cancel = (e) => {
+        e.preventDefault();
+        setMessage('');
+        setValidation('');
+
+        dispatch({type : 'close'});
+    }
+
+    if(!state.show){
         return null;
     }else{
         return (
@@ -91,7 +102,7 @@ function AddChannel(props) {
                         <p>特定のトピックに基づいてチャンネルを作ると良いでしょう。</p>
                     </div>
                     <div className='close'>
-                        <a href="/" className='close_button' onClick={props.cancel}>X</a>
+                        <a href="/" className='close_button' onClick={Cancel}>X</a>
                     </div>
                     <div className='error'>
                         <p>{message}</p>
@@ -117,8 +128,3 @@ function AddChannel(props) {
 }
 
 export default AddChannel;
-
-//不足点
-/* 
-②cancelの実行時にエラーを削除する。もしくはpopup時にでも構わない
-*/
