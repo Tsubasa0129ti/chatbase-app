@@ -1,4 +1,4 @@
-import {useState,useEffect} from 'react';
+import {useState,useEffect,useContext} from 'react';
 import { useHistory } from 'react-router';
 
 import Header from '../../components/block/header';
@@ -7,17 +7,17 @@ import {HandleError,Code401,Code500} from '../../components/module/errorHandler'
 import AccountDelete from '../../components/ReactModal/accountDelete';
 import ProfileComment from '../../components/atoms/profileComment';
 
+import { UserDeleteStore } from '../../components/module/store';
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCog , faAddressCard , faEdit , faTrashAlt ,faIdCard ,faUser , faChartLine , faBlog} from "@fortawesome/free-solid-svg-icons";
 import {faComments} from '@fortawesome/free-regular-svg-icons'
 
 import '../../styles/layouts/users/mypage.scss';
 
-function Mypage(props){
+function Mypage(){
     const [user,setUser] = useState({});
-    const [profile,setProfile] = useState(false);
-    const [show,setShow] = useState(false);
-
+    const {dispatch} = useContext(UserDeleteStore);
     const history = useHistory();
 
     useEffect(() => {
@@ -25,9 +25,6 @@ function Mypage(props){
         .then(HandleError)
         .then((obj) => {
             setUser(obj.user);
-            if(obj.profile){
-                setProfile(true);
-            }
         }).catch((err) => {
             if(err.status === 401){
                 Code401(err,history);
@@ -37,14 +34,26 @@ function Mypage(props){
         });
     },[]);
 
-    const cancel = () => {
-        setShow(false);
-    };
+    const popup = (e) => {
+        e.preventDefault();
+        dispatch({type:'popup'});
+    }
+
+    const menu = (e) => { //この取得方法は大幅に変更の可能性あり。
+        e.preventDefault();
+
+        var popup = e.currentTarget.nextElementSibling;
+        if(popup.className === 'prevPopup'){
+            popup.classList.replace('prevPopup','popup-menu');
+        }else{
+            popup.classList.replace('popup-menu','prevPopup');
+        }
+    }
 
     if(!user.name){
         return null;
     }else{
-        if(!profile) {
+        if(!user.profile) {
             return(
                 <div className='mypage'>
                     <Header loggedIn={true} />
@@ -52,36 +61,12 @@ function Mypage(props){
                         <div className='mypage-top'>
                             <p className='mypage-title'>My Page</p>
                             <div className='mypage-menu'>
-                                <button 
-                                    className='menu-button'
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        var popup = e.currentTarget.nextElementSibling;
-                                        if(popup.className === 'prevPopup'){
-                                            popup.classList.replace('prevPopup','popup-menu');
-                                        }else{
-                                            popup.classList.replace('popup-menu','prevPopup');
-                                        }
-                                    }}
-                                >
+                                <button className='menu-button' onClick={menu}>
                                     <FontAwesomeIcon icon={faCog} size='3x' className='cog-icon' />
                                 </button>
                                 <div className='prevPopup'>
-                                    <button 
-                                        className='toEdit'
-                                        onClick={() => history.push('/users/mypage/edit')}
-                                    >
-                                        <FontAwesomeIcon icon={faEdit} /> Edit Account
-                                    </button>
-                                    <button
-                                        className='toDelete'
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            setShow(true);
-                                        } }
-                                    >
-                                        <FontAwesomeIcon icon={faTrashAlt} /> Delete Account
-                                    </button>
+                                    <a href="/users/mypage/edit" className='toEdit'><FontAwesomeIcon icon={faEdit} /> Edit Account</a>
+                                    <a href="/" className='toDelete' onClick={popup}><FontAwesomeIcon icon={faTrashAlt} /> Delete Account</a>
                                 </div>
                             </div>
                             
@@ -102,20 +87,10 @@ function Mypage(props){
                         </div>
                         <div className='toCreateProfile'>
                             <p className='profileDesc'>プロフィールを作成すると、自身の自己紹介などを設定することができます。</p>
-                            <button
-                                className='toProfile' 
-                                onClick={
-                                    (e) => {
-                                        e.preventDefault();
-                                        history.push('/profile/new');
-                                    }
-                                }
-                            >
-                                <FontAwesomeIcon icon={faAddressCard} /> Create Profile
-                            </button>
+                            <a href="/profile/new" className='toProfile' ><FontAwesomeIcon icon={faAddressCard} /> Create Profile</a>
                         </div>
                     </div>
-                    <AccountDelete show={show} onCancelCallback={() => {cancel()}} />
+                    <AccountDelete />
                 </div>
             )
         }else{
@@ -133,13 +108,7 @@ function Mypage(props){
                                 </div>
                                 <a href="/users/mypage/edit"><FontAwesomeIcon icon={faEdit} /> Edit Account</a>
                                 <a href="/profile/edit"><FontAwesomeIcon icon={faIdCard} /> Edit Profile</a>
-                                <a 
-                                    href='/' 
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        setShow(true);
-                                    }}
-                                >
+                                <a href='/' onClick={popup}>
                                     <FontAwesomeIcon icon={faTrashAlt} /> Delete
                                 </a>
                             </div>
@@ -201,7 +170,7 @@ function Mypage(props){
                             </div>
                         </div>
                     </div>
-                    <AccountDelete show={show} onCancelCallback={() => {cancel()}} />
+                    <AccountDelete />
                 </div>
             )
         }

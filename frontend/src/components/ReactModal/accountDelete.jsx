@@ -1,12 +1,15 @@
+import {useContext} from 'react';
 import { useHistory } from 'react-router-dom';
 import { HandleError, Code401, Code500 } from '../module/errorHandler';
+import { UserDeleteStore } from '../module/store';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faExclamationTriangle} from "@fortawesome/free-solid-svg-icons";
 
 import '../../styles/components/ReactModal/accountDelete.scss';
 
-function AccountDelete(props) {
+function AccountDelete() {
+    const {state,dispatch} = useContext(UserDeleteStore);
     const history = useHistory();
 
     const deleteEvent = (e) => {
@@ -34,7 +37,12 @@ function AccountDelete(props) {
         });
     }
 
-    if(!props.show){
+    const Cancel = (e) => {
+        e.preventDefault();
+        dispatch({type:'close'});
+    }
+
+    if(!state.show){
         return null;
     }else{
         return(
@@ -43,7 +51,7 @@ function AccountDelete(props) {
                     <FontAwesomeIcon icon={faExclamationTriangle} size='3x' className='warn-icon' />
                     <p className='delete'>Delete Account</p>
                     <p className='delete-message'>*you will permanently lose your profile*</p>
-                    <button className='cancel-button' onClick={props.onCancelCallback} >Cancel</button>
+                    <button className='cancel-button' onClick={Cancel} >Cancel</button>
                     <button className='delete-button' onClick={deleteEvent} >Delete</button>
                 </div>
             </div>
@@ -52,4 +60,3 @@ function AccountDelete(props) {
 }
 
 export default AccountDelete;
-//acountDeleteでイベントの起動は実行することにした。ただし、modalの出現に関しては、上位のコンポーネントで実施する事にした。（修正する可能性はあり）

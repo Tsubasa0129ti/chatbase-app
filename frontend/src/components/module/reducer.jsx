@@ -60,5 +60,20 @@ const reducer_addChannelModal = (state={},action) => {
             return state
     }
 }
+
+const reducer_userDeleteModal = (state={},action) => {
+    switch(action.type){
+        case 'popup':
+            return {
+                ...state,
+                show : true
+            }
+        case 'close':
+            return {
+                ...state,
+                show : false
+            }
+    }
+}
  
-export {reducer_deleteModal,reducer_profileModal,reducer_addChannelModal};
+export {reducer_deleteModal,reducer_profileModal,reducer_addChannelModal,reducer_userDeleteModal};
