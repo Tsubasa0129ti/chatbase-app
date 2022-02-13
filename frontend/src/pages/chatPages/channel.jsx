@@ -84,7 +84,7 @@ function Channel(){
                 socketIO.once("accepter",(data) => {
                     var newSocket = {
                         userId : data.userId,
-                        username : data.user,
+                        username : data.username,
                         date : data.date,
                         time : data.time,
                         text : data.text,

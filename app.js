@@ -4,7 +4,7 @@ const express = require("express"),
     helmet = require("helmet"),
     path = require("path"),
     logger = require("morgan"),  
-    session = require("express-session"),　
+    session = require("express-session"),
     cookieParser = require("cookie-parser"),
     bodyParser = require("body-parser"),
     uuid = require("uuid"), 
@@ -32,7 +32,7 @@ app.set(express.static(path.join(__dirname,"views")));
 app.use(express.static("public"))
 
 app.use(logger("dev"));
-app.use(express.json());　//下記２行
+app.use(express.json());
 app.use(express.urlencoded({extended:false}));
 
 app.use(bodyParser.urlencoded({extended: true}))
@@ -85,7 +85,7 @@ mongoose.connect(
 mongoose.set("useCreateIndex",true);
 const db = mongoose.connection;
 db.once("open",() => {
-    console.log("DB接続完了！");
+    console.log("DB接続完了");
 });
 
 /* passportの設定 */
@@ -141,204 +141,133 @@ io.on("connection",(socket) => {
     console.log(`userId : ${userId} && username : ${username}`); */
 
     //メッセージの作成処理
-    socket.on("message",(message) => {
-        //ルームへの入室
-        if(!room){
-            var room = message.id;
-            socket.join(room);
-            console.log('入室')
-        }
-
-        //データベースの保管層
-        var newDate = message.date;
-        var newMessage = new Message({
-            userId : message.userId,
-            username : message.username,
-            date : message.date,
-            text : message.text,
-            time : message.time,
-            customId : message.customId
-        });
-
-        Chat.findById(message.id)
-        .then(chat => {
-            var latest = chat.chatData.length;
-            if(latest !== 0) {
-                var latestDate = chat.chatData[latest-1].date;
+    socket.on("message",async(message) => {
+        try {
+            //ルームへの入室
+            if(!room){
+                var room = message.id;
+                socket.join(room);
+                console.log('入室')
+            }
+            
+            var obj = {
+                userId : message.userId,
+                username : message.username,
+                date : message.date,
+                text : message.text,
+                time : message.time,
+                customId : message.customId
             }
 
-            if(latest === 0 || newDate!==latestDate){
-                //パターン1
-                Message.create(newMessage)
-                .then(msg => {
-                    Chat.findByIdAndUpdate(message.id,{
-                        $push : {
-                            chatData : {
-                                date : message.date,
-                                messages : msg._id
-                            }
-                        }
-                    }).then(() => {
-                        console.log("新しい日付、メッセージの作成に成功しました。");
-                        io.to(room).emit("accepter",{
-                            userId : message.userId,
-                            user : message.username,
-                            time : message.time,
+            var newMessage = new Message(obj);//万能型messageの作成
+
+            var chat = await Chat.findById(message.id);
+            var newMsg = await Message.create(newMessage);
+
+            var leng = chat.chatData.length;
+
+            if(leng !== 0) {
+                var latestDate = chat.chatData.slice(-1)[0].date;
+            }
+
+            if(leng === 0 || obj.date!==latestDate){
+                var promise = await Chat.findByIdAndUpdate(message.id,{
+                    $push : {
+                        chatData : {
                             date : message.date,
-                            text : message.text,
-                            customId : message.customId,
-                        });
-                    }).catch((err) => {
-                        console.log(`エラー：${err.message}`);
-                    });
-                }).catch(err => {
-                    console.log(`エラー2：${err.message}`);
-                });
-            }else{
-                Message.create(newMessage)
-                .then(msg => {
-                    Chat.update(
-                        {_id : message.id,"chatData.date":latestDate},
-                        {
-                            $push : {
-                                "chatData.$.messages" : msg._id
-                            }
+                            messages : newMsg._id
                         }
-                    ).then(() => {
-                        console.log("メッセージの作成に成功しました。");
-                        io.to(room).emit("accepter",{
-                            userId : message.userId,
-                            user : message.username,
-                            time : message.time,
-                            text : message.text,
-                            customId : message.customId,
-                        });
-                    }).catch((err) => {
-                        console.log(`エラー3：${err.message}`);
-                    });
-                }).catch(err => {
-                    console.log(`エラー4：${err.message}`);
-                });
+                    }
+                }).exec();
+                io.to(room).emit("accepter",obj);
+            }else{
+                var promise = await Chat.updateOne(
+                    {_id : message.id,"chatData.date":latestDate},
+                    {
+                        $push : {
+                            "chatData.$.messages" : newMsg._id
+                        }
+                    }
+                ).exec();
+                delete obj.date;
+                io.to(room).emit("accepter",obj);
             }
-        }).catch(err => {
-            console.log(`エラー5：${err.message}`);
-        });
+        }catch(err){
+            console.log(err.message);//next関数がないので、エラー処理が不十分になってしまっている。sessionと同時に使用可能にする。
+        }
     });
 
-    //メッセージの編集処理 エラー処理については後ほどやる
-    socket.on("update",(message) => {
-        //ルームへの入室
-        if(!room){
-            var room = message.chatId;
-            socket.join(room);
-            console.log(`${message.userId}は、${message.chatId}に入室しました。`);
-        }
-
-        Message.findOne({customId : message.customId},function(err,msg) {
-            if(err || msg === null){
-                console.log(err);
+    //メッセージの編集処理
+    socket.on("update",async(message) => {
+        try{
+            if(!room){
+                var room = message.chatId;
+                socket.join(room);
+                console.log(`${message.userId}は、${message.chatId}に入室しました。`);
             }
-            console.log(msg)
-            Message.update(
+
+            var promise = await Message.updateOne(
                 {customId : message.customId},
                 {
                     $set : {
                         text : message.newMsg
                     }
                 }
-            ).then(msg => {
-                io.to(room).emit("update",{
-                    text : message.newMsg
-                });
-                console.log("OK");
-            }).catch(err => {
-                console.log(err.message);
-            });    
-        }); 
+            ).exec();
+            io.to(room).emit("update",{
+                text : message.newMsg
+            });
+        }catch(err){
+            console.log(err.message);
+        }
     });
 
-    //メッセージの削除処理　これに関しては、Chatのデータベースの一つの連結の解除も必要（データベース二つに対応）
-    socket.on("delete",(message) => {
-        //ルームへの入室
-        if(!room){
-            var room = message.chatId;
-            socket.join(room);
-        }
+    //メッセージの削除処理
+    socket.on("delete",async(message) => {
 
-        //削除機能　残りは配列の削除の場所のみ
-        Message.findOne({customId : message.customId})
-        .then(msg => {
-            var msgId = msg._id;
-            console.log(`msgId : ${msgId}`);
-            var msgDate = msg.date;
-            Chat.findOne({_id : message.chatId})
-            .then(chat => {
-                console.log(`chat :::::${chat}`);
-                var leng = chat.chatData.length;
-                for(var i=0;i<leng;i++){
-                    if(chat.chatData[i].date === msgDate){
-                        var msgLeng = chat.chatData[i].messages.length;
-                        if(msgLeng <= 1){
-                            //この時配列をそのまま削除する
-                            console.log("結果1件未満");
-                            Chat.updateOne(
-                                {_id : message.chatId},
-                                {
-                                    $pull : {
-                                        chatData : {
-                                            date : msgDate
-                                        }
+        try {
+            if(!room){
+                var room = message.chatId;
+                socket.join(room);
+            }
+
+            var msg = await Message.findOne({customId:message.customId}).exec();
+            var chat = await Chat.findById(message.chatId).exec();
+
+            chat.chatData.forEach(async(element) => {
+                if(element.date === msg.date){
+                    var leng = element.messages.length;
+
+                    if(leng === 1){ //書き込みが一つしかない場合
+                        console.log('書き込み件数一件');
+                        var promise = await Chat.updateOne(
+                            {_id : message.chatId},
+                            {
+                                $pull : {
+                                    chatData : {
+                                        date : msg.date
                                     }
                                 }
-                            ).then(chat => {
-                                console.log(`chatResult : ${chat}`);
-                                Message.findByIdAndRemove(msgId,function(err,result){
-                                    if(err){
-                                        console.log(err.message);
-                                    }
-                                    io.to(room).emit("delete",{
-                                        confirm : "dateDeleted"
-                                    });
-                                    console.log("削除に成功");
-                                });
-                            }).catch(err => {
-                                console.log(err.message);
-                            })
-                        }else if(msgLeng >= 2){
-                            //配列の中身のみ削除する
-                            console.log("結果2件以上");
-                            Chat.update(
-                                {_id : message.chatId,"chatData.date" : msgDate},
-                                {
-                                    $pull : {
-                                        "chatData.$.messages" : msgId
-                                    }
+                            }
+                        ).exec();
+                    }else{
+                        console.log(`書き込み件数${leng}件`);
+                        var promise = await Chat.updateOne(
+                            {_id : message.chatId,"chatData.date" : msg.date},
+                            {
+                                $pull : {
+                                    "chatData.$.messages" : msg._id
                                 }
-                            ).then(chat => {
-                                Message.findByIdAndRemove(msgId,function(err,result){
-                                    if(err){
-                                        console.log(err.message);
-                                    }
-                                    io.to(room).emit("delete",{
-                                        confirm : 'deleted'
-                                    });
-                                    console.log("削除に成功");
-                                });
-                            }).catch(err => {
-                                console.log(err.message);
-                            });
-                        }else{
-                            //エラー処理
-                        }
+                            }
+                        ).exec(); //ここでは従属されているidが消されるはず
                     }
+                    var promiseDel = await Message.findByIdAndDelete(msg._id).exec();
+                    io.to(room).emit("delete");
                 }
-            }).catch(err => {
-                console.log(err.message);
             });
-        }).catch(err => {
-            console.log(err.message);
-        });
-
+        }catch(err){
+            console.log(err);
+        }
     });
 
     //ルームの退出処理が不明瞭　つまり、一つのルームに入った後に他のルームに切断せずに移動することができるのではないかということ　→この場合、　socketが複数のルームへと適用されるかも
