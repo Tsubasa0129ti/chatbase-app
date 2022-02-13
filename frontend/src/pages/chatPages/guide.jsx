@@ -1,4 +1,4 @@
-import {useState,useEffect} from 'react';
+import {useEffect} from 'react';
 
 function Guide(props){
     useEffect(() => {

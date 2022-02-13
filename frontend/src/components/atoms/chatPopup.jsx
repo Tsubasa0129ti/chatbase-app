@@ -11,7 +11,7 @@ function ChatPopup(props){
     const el = useRef(null);
     const box = useRef(null);
 
-    const {state,dispatch} = useContext(DeleteStore);
+    const {dispatch} = useContext(DeleteStore);
 
     const reaction = (e) => {
         e.preventDefault();
@@ -42,15 +42,16 @@ function ChatPopup(props){
 
         var target = e.currentTarget;
         var block = target.parentNode.parentNode.parentNode.parentNode;
+        var date;
 
         if(block.closest('.database_message')){
-            var date = block.parentNode.firstChild.textContent;
+            date = block.parentNode.firstChild.textContent;
         }else{
             if(block.previousElementSibling){
-                var date = block.previousElementSibling.textContent;
+                date = block.previousElementSibling.textContent;
             }else{
                 var socketMessage = block.closest('.socket_message');
-                var date = socketMessage.previousElementSibling.lastChild.firstChild.textContent;
+                date = socketMessage.previousElementSibling.lastChild.firstChild.textContent;
             }
         }
 
@@ -71,9 +72,10 @@ function ChatPopup(props){
         if(current){
             var parent = current.parentNode;
             var userId = parent.children[0].dataset.user;
+            var popup;
 
             if(props.userId === userId){
-                var popup = (
+                popup = (
                     <div className='popup_box'>
                         <div className='reaction_button'>
                             <a href="/" onClick={reaction}><FontAwesomeIcon icon={faSmile} /></a>
@@ -91,7 +93,7 @@ function ChatPopup(props){
                     </div>
                 )
             }else{
-                var popup = (
+                popup = (
                     <div className='popup_box'>
                         <div className='reaction_button'>
                             <a href="/" onClick={reaction}><FontAwesomeIcon icon={faSmile} /></a>

@@ -22,9 +22,8 @@ function Channel(){
     const [channel,setChannel] = useState({});
     const [chatData,setChatData] = useState([]); //chatのメッセージ管理を行
     const [socket,setSocket] = useState(''); //socketのメッセージ管理を行う
-    const [message,setMessage] = useState(''); //dispatchみたいな形でエラーはほとんど外部から受け取る形に変更するかもしれない。出来次第消す。
 
-    const {state,dispatch} = useContext(ProfileStore); //stat.messageでuserProfileのユーザーがいない場合のエラーを取得できるようにした。
+    const {state} = useContext(ProfileStore); //stat.messageでuserProfileのユーザーがいない場合のエラーを取得できるようにした。
 
     const history = useHistory();
     const location = useLocation();
@@ -110,7 +109,7 @@ function Channel(){
                     <p>チャンネル名 : {channel.channelName}</p>
                     <p>チャンネル詳細 : {channel.channelDetail}</p>
                     <p>作成者 : {channel.createdBy}</p>
-                    <p>{message || state.message}</p>
+                    <p>{state.message}</p>
                 </div>
                 <DatabaseMessage 
                     chatData={chatData} 

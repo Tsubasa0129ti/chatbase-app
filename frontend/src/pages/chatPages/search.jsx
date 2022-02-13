@@ -12,7 +12,7 @@ function Search(){
     const [count,setCount] = useState('');
     const [channel,setChannel] = useState([]);
 
-    const {state,dispatch} = useContext(AddChannelStore);
+    const {dispatch} = useContext(AddChannelStore);
 
     const history  = useHistory();
     const location = useLocation();

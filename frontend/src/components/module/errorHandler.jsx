@@ -39,7 +39,6 @@ export function Code500(err,history){
 
 //若干冗長な気がするので、ここは最善主が見つかれば修正をする予定
 export function UserValidation(err){
-    console.log(error);
     var params = [];
     var error = [];
 
@@ -86,6 +85,7 @@ export function ProfileValidation(err){
                 break;
             case 'site' :
                 error[1] = e.msg;
+                break;
             default :
                 console.log('');
         }

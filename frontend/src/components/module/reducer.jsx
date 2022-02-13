@@ -73,6 +73,8 @@ const reducer_userDeleteModal = (state={},action) => {
                 ...state,
                 show : false
             }
+        default :
+            return state
     }
 }
  

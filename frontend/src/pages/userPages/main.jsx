@@ -16,7 +16,7 @@ function Index(){
         if(location.state){
             setMessage(location.state.message);
         }
-    });
+    },[location.state]);
 
     return(
         <div className='main'>

@@ -6,7 +6,7 @@ import {ProfileStore} from '../module/store';
 
 function DatabaseMessage(props){
     const [item,setItem] = useState("");
-    const {state,dispatch} = useContext(ProfileStore);
+    const {dispatch} = useContext(ProfileStore);
 
     const profileShow = (e) => {
         e.preventDefault();

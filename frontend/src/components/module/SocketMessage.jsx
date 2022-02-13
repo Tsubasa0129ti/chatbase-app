@@ -6,7 +6,7 @@ import {ProfileStore} from './store';
 
 function SocketMessage(props){
     const [item,setItem] = useState([]);
-    const {state,dispatch} = useContext(ProfileStore);
+    const {dispatch} = useContext(ProfileStore);
 
     const profileShow = (e) => {
         e.preventDefault();
@@ -41,14 +41,15 @@ function SocketMessage(props){
         var socket = props.socket;
         if(socket){
             socket.forEach((message) => {
+                var newItem;
                 if(!message.date){
-                    var newItem = (
+                    newItem = (
                         <div>
                             {Content(message)}
                         </div>
                     );
                 }else{
-                    var newItem = (
+                    newItem = (
                         <div>
                             <p>{message.date}</p>
                             {Content(message)}
