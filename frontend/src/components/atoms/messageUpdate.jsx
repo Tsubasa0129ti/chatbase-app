@@ -1,14 +1,13 @@
-import {useState,useEffect,useRef} from 'react';
+import {useState,useEffect,useContext,useRef} from 'react';
 import { useLocation } from 'react-router-dom';
-import socketIOClient from 'socket.io-client';
 
-const ENDPOINT = 'http://localhost:3001';
-const socketIO = socketIOClient(ENDPOINT);
+import SocketContext from '../module/socket.io';
 
 function MessageUpdate(props){
     const [value,setValue] = useState('');
     const form = useRef(null);
 
+    const socketIO = useContext(SocketContext);
     const location = useLocation();
 
     useEffect(() => {

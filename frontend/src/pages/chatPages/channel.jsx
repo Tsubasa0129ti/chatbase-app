@@ -1,6 +1,5 @@
 import { useState,useEffect, useContext} from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
-import socketIOClient from 'socket.io-client';
 import uuid from 'react-uuid';
 
 import ChatHeader from '../../components/block/chatHeader'; //ここに関しては、header単体の修正をする。
@@ -11,9 +10,10 @@ import UserProfile from '../../components/ReactModal/userProfile';
 
 import {ProfileStore} from '../../components/module/store'; //ここからstoreのアクセスをする。
 import {HandleError,Code401,Code500} from '../../components/module/errorHandler';
+import SocketContext from '../../components/module/socket.io';
 
-const ENDPOINT = 'http://localhost:3001';
-const socketIO = socketIOClient(ENDPOINT);
+//現状root上にsocketがないため、エンドポイントを設定しても読み取れられることは無くなってしまう。とすると最終的には/chatのルート上にこれを設定すれば余計なロードは減るかもしれない
+//socketの接続場所を作成する。そして、ここにいる限りは接続されるようにする。そこに作成、編集、削除の全ての機能を委ねる。
 
 function Channel(){
     const [userId,setUserId] = useState(''); //これはsessionが適用され次第削除したい。
@@ -28,6 +28,8 @@ function Channel(){
 
     const history = useHistory();
     const location = useLocation();
+
+    const socketIO = useContext(SocketContext); //これをロードすることによって、socketのロード回数を減らすことには成功した。
 
     useEffect(() => {//初期ロード時に読み込むもの
         var path = location.pathname;
@@ -50,6 +52,12 @@ function Channel(){
         });
     },[]);
 
+    useEffect(() => { //ページを変更した際に発生する。
+        const path = location.pathname;
+        const id = path.split('/')[3];
+        socketIO.emit('join',id);
+    },[location.pathname]);
+
     const handleChange = (e) => { //例えば、送信機能を故コンポーネントに委ねてしまうという手段。これを行うと、可読性の向上にはつながると思うが、
         const target = e.target;
         const value = target.value;
@@ -59,18 +67,14 @@ function Channel(){
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
-        //socketの配列を更新する
+
         var date = new Date();
         var dayGetter = ["日","月","火","水","木","金","土"]; 
         var customId = uuid();
-        var path = location.pathname;
-        const chatId = path.split('/')[3];
-
+    
         if(text){
             if(socketIO !== undefined){
                 const message = {
-                    id : chatId,
                     userId : userId,
                     username : username,
                     text : text,
@@ -80,19 +84,6 @@ function Channel(){
                 }
 
                 socketIO.emit('message',message);
-
-                socketIO.once("accepter",(data) => {
-                    var newSocket = {
-                        userId : data.userId,
-                        username : data.username,
-                        date : data.date,
-                        time : data.time,
-                        text : data.text,
-                        customId : data.customId
-                    }
-
-                    setSocket([...socket,newSocket]);
-                });
             }
         }
 
@@ -100,6 +91,28 @@ function Channel(){
         target['text'].value = '';
         setText('');
     }
+
+    useEffect(() => { //これがsocketの内容の変化に応じて取得されるもの
+        socketIO.once("accepter",(data) => {
+            console.log('effect')
+            var newSocket = {
+                userId : data.userId,
+                username : data.username,
+                date : data.date,
+                time : data.time,
+                text : data.text,
+                customId : data.customId
+            }
+    
+            setSocket([...socket,newSocket]);
+        });
+        return () => { //これがクリーンアップ関数の役割を果たす。何をしているのかというとこれ無しであると、、レンダリングのたびに何重にもsetSocketが実行されてしまうが、それを打ち消している。
+            console.log('cleanup')
+            socketIO.off("accepter");
+        }
+    });
+
+    console.log('render')
 
     return(
         <div>

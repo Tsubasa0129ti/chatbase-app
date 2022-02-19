@@ -39,7 +39,7 @@ function ProfileComment(props){
         }
     }
 
-    useEffect(() => {
+    useEffect(() => { //mypageへのアクセス時に毎回読み込まれてしまっている。
         fetch('/api/profile/introUpdate',{
             method : 'PUT',
             headers : {

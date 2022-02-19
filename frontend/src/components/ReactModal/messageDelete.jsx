@@ -1,16 +1,15 @@
 import { useContext } from 'react';
 import {useLocation} from 'react-router-dom'
-import socketIOClient from 'socket.io-client';
 
 import {DeleteStore} from '../module/store';
+import SocketContext from '../../components/module/socket.io';
 import '../../styles/components/ReactModal/messageDelete.scss';
-
-const ENDPOINT = 'http://localhost:3001';
-const socketIO = socketIOClient(ENDPOINT);
 
 function MessageDelete(){
     const {state,dispatch} = useContext(DeleteStore);
     const location = useLocation();
+
+    const socketIO = useContext(SocketContext); //おそらくこれでdeleteもいけるはず。
 
     const Cancel = (e) => {
         e.preventDefault();
