@@ -1,4 +1,4 @@
-module.exports = (io) => { //ここがなぜか接続後3回も読み込まれてしまっている。
+module.exports = (io) => {
     io.on("connection",(socket) => {
         var user_session = socket.request.user;
 
