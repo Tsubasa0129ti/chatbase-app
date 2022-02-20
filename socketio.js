@@ -1,23 +1,25 @@
 module.exports = (io) => { //ここがなぜか接続後3回も読み込まれてしまっている。
     io.on("connection",(socket) => {
-        /* if(socket.request.user) {
-            console.log(`接続済み from ${socket.request.user.email}`); //そっか、これログインしていない時にはサーバーが止まるようになってしまうのか　回避のための手段を講じる必要もあるか
-            console.log(socket.request)
-        } */
-    
+        var user_session = socket.request.user;
+
+        if(user_session){ 
+            var userId = user_session._id;
+            var username = user_session.name.first + ' ' + user_session.name.last;
+        }
+        
         socket.on("join",(id) => {
             socket.join(id);
             console.log(socket.rooms); //同時に稼働していないかもしれないな。色々と検証をする必要性はありそう。
     
-            socket.on("message",async(message) => { //ここでもroomが地続きとなっていなければならない
+            socket.on("message",async(message) => {
                 try {
                     var obj = {
-                        userId : message.userId, //これはsession
-                        username : message.username, //これもsession
+                        userId : userId,
+                        username : username,
                         date : message.date,
                         text : message.text,
                         time : message.time,
-                        customId : message.customId //少なくともこれ要らなくね？
+                        customId : message.customId
                     }
     
                     var newMessage = new Message(obj);
@@ -120,9 +122,14 @@ module.exports = (io) => { //ここがなぜか接続後3回も読み込まれ�
                 }
             });
         });
+
+        socket.on("disconnecting",() => { //こっちの方が下のものよりも若干早く実行される。これら自体がイベントになっているのか
+            console.log(socket.rooms);
+            console.log('disconnecting now');
+        })
         
-        socket.on("disconnect",(room) => { //これに関しては、切断処理を行う（これを前に指定しまうと、送信前に切断されてしまうことに注意）
-            socket.leave(room.id);
+        socket.on("disconnect",(reason) => {
+            console.log(reason);
             console.log("user disconnected");
         }); 
     });

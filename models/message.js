@@ -23,7 +23,7 @@ var messageSchema = new Schema(
             type : String,
             required : true
         },
-        customId : { //これに関しては、使わなければ消す
+        customId : {
             type : String,
             required : true
         }

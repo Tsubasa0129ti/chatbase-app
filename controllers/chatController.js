@@ -105,13 +105,11 @@ module.exports = {
     talk : async(req,res,next) => { //もしセッションからデータの獲得ができるのであれば、コンポーネントで使用しているid以外は不要になるかも
         try{
             var userId = req.user._id;
-            var username = req.user.name.first + ' ' + req.user.name.last;
             var id = req.params.id;
 
             var channel = await Chat.findById(id).populate("chatData.messages").exec();
             res.json({
                 userId : userId,
-                username : username,
                 channel : channel
             });
         }catch(err){

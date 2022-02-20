@@ -3,19 +3,19 @@ import {useState,useEffect,useContext,useRef} from 'react';
 import SocketContext from '../module/socket.io';
 import {getBlock,getSocketBlock} from '../module/socketEvent';
 
-function MessageUpdate(){ //userIDが不要になったので親コンポーネントのuseridの送信も不要になるかもしれない
+function MessageUpdate(){
     const [value,setValue] = useState('');
     const form = useRef(null);
 
     const socketIO = useContext(SocketContext);
 
-    useEffect(() => { //このcurrentは自分が編集できる箇所の下層ブロック
+    useEffect(() => {
         var current = form.current;
         var text = current.parentNode.parentNode.parentNode.children[2].textContent;
         setValue(text);
     },[]);
 
-    const handleChange = (e) => { //これは編集箇所なので、欲しいブロックではないのか
+    const handleChange = (e) => {
         e.preventDefault();
 
         var target = e.target;
@@ -24,7 +24,7 @@ function MessageUpdate(){ //userIDが不要になったので親コンポーネ�
         setValue(value);  
     }
 
-    const Cancel = (e) => { //テキストに関しても、displayを消すので、戻す必要がある。情報が更新されるように設定したい。ここについては、編集者のみに見えるものとする。
+    const Cancel = (e) => {
         e.preventDefault();
 
         var current = form.current;

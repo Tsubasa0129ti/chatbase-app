@@ -6,7 +6,7 @@ import {faSmile,faReply,faEdit,faEraser} from '@fortawesome/free-solid-svg-icons
 import MessageUpdate from './messageUpdate';
 import {DeleteStore} from '../module/store';
 
-function ChatPopup(props){
+function ChatPopup(props){ //props.userIdによる分岐さえなくすことができれば、channelのsetUserIdを消すことができる。
     const [content,setContent] = useState('');
     const el = useRef(null);
     const box = useRef(null);

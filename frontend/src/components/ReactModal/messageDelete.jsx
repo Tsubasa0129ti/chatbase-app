@@ -25,7 +25,7 @@ function MessageDelete(){
 
         socketIO.emit('delete',{customId:customId});
 
-        dispatch({type:'close'}); //windowはここでしか行えないか
+        dispatch({type:'close'});
     }
 
     useEffect(() => {
@@ -80,3 +80,5 @@ function MessageDelete(){
 }
 
 export default MessageDelete;
+
+//たまにエラーが発生してしまうので、そこの点についてもう少しテストをするので、一旦コンソールへの書き込みは残しておく。

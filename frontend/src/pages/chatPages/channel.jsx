@@ -12,12 +12,8 @@ import {ProfileStore} from '../../components/module/store'; //ここからstore�
 import {HandleError,Code401,Code500} from '../../components/module/errorHandler';
 import SocketContext from '../../components/module/socket.io';
 
-//現状root上にsocketがないため、エンドポイントを設定しても読み取れられることは無くなってしまう。とすると最終的には/chatのルート上にこれを設定すれば余計なロードは減るかもしれない
-//socketの接続場所を作成する。そして、ここにいる限りは接続されるようにする。そこに作成、編集、削除の全ての機能を委ねる。
-
 function Channel(){
-    const [userId,setUserId] = useState(''); //これはsessionが適用され次第削除したい。
-    const [username,setUsername] = useState(''); //同様
+    const [userId,setUserId] = useState(''); //これに関してはsessionでの機能以外にもchatPopupの自分のメッセージかどうかの分岐に！
     const [text,setText] = useState('');
     const [channel,setChannel] = useState({});
     const [chatData,setChatData] = useState([]); //chatのメッセージ管理を行
@@ -28,9 +24,9 @@ function Channel(){
     const history = useHistory();
     const location = useLocation();
 
-    const socketIO = useContext(SocketContext); //これをロードすることによって、socketのロード回数を減らすことには成功した。
+    const socketIO = useContext(SocketContext);
 
-    useEffect(() => {//初期ロード時に読み込むもの
+    useEffect(() => {//ここではサーバーへのアクセスをしている。
         var path = location.pathname;
         var id = path.split("/")[3];
 
@@ -38,7 +34,6 @@ function Channel(){
         .then(HandleError)
         .then((obj) => {
             setUserId(obj.userId);
-            setUsername(obj.username);
             setChannel(obj.channel);
             setChatData(obj.channel.chatData)
         })
@@ -74,8 +69,6 @@ function Channel(){
         if(text){
             if(socketIO !== undefined){
                 const message = {
-                    userId : userId,
-                    username : username,
                     text : text,
                     date : `${date.getFullYear()}年${date.getMonth()+1}月${date.getDate()}日(${dayGetter[date.getDay()]})`,
                     time : `${date.getHours()}:${date.getMinutes()}`,
@@ -91,7 +84,7 @@ function Channel(){
         setText('');
     }
 
-    useEffect(() => { //これがsocketの内容の変化に応じて取得されるもの
+    useEffect(() => { //一つ疑問点として、useEffectの第二引数が指定している人が結構いるが、実装してみると一度のみしか読まれなくなってしまう。
         socketIO.once("accepter",(data) => {
             var newSocket = {
                 userId : data.userId,
@@ -120,7 +113,7 @@ function Channel(){
                     <p>作成者 : {channel.createdBy}</p>
                     <p>{state.message}</p>
                 </div>
-                <DatabaseMessage 
+                <DatabaseMessage
                     chatData={chatData} 
                     userId={userId}
                 />
@@ -140,3 +133,5 @@ function Channel(){
 }
 
 export default Channel;
+
+//今後としては、socketへのアクセスはcontextですぐに取り次ぐことができるので、一旦他のコンポーネントに移行してみるのもありかもしれない。
