@@ -20,7 +20,7 @@ function SocketMessage(props){
     const Content = (message) => {
         const content = [];
         content.push(
-            <div onMouseEnter={mouseEnter} onMouseLeave={mouseLeave}>
+            <div className='msgFromSocket' onMouseEnter={mouseEnter} onMouseLeave={mouseLeave}>
                 <a 
                     href={`/profile/account/${message.userId}`}
                     data-user={message.userId}
@@ -44,13 +44,13 @@ function SocketMessage(props){
                 var newItem;
                 if(!message.date){
                     newItem = (
-                        <div>
+                        <div className='socketData'>
                             {Content(message)}
                         </div>
                     );
                 }else{
                     newItem = (
-                        <div>
+                        <div className='socketData'>
                             <p>{message.date}</p>
                             {Content(message)}
                         </div>

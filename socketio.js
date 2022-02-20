@@ -12,12 +12,12 @@ module.exports = (io) => { //ここがなぜか接続後3回も読み込まれ�
             socket.on("message",async(message) => { //ここでもroomが地続きとなっていなければならない
                 try {
                     var obj = {
-                        userId : message.userId,
-                        username : message.username,
+                        userId : message.userId, //これはsession
+                        username : message.username, //これもsession
                         date : message.date,
                         text : message.text,
                         time : message.time,
-                        customId : message.customId
+                        customId : message.customId //少なくともこれ要らなくね？
                     }
     
                     var newMessage = new Message(obj);
@@ -58,7 +58,7 @@ module.exports = (io) => { //ここがなぜか接続後3回も読み込まれ�
                 }
             });
     
-            socket.on("update",async(message) => {
+            socket.on("update",async(message) => { //ここに関してはおそらくOK（エラー処理以外については）
                 try{
                     var promise = await Message.updateOne(
                         {customId : message.customId},
@@ -69,7 +69,8 @@ module.exports = (io) => { //ここがなぜか接続後3回も読み込まれ�
                         }
                     ).exec();
                     io.to(id).emit("update",{
-                        text : message.newMsg
+                        text : message.newMsg,
+                        customId : message.customId
                     });
                 }catch(err){
                     console.log(err.message);
@@ -77,7 +78,6 @@ module.exports = (io) => { //ここがなぜか接続後3回も読み込まれ�
             });
     
             socket.on("delete",async(message) => {
-        
                 try {
                     var msg = await Message.findOne({customId:message.customId}).exec();
                     var chat = await Chat.findById(message.chatId).exec();
