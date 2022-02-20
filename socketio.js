@@ -77,10 +77,12 @@ module.exports = (io) => { //ここがなぜか接続後3回も読み込まれ�
                 }
             });
     
-            socket.on("delete",async(message) => {
+            socket.on("delete",async(message) => { //deleteに関しては指定していない場所が削除されてしまったり、dateがないとのエラーがでてしまうなど挙動が不安定になっている。
                 try {
                     var msg = await Message.findOne({customId:message.customId}).exec();
-                    var chat = await Chat.findById(message.chatId).exec();
+                    var chat = await Chat.findById(id).exec();
+
+                    console.log(msg);
         
                     chat.chatData.forEach(async(element) => {
                         if(element.date === msg.date){
@@ -89,7 +91,7 @@ module.exports = (io) => { //ここがなぜか接続後3回も読み込まれ�
                             if(leng === 1){ //書き込みが一つしかない場合
                                 console.log('書き込み件数一件');
                                 var promise = await Chat.updateOne(
-                                    {_id : message.chatId},
+                                    {_id : id},
                                     {
                                         $pull : {
                                             chatData : {
@@ -101,7 +103,7 @@ module.exports = (io) => { //ここがなぜか接続後3回も読み込まれ�
                             }else{
                                 console.log(`書き込み件数${leng}件`);
                                 var promise = await Chat.updateOne(
-                                    {_id : message.chatId,"chatData.date" : msg.date},
+                                    {_id : id,"chatData.date" : msg.date},
                                     {
                                         $pull : {
                                             "chatData.$.messages" : msg._id
@@ -110,7 +112,7 @@ module.exports = (io) => { //ここがなぜか接続後3回も読み込まれ�
                                 ).exec(); //ここでは従属されているidが消されるはず
                             }
                             var promiseDel = await Message.findByIdAndDelete(msg._id).exec();
-                            io.to(id).emit("delete");
+                            io.to(id).emit("delete",{customId:message.customId});
                         }
                     });
                 }catch(err){

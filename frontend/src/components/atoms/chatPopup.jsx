@@ -63,7 +63,7 @@ function ChatPopup(props){
             date : date
         }
 
-        dispatch({type : 'popup',deleteData : deleteData,block:block});
+        dispatch({type : 'popup',deleteData : deleteData});
     }
 
     useEffect(() => {

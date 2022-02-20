@@ -93,7 +93,6 @@ function Channel(){
 
     useEffect(() => { //これがsocketの内容の変化に応じて取得されるもの
         socketIO.once("accepter",(data) => {
-            console.log('effect')
             var newSocket = {
                 userId : data.userId,
                 username : data.username,
@@ -106,12 +105,9 @@ function Channel(){
             setSocket([...socket,newSocket]);
         });
         return () => { //これがクリーンアップ関数の役割を果たす。何をしているのかというとこれ無しであると、、レンダリングのたびに何重にもsetSocketが実行されてしまうが、それを打ち消している。
-            console.log('cleanup')
             socketIO.off("accepter");
         }
     });
-
-    console.log('render')
 
     return(
         <div>

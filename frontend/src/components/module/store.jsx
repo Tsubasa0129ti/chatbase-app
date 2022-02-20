@@ -3,8 +3,7 @@ import {reducer_deleteModal,reducer_profileModal,reducer_addChannelModal,reducer
 
 const deleteState = {
     show : false,
-    deleteData : '',
-    block : ''
+    deleteData : ''
 }
 
 const DeleteStore = createContext();

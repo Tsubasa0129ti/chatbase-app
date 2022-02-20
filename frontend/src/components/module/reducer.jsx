@@ -5,14 +5,12 @@ const reducer_deleteModal = (state={},action) => {
                 ...state,
                 show : true,
                 deleteData : action.deleteData,
-                block : action.block
             }
         case 'close':
             return {
                 ...state,
                 show : false,
                 deleteData : '',
-                block : ''
             }
         default:
             return state

@@ -1,15 +1,15 @@
-import { useContext } from 'react';
-import {useLocation} from 'react-router-dom'
+import { useEffect, useContext } from 'react';
 
 import {DeleteStore} from '../module/store';
 import SocketContext from '../../components/module/socket.io';
+import {getBlock,getSocketBlock} from '../module/socketEvent';
+
 import '../../styles/components/ReactModal/messageDelete.scss';
 
 function MessageDelete(){
     const {state,dispatch} = useContext(DeleteStore);
-    const location = useLocation();
 
-    const socketIO = useContext(SocketContext); //おそらくこれでdeleteもいけるはず。
+    const socketIO = useContext(SocketContext);
 
     const Cancel = (e) => {
         e.preventDefault();
@@ -21,33 +21,40 @@ function MessageDelete(){
         const target = e.currentTarget;
         var deleteModal = target.parentNode;
 
-        var path = location.pathname;
-        var chatId = path.split('/')[3];
         var customId = deleteModal.children[3].lastChild.value;
 
-        const message = {
-            chatId : chatId,
-            customId : customId
-        };
+        socketIO.emit('delete',{customId:customId});
 
-        socketIO.emit('delete',message);
+        dispatch({type:'close'}); //windowはここでしか行えないか
+    }
 
+    useEffect(() => {
         socketIO.once('delete',(data) => {
-            var block = state.block;
-            var parent = block.parentNode;
+            var block;
+            var parent;
+            if(getBlock(data)){
+                block = getBlock(data);
+                parent = block.parentNode;
+                console.log(parent);
 
-            if(block.closest('.socket_message')){
-                parent.style.display = 'none';
-            }else{
-                if(parent.childElementCount <= 2){
+                if(parent.childElementCount <= 2){ //多分ここの分岐が不十分なのかな,何度かやってみた感じ一回起こった時以外は問題なさそうだけど。。。
+                    console.log('上')
                     parent.style.display = 'none';
+                }else{
+                    console.log('下')
+                    block.style.display = 'none';
                 }
-                block.style.display = 'none';
+
+            }else{
+                block = getSocketBlock(data);
+                parent = block.parentNode;
+                parent.style.display = 'none';
             }
         });
-
-        dispatch({type:'close'});
-    }
+        return () => {
+            socketIO.once('delete');
+        }
+    })
 
     if(!state.show){
         return null;
