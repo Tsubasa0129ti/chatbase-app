@@ -3,6 +3,8 @@ import {useState,useEffect,useContext,useRef} from 'react';
 import SocketContext from '../module/socket.io';
 import {getBlock,getSocketBlock} from '../module/socketEvent';
 
+import '../../styles/components/atoms/messageUpdate.scss';
+
 function MessageUpdate(){
     const [value,setValue] = useState('');
     const form = useRef(null);
@@ -81,10 +83,10 @@ function MessageUpdate(){
     });
 
     return(
-        <form ref={form} style={{display:"none"}}>
-            <input type="text" onChange={handleChange} value={value} />
-            <input type="submit" value='Cancel' onClick={Cancel} />
-            <input type="submit" value='Update' onClick={Update} />
+        <form className='update_form' ref={form} style={{display:"none"}}>
+            <input className='input' type="text" onChange={handleChange} value={value} />
+            <input className='cancel' type="submit" value='Cancel' onClick={Cancel} />
+            <input className='update' type="submit" value='Update' onClick={Update} />
         </form>
     )
 }

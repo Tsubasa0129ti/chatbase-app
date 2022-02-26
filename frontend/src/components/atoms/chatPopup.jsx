@@ -6,6 +6,8 @@ import {faSmile,faReply,faEdit,faEraser} from '@fortawesome/free-solid-svg-icons
 import MessageUpdate from './messageUpdate';
 import {DeleteStore} from '../module/store';
 
+import '../../styles/components/atoms/chatPopup.scss';
+
 function ChatPopup(props){ //props.userIdによる分岐さえなくすことができれば、channelのsetUserIdを消すことができる。
     const [content,setContent] = useState('');
     const el = useRef(null);
@@ -78,16 +80,16 @@ function ChatPopup(props){ //props.userIdによる分岐さえなくすことが
                 popup = (
                     <div className='popup_box'>
                         <div className='reaction_button'>
-                            <a href="/" onClick={reaction}><FontAwesomeIcon icon={faSmile} /></a>
+                            <a href="/" onClick={reaction}><FontAwesomeIcon icon={faSmile} className='icon' /></a>
                         </div>
                         <div className='reply_button'>
-                            <a href="/" onClick={reply}><FontAwesomeIcon icon={faReply} /></a>
+                            <a href="/" onClick={reply}><FontAwesomeIcon icon={faReply} className='icon' /></a>
                         </div>
                         <div className='edit_button'>
-                            <a href="/" onClick={update}><FontAwesomeIcon icon={faEdit} /></a>
+                            <a href="/" onClick={update}><FontAwesomeIcon icon={faEdit} className='icon' /></a>
                         </div>
                         <div className='delete_button'>
-                            <a href="/" onClick={erase}><FontAwesomeIcon icon={faEraser} /></a>
+                            <a href="/" onClick={erase}><FontAwesomeIcon icon={faEraser} className='icon' /></a>
                         </div>
                         <MessageUpdate userId={props.userId} />
                     </div>
@@ -96,10 +98,10 @@ function ChatPopup(props){ //props.userIdによる分岐さえなくすことが
                 popup = (
                     <div className='popup_box'>
                         <div className='reaction_button'>
-                            <a href="/" onClick={reaction}><FontAwesomeIcon icon={faSmile} /></a>
+                            <a href="/" onClick={reaction}><FontAwesomeIcon icon={faSmile} className='icon' /></a>
                         </div>
                         <div className='reply_button'>
-                            <a href="/" onClick={reply}><FontAwesomeIcon icon={faReply} /></a>
+                            <a href="/" onClick={reply}><FontAwesomeIcon icon={faReply} className='icon' /></a>
                         </div>
                     </div>
                 )
@@ -114,7 +116,7 @@ function ChatPopup(props){ //props.userIdによる分岐さえなくすことが
         );
     }else{
         return (
-            <div ref={box} style={{display:'none'}}>{content}</div>
+            <div className='popup_container' ref={box} style={{display:'none'}}>{content}</div>
         )
     }
 }

@@ -1,0 +1,47 @@
+.socket_message {
+    .socketData {
+
+        .message_date {
+            width: 150px;
+            margin: 0 auto;
+            color: white;
+        }
+        .msgFromSocket {
+            padding: 5px 10px;
+            position: relative;
+
+            .message_user {
+                display: inline-block;
+                color: #ffffff;
+                text-decoration: none;
+                font-weight: bolder;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+            .message_time {
+                display: inline-block;
+                margin: 0 5px;
+
+                font-size: 13px;
+                color: rgba($color: #ffffff, $alpha: 0.6);
+            }
+            .message_text {
+                margin: 10px 0 7px 0;
+                font-size: 18px;
+                color: white;
+            }
+
+            .popup_container {
+                position: absolute;
+                top: 5px;
+                right: 5px;
+            }
+
+            &:hover {
+                background-color: #232529;
+            }
+        }
+    }
+}

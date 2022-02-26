@@ -12,6 +12,11 @@ import {ProfileStore} from '../../components/module/store'; //ここからstore�
 import {HandleError,Code401,Code500} from '../../components/module/errorHandler';
 import SocketContext from '../../components/module/socket.io';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faPaperPlane} from '@fortawesome/free-regular-svg-icons'
+
+import '../../styles/layouts/chats/channel.scss';
+
 function Channel(){
     const [userId,setUserId] = useState(''); //これに関してはsessionでの機能以外にもchatPopupの自分のメッセージかどうかの分岐に！
     const [text,setText] = useState('');
@@ -103,14 +108,22 @@ function Channel(){
     });
 
     return(
-        <div>
+        <div className='channel_container'>
             <ChatHeader isLoggedIn={true} />
 
             <div className='chat_main'>
                 <div className='channel_information'>
-                    <p>チャンネル名 : {channel.channelName}</p>
-                    <p>チャンネル詳細 : {channel.channelDetail}</p>
-                    <p>作成者 : {channel.createdBy}</p>
+                    
+                    <p className='channelName'>#{channel.channelName}</p>
+                    <div className='channelDetail'>
+                        <p className='description'>このチャンネルについて</p>
+                        <input type="text" className='content' value={channel.channelDetail} disabled />
+                    </div>
+                    <div className='createdBy'>
+                        <p className='description'>チャンネル作成者ID</p>
+                        <p className='content'>{channel.createdBy}</p>
+                    </div>
+
                     <p>{state.message}</p>
                 </div>
                 <DatabaseMessage
@@ -121,9 +134,9 @@ function Channel(){
                     socket={socket}
                     userId={userId}
                 />
-                <form className='message_submit' onSubmit={handleSubmit}>
-                    <input type="text" name='text' onChange={handleChange} />
-                    <input type="submit" value='送信' />
+                <form className='message_form' onSubmit={handleSubmit}>
+                    <input type="text" name='text' className='message_input' onChange={handleChange} />
+                    <button className='message_submit' ><FontAwesomeIcon icon={faPaperPlane} size={'2x'} /></button>
                 </form>
                 <MessageDelete />
                 <UserProfile />

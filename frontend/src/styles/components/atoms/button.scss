@@ -5,14 +5,14 @@
     font-size: 15px;
     font-family: 'Courier Ne, Courier, monospacew';
     font-weight: 500;
-    color: black;
-    background-color: rgba(64,87,109,.07);
+    color: rgb(0, 0, 0);
+    background-color: rgb(204, 204, 204);
     border-radius: 3px;
     border: 1px solid transparent;
     cursor: pointer;
 
     &:hover {
-        background-color: rgba(64,87,109,0.2);
+        background-color: rgb(165, 162, 162);
         transition-duration: 0.3s;
     }
 }

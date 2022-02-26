@@ -1,0 +1,31 @@
+.popup_box {
+    display: flex;
+    border: solid 1px rgb(255, 255, 255);
+    box-sizing: border-box;
+    border-radius: 3px;
+    color: white;
+
+    .reaction_button {
+        margin: 3px 5px;
+        display: inline;
+    }
+    .reply_button {
+        margin: 3px 5px;
+        display: inline;
+    }
+    .edit_button {
+        margin: 3px 5px;
+        display: inline;
+    }
+    .delete_button {
+        margin: 3px 5px;
+        display: inline;
+    }
+
+    .icon {
+        color: white;
+    }
+}
+
+//これに関しては、editがUI的にできなくなってしまった...。
+//アイコンに関しては、もしかしたらここに色を設定するかもしれない
