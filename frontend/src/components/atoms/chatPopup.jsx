@@ -3,8 +3,7 @@ import { useState, useEffect, useRef, useContext } from 'react';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faSmile,faReply,faEdit,faEraser} from '@fortawesome/free-solid-svg-icons';
 
-import MessageUpdate from './messageUpdate';
-import {DeleteStore} from '../module/store';
+import {DeleteStore,TextUpdateStore} from '../module/store';
 
 import '../../styles/components/atoms/chatPopup.scss';
 
@@ -14,6 +13,7 @@ function ChatPopup(props){ //props.userIdによる分岐さえなくすことが
     const box = useRef(null);
 
     const {dispatch} = useContext(DeleteStore);
+    const {updateState,updateDispatch} = useContext(TextUpdateStore);
 
     const reaction = (e) => {
         e.preventDefault();
@@ -29,14 +29,20 @@ function ChatPopup(props){ //props.userIdによる分岐さえなくすことが
         e.preventDefault();
 
         var target = box.current;//現在獲得可能な最上位を取得
-
         var parent = target.parentNode;
+
         var textElement = parent.children[2];
         textElement.style.display = 'none';
 
-        var current = box.current;
-        var form = current.children[0].children[4];
-        form.style.display = 'inline-block'
+        var form = parent.lastChild;
+        form.style.display = 'block';
+
+        var data = {
+            currentText : textElement.textContent,
+            customId : parent.children[3].value,
+        }
+
+        updateDispatch({type:'popup',data});
     }
 
     const erase = (e) => {
@@ -91,7 +97,6 @@ function ChatPopup(props){ //props.userIdによる分岐さえなくすことが
                         <div className='delete_button'>
                             <a href="/" onClick={erase}><FontAwesomeIcon icon={faEraser} className='icon' /></a>
                         </div>
-                        <MessageUpdate userId={props.userId} />
                     </div>
                 )
             }else{

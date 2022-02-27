@@ -1,6 +1,7 @@
 import {useState,useEffect,useContext} from 'react';
 
 import ChatPopup from '../atoms/chatPopup';
+import MessageUpdate from '../atoms/messageUpdate';
 import {mouseEnter,mouseLeave} from './mouseMove';
 import {ProfileStore} from '../module/store';
 
@@ -36,7 +37,7 @@ function DatabaseMessage(props){
                     <p className='message_text'>{message.text}</p>
                     <input type='hidden' value={message.customId} />
                     <ChatPopup userId={props.userId} />
-                    {/* ここに対して、messageUpdateを用意すればいけるはず。問題点二つとも。あとはcssでアクセントをつけるなりすればいいと思う */}
+                    <MessageUpdate />
                 </div>
             );
         });
@@ -57,7 +58,6 @@ function DatabaseMessage(props){
             });
         }
     },[props.chatData]);
-
     return(
         <div className='database_message'>
             {item}

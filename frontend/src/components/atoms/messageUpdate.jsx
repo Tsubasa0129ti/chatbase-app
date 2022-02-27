@@ -3,6 +3,8 @@ import {useState,useEffect,useContext,useRef} from 'react';
 import SocketContext from '../module/socket.io';
 import {getBlock,getSocketBlock} from '../module/socketEvent';
 
+import {TextUpdateStore} from '../module/store';
+
 import '../../styles/components/atoms/messageUpdate.scss';
 
 function MessageUpdate(){
@@ -10,12 +12,13 @@ function MessageUpdate(){
     const form = useRef(null);
 
     const socketIO = useContext(SocketContext);
+    const {updateState,updateDispatch} = useContext(TextUpdateStore);
 
     useEffect(() => {
-        var current = form.current;
-        var text = current.parentNode.parentNode.parentNode.children[2].textContent;
-        setValue(text);
-    },[]);
+        if(updateState.data){
+            setValue(updateState.data.currentText);
+        }
+    },[updateState]);
 
     const handleChange = (e) => {
         e.preventDefault();
@@ -32,34 +35,30 @@ function MessageUpdate(){
         var current = form.current;
         current.style.display = 'none';
 
-        var messageBox = current.parentNode.parentNode.parentNode.children[2];
-        messageBox.style.display = 'block'; //一応これでも可能だけど、流石にこの取得の仕方は可読性等に問題あり、、、
+        var textBox = current.parentNode.children[2];
+        textBox.style.display = 'block';
+        setValue(updateState.data.currentText);
 
-        var text = messageBox.textContent;
-        setValue(text);
+        updateDispatch({type : 'close'});
     }
 
     const Update = (e) => {
         e.preventDefault();
 
-        var current = form.current;
-        var block = current.parentNode.parentNode.parentNode;
-        var currentText = block.children[2].textContent;
-        var customId = block.children[3].value; 
-
         var message = {
-            customId : customId,
+            customId : updateState.data.customId,
             newMsg : value
         }
 
-        if(value ==='' || value === currentText ){
+        if(value ==='' || value === updateState.data.currentText ){
             Cancel(e)
         }else{
             socketIO.emit('update',message);
+            updateDispatch({type:'close'});
         }
     }
 
-    useEffect(() => {
+    useEffect(() => { //この層に関しては変更を受け取っているだけなので、一旦は放置にしてもよさそうかな いや場所を移動したことによりcurrentの取得するものが変化してしまうのでここに対してのアプローチも必要となった。
         socketIO.once('update',(data) => {
             var current = form.current;
             current.style.display = 'none';
@@ -96,5 +95,6 @@ export default MessageUpdate;
 修正点
 ①domの取得方法が少しややこしいのでこれの改善をする。
 ②この画面が表示されているときはpopupが消失しないようにする。でないと、動かした時にmessageだけが存在しないものになってしまう。
+→一応修正できたけど、コレにさらに優先度とか光とかつけて目立つようにするなりしようかな
 ③編集者以外のレンダリングが凄まじい勢いで発生してしまう
 */

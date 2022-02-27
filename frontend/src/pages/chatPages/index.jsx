@@ -6,7 +6,7 @@ import Guide from './guide';
 import Channel from './channel';
 import NotFound from '../errorPages/notFound';
 
-import {DeleteProvider,ProfileProvider,AddChannelProvider} from '../../components/module/store';
+import {DeleteProvider,ProfileProvider,AddChannelProvider,TextUpdateProvider} from '../../components/module/store';
 import SocketContext,{socketIO} from '../../components/module/socket.io';
 
 function Chat(props) {//レンダリング層の大規模な修正が必要になった。ちなみに、後でreact-router-domの使い方についてもう少し深ぼってみる。
@@ -43,7 +43,9 @@ function Chat(props) {//レンダリング層の大規模な修正が必要に�
                         <DeleteProvider>
                             <ProfileProvider>
                                 <SocketContext.Provider value={socketIO}>
-                                    <Channel />
+                                    <TextUpdateProvider>
+                                        <Channel />
+                                    </TextUpdateProvider>
                                 </SocketContext.Provider>
                             </ProfileProvider>
                         </DeleteProvider>

@@ -1,5 +1,5 @@
 import { useReducer,createContext } from "react";
-import {reducer_deleteModal,reducer_profileModal,reducer_addChannelModal,reducer_userDeleteModal} from "./reducer";
+import {reducer_deleteModal,reducer_profileModal,reducer_addChannelModal,reducer_userDeleteModal,reducer_textUpdatePop} from "./reducer";
 
 const deleteState = {
     show : false,
@@ -49,4 +49,16 @@ const UserDeleteProvider = ({children}) => {
     return <UserDeleteStore.Provider value={{state,dispatch}}>{children}</UserDeleteStore.Provider>
 }
 
-export {DeleteStore,DeleteProvider,ProfileStore,ProfileProvider,AddChannelStore,AddChannelProvider,UserDeleteStore,UserDeleteProvider};
+const TextUpdateStore = createContext();
+
+const textUpdateState = {
+    show : false,
+    data : ''
+};
+
+const TextUpdateProvider = ({children}) => {
+    const [updateState,updateDispatch] = useReducer(reducer_textUpdatePop,textUpdateState);
+    return <TextUpdateStore.Provider value={{updateState,updateDispatch}}>{children}</TextUpdateStore.Provider>
+}
+
+export {DeleteStore,DeleteProvider,ProfileStore,ProfileProvider,AddChannelStore,AddChannelProvider,UserDeleteStore,UserDeleteProvider,TextUpdateStore,TextUpdateProvider};
