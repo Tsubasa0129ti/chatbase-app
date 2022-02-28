@@ -3,6 +3,7 @@ import {useState,useEffect,useContext} from 'react';
 import ChatPopup from '../atoms/chatPopup';
 import {mouseEnter,mouseLeave} from './mouseMove';
 import {ProfileStore} from './store';
+import MessageUpdate from '../atoms/messageUpdate';
 
 import '../../styles/components/module/socketMessage.scss';
 
@@ -35,6 +36,7 @@ function SocketMessage(props){
                 <p className='message_text'>{message.text}</p>
                 <input type='hidden' value={message.customId} />
                 <ChatPopup userId={props.userId}  />
+                <MessageUpdate />
             </div>
         );
         return content;

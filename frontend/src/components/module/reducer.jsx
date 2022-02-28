@@ -76,7 +76,7 @@ const reducer_userDeleteModal = (state={},action) => {
     }
 }
 
-const reducer_textUpdatePop = (state={},action) => {
+const reducer_textUpdatePop = (state={},action) => { //これに関しては少し減らすことはできるかな。ただ今後修正してstate管理移行の時のため一応残す
     switch(action.type){
         case 'popup':
             return {
