@@ -2,10 +2,8 @@
 const express = require("express"),
     http = require("http"), //これhttpsに切り替えなければならないな
     helmet = require("helmet"),
-    path = require("path"),
     logger = require("morgan"),  
     cookieParser = require("cookie-parser"),
-    bodyParser = require("body-parser"),
     methodOverride = require("method-override"),
     passport = require("passport"),
     session = require("express-session"),
@@ -20,33 +18,17 @@ const indexRoutes = require("./routes/index");
 var apiRoutes = require("./routes/apiRouter");
 var errorRoutes = require("./routes/errorRouter");
 var errorControllers = require("./controllers/errorController");
-
 var socketio = require('./socketio');
 
-/* appの指定 */
 var app = express();
-app.use(helmet());
+app.use(helmet()); //コレはまた今度やるけど、セキュリティ
 
 /* モジュールの使用 */
-app.set("view engine","ejs");//ejs使用していないからいらないかもしれない
-app.set(express.static(path.join(__dirname,"views")));//viewsは使用していない
-app.use(express.static("public")); //これはディレクトリは存在するけど使用はしていないはず
-
-app.use(logger("dev")); //これはおそらくログへの出力　詳細を理解をしているわけではないけど、必要だろうな
+app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
-
-app.use(bodyParser.urlencoded({extended: true}))
-app.use(bodyParser.json())
-
-//method-overrideに関しては後で実験 一旦元のやつに似せた
-app.use(
-    methodOverride("_method",{
-        methods : ["POST","GET"]
-    })
-);
-app.use(cookieParser("secret_passcode"));
-app.use(express.static(path.join(__dirname,"public")));
+app.use(methodOverride("_method"));
+app.use(cookieParser());
 
 var sessionMiddleware = session({
     secret : "keyboard cat",
@@ -74,13 +56,16 @@ app.use((req,res,next) => {//実装段階でcookieの使用をsecureのみに制
 mongoose.Promise = global.Promise;
 mongoose.connect(
     "mongodb://localhost:27017/chatAppDB",
-    {useUnifiedTopology : true},
-    {useNewUrlParser : true}
+    {
+        useNewUrlParser : true,
+        useUnifiedTopology : true,
+        useFindAndModify: false
+    }
 );
 mongoose.set("useCreateIndex",true);
 const db = mongoose.connection;
 db.once("open",() => {
-    console.log("DB接続完了");
+    console.log("mongoose connected");
 });
 
 /* passportの設定 */
@@ -126,3 +111,4 @@ io.use(wrap(passport.session()));
 socketio(io);
 //残り　エラールーターを読み込んでも、これがミルウェアとして常に読み込まれない　ここの要素としてエラーハンドリングを記載し、nextで繋げることはできるが、errorRouterを読み込むだけだとこれがなされない
 //結果としては、errorRouterをapp.js内部で読み込むことで、全てのcontrollerからのnext(error)からここに繋げるようにしたい
+//環境変数を取り入れる。ないとdeployは不安だな。というかあまりgitにも上げない方がいいかもしれない
