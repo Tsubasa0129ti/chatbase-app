@@ -82,10 +82,12 @@ function MessageUpdate(){
     });
 
     return(
-        <form className='update_form' ref={form} style={{display:"none"}}>
+        <form className='msg-update-form' ref={form} style={{display:"none"}}>
             <input className='input' type="text" onChange={handleChange} value={value} />
-            <input className='cancel' type="submit" value='Cancel' onClick={Cancel} />
-            <input className='update' type="submit" value='Update' onClick={Update} />
+            <div className='btn-wrap'>
+                <input className='cancel-btn' type="submit" value='キャンセル' onClick={Cancel} />
+                <input className='update-btn' type="submit" value='保存する' onClick={Update} />
+            </div> 
         </form>
     )
 }

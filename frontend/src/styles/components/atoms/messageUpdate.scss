@@ -1,16 +1,30 @@
 //いずれにせよまずは位置の固定からする必要性があるな...
 
-//場所は、textの部分を置き換えるように
+//場所は、textの部分を置き換えるように 
 
-.update_form {
-
+.msg-update-form {
     .input {
+        margin-top: 15px;
+        width: 99%;
 
+        height: 45px;
+        border-radius: 10px;
     }
-    .cancel {
+    
 
-    }
-    .update {
-
+    .btn-wrap {
+        width: 99%;
+        display: flex;
+        justify-content: flex-end;
+        .cancel-btn {
+            margin: 3px 5px;
+            width: 100px;
+            height: 30px;
+        }
+        .update-btn {
+            margin: 3px 5px;
+            width: 100px;
+            height: 30px;
+        }
     }
 }
