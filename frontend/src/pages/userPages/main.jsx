@@ -8,11 +8,11 @@ import { faSms , faUserPlus , faUserLock } from "@fortawesome/free-solid-svg-ico
 import '../../styles/layouts/users/main.scss';
 
 function Index(){
-    const [message,setMessage] = useState('');
+    const [message,setMessage] = useState(''); //ここに関して、messageを送信しているが、コレについてはheaderにheaderに受け取る層が無いため使用していない
     const location = useLocation();
     const history = useHistory();
 
-    useEffect(() => {
+    useEffect(() => { //ここの詳細の確認をする。
         if(location.state){
             setMessage(location.state.message);
         }
@@ -63,3 +63,5 @@ function Index(){
 }
 
 export default Index;
+
+//messageを使用しないのであれば、message関連のものを全て削除する。

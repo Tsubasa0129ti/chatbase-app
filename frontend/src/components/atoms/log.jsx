@@ -1,10 +1,11 @@
-import { useHistory } from 'react-router-dom';
+import { useHistory,useLocation } from 'react-router-dom';
 
 import { HandleError, Code500 } from '../module/errorHandler';
 import '../../styles/components/atoms/button.scss';
 
 function Log(props){
     const history = useHistory();
+    const location = useLocation();
 
     const login = () => {
         history.push('/users/login');
@@ -18,6 +19,9 @@ function Log(props){
                 pathname : obj.redirectPath,
                 state : {message : 'ログアウトしました。'}
             });
+            if(location.pathname = '/'){
+                history.go();
+            }
         }).catch((err) => {
             if(err.status === 500){
                 Code500(err,history);

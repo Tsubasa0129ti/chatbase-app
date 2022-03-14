@@ -58,7 +58,7 @@ function MessageUpdate(){
         }
     }
 
-    useEffect(() => { //この層に関しては変更を受け取っているだけなので、一旦は放置にしてもよさそうかな いや場所を移動したことによりcurrentの取得するものが変化してしまうのでここに対してのアプローチも必要となった。
+    useEffect(() => {
         socketIO.once('update',(data) => {
             var current = form.current;
             current.style.display = 'none';

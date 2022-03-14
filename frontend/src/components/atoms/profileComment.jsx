@@ -32,7 +32,9 @@ function ProfileComment(props){
         e.preventDefault();
         var input = document.getElementById('intro-form-inner').textContent;
 
-        if(isLength(input,{min:0,max:100})){
+        if(props.intro === intro){
+            cancel(e);
+        }else if(isLength(input,{min:0,max:100})){
             setIntro(input); //introを更新すると、下のuseEffectが呼び出される。
         }else{
             setMessage('コメントは100字以内に設定してください。');
@@ -40,30 +42,32 @@ function ProfileComment(props){
     }
 
     useEffect(() => { //mypageへのアクセス時に毎回読み込まれてしまっている。
-        fetch('/api/profile/introUpdate',{
-            method : 'PUT',
-            headers : {
-                'Accept': 'application/json,text/plain, */*',
-                'Content-Type': 'application/json'
-            },
-            body : JSON.stringify({
-                intro : intro
+        if(edit){
+            fetch('/api/profile/introUpdate',{
+                method : 'PUT',
+                headers : {
+                    'Accept': 'application/json,text/plain, */*',
+                    'Content-Type': 'application/json'
+                },
+                body : JSON.stringify({
+                    intro : intro
+                })
             })
-        })
-        .then(HandleError)
-        .then((obj) => {
-            setEdit(false);
-            history.push({
-                pathname : obj.redirectPath,
-                state : {message : 'プロフィールの更新に成功しました。'}
+            .then(HandleError)
+            .then((obj) => {
+                setEdit(false);
+                history.push({
+                    pathname : obj.redirectPath,
+                    state : {message : 'プロフィールの更新に成功しました。'}
+                });
+            }).catch((err) => {
+                if(err.status === 401){
+                    Code401(err,history);
+                }else if(err.status === 500){
+                    Code500(err,history);
+                }
             });
-        }).catch((err) => {
-            if(err.status === 401){
-                Code401(err,history);
-            }else if(err.status === 500){
-                Code500(err,history);
-            }
-        });
+        } 
     },[intro])
     
     if(!edit){
