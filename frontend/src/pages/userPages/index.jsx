@@ -1,7 +1,6 @@
 import {Route,Switch} from 'react-router-dom';
 import { UserDeleteProvider } from '../../components/module/store';
 
-//①まずはここで必要なファイルのimport
 import Index from './main';
 import New from './new';
 import Login from './login';

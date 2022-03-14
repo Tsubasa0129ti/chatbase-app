@@ -1,4 +1,4 @@
-import {useState,useEffect} from 'react';
+import React,{useState,useEffect} from 'react';
 import {useHistory} from 'react-router-dom';
 
 import { HandleError, Code500 } from '../module/errorHandler';
@@ -58,4 +58,4 @@ function Header(props){
     )
 }
 
-export default Header;
+export default React.memo(Header); //ここにメモをつけることにより、レンダリングの回数を抑えることに成功した。ただこれの更新をどのように行うのだろうか

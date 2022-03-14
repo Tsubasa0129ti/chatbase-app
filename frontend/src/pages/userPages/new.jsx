@@ -181,7 +181,7 @@ function New(){
 
     return(
         <div className='user_new'>
-            <Header loggedIn={false} />      
+            <Header loggedIn={false} />
             <div className='create_page'>
                 <div className='empty'></div>
                 <div className='create-top'>
