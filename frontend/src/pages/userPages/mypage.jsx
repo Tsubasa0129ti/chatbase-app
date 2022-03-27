@@ -1,4 +1,4 @@
-import {useState,useEffect,useContext} from 'react';
+import {useState,useEffect} from 'react';
 import { useHistory } from 'react-router';
 
 import Header from '../../components/block/header';
@@ -6,18 +6,16 @@ import {HandleError,Code401,Code500} from '../../components/module/errorHandler'
 
 import AccountDelete from '../../components/ReactModal/accountDelete';
 import ProfileComment from '../../components/atoms/profileComment';
-
-import { UserDeleteStore } from '../../components/module/store';
+import DeleteButton from '../../components/atoms/delete_button';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCog , faAddressCard , faEdit , faTrashAlt ,faIdCard ,faUser , faChartLine , faBlog} from "@fortawesome/free-solid-svg-icons";
+import { faCog , faAddressCard , faEdit ,faIdCard ,faUser , faChartLine , faBlog} from "@fortawesome/free-solid-svg-icons";
 import {faComments} from '@fortawesome/free-regular-svg-icons'
 
 import '../../styles/layouts/users/mypage.scss';
 
 function Mypage(){
     const [user,setUser] = useState({});
-    const {dispatch} = useContext(UserDeleteStore);
     const history = useHistory();
 
     useEffect(() => {
@@ -33,11 +31,6 @@ function Mypage(){
             }
         });
     },[]);
-
-    const popup = (e) => {
-        e.preventDefault();
-        dispatch({type:'popup'});
-    }
 
     const menu = (e) => { //この取得方法は大幅に変更の可能性あり。
         e.preventDefault();
@@ -66,7 +59,7 @@ function Mypage(){
                                 </button>
                                 <div className='prevPopup'>
                                     <a href="/users/mypage/edit" className='toEdit'><FontAwesomeIcon icon={faEdit} /> Edit Account</a>
-                                    <a href="/" className='toDelete' onClick={popup}><FontAwesomeIcon icon={faTrashAlt} /> Delete Account</a>
+                                    <DeleteButton />
                                 </div>
                             </div>
                             
@@ -108,9 +101,7 @@ function Mypage(){
                                 </div>
                                 <a href="/users/mypage/edit"><FontAwesomeIcon icon={faEdit} /> Edit Account</a>
                                 <a href="/profile/edit"><FontAwesomeIcon icon={faIdCard} /> Edit Profile</a>
-                                <a href='/' onClick={popup}>
-                                    <FontAwesomeIcon icon={faTrashAlt} /> Delete
-                                </a>
+                                <DeleteButton />
                             </div>
                             <div className='application'>
                                 <div className='text-line'>
@@ -175,8 +166,6 @@ function Mypage(){
             )
         }
     }
-
-    
 }
 
 export default Mypage;

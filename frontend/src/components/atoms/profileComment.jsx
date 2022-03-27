@@ -1,4 +1,4 @@
-import {useState,useEffect} from 'react';
+import React,{useState,useEffect} from 'react';
 import {useHistory} from 'react-router-dom';
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
@@ -12,7 +12,7 @@ import '../../styles/components/atoms/profileComment.scss';
 function ProfileComment(props){
 
     const [edit,setEdit] = useState(false);
-    const [intro,setIntro] = useState(props.intro);//初期値に関しては、とりあえずこれにしておくけど後々かえるかもしれない
+    const [intro,setIntro] = useState(props.intro);
     const [message,setMessage] = useState('');
 
     const history = useHistory();
@@ -32,16 +32,16 @@ function ProfileComment(props){
         e.preventDefault();
         var input = document.getElementById('intro-form-inner').textContent;
 
-        if(props.intro === intro){
+        if(props.intro === input){
             cancel(e);
         }else if(isLength(input,{min:0,max:100})){
-            setIntro(input); //introを更新すると、下のuseEffectが呼び出される。
+            setIntro(input);
         }else{
             setMessage('コメントは100字以内に設定してください。');
         }
     }
 
-    useEffect(() => { //mypageへのアクセス時に毎回読み込まれてしまっている。
+    useEffect(() => {
         if(edit){
             fetch('/api/profile/introUpdate',{
                 method : 'PUT',
@@ -54,13 +54,8 @@ function ProfileComment(props){
                 })
             })
             .then(HandleError)
-            .then((obj) => {
-                setEdit(false);
-                history.push({
-                    pathname : obj.redirectPath,
-                    state : {message : 'プロフィールの更新に成功しました。'}
-                });
-            }).catch((err) => {
+            .then(() => setEdit(false)
+            ).catch((err) => {
                 if(err.status === 401){
                     Code401(err,history);
                 }else if(err.status === 500){
@@ -118,4 +113,4 @@ function ProfileComment(props){
     }
 }
 
-export default ProfileComment;
+export default React.memo(ProfileComment);
