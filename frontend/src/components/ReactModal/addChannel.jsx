@@ -1,4 +1,4 @@
-import {useState,useContext} from 'react';
+import React,{useState,useContext} from 'react';
 import {useHistory} from 'react-router-dom';
 import {HandleError,Code401,Code500,AddChannelValidation} from '../module/errorHandler';
 import {isLength} from '../../components/module/validation';
@@ -97,9 +97,9 @@ function AddChannel() {
             <div className='overray'>
                 <form className='addChannelModal' onSubmit={handleSubmit}>
                     <div className='description'>
-                        <h3>チャンネルを作成する</h3>
-                        <p>チャンネルとはコミュニケーションを取る場所です。</p>
-                        <p>特定のトピックに基づいてチャンネルを作ると良いでしょう。</p>
+                        <h3 className='description-title'>チャンネルを作成する</h3>
+                        <p className='description-msg'>チャンネルとはコミュニケーションを取る場所です。</p>
+                        <p className='description-msg'>特定のトピックに基づいてチャンネルを作ると良いでしょう。</p>
                     </div>
                     <div className='close'>
                         <a href="/" className='close_button' onClick={Cancel}>X</a>
@@ -109,17 +109,16 @@ function AddChannel() {
                     </div>
                     <div className='channel_name'>
                         <label htmlFor="channelName">チャンネル名</label>
-                        <input type="text" className='channelName' name='channelName' required onChange={handleChange} />
+                        <input type="text" name='channelName' required onChange={handleChange} />
                         <p className='validation'>{validation.channelName_error}</p>
+                        <p className='clear'></p>
                     </div>
-                    <div className='detail'>
-                        <label htmlFor="channel_detail">
-                            <label htmlFor="channelDetail">チャンネル詳細</label>
-                            <input type="text" className='channelDetail' name='channelDetail' onChange={handleChange} />
-                            <p className='validation'>{validation.channelDetail_error}</p>
-                        </label>
+                    <div className='channel_detail'>
+                        <label htmlFor="channelDetail">チャンネル詳細</label>
+                        <input type="text" className='channelDetail' name='channelDetail' onChange={handleChange} />
+                        <p className='validation'>{validation.channelDetail_error}</p>
                     </div>
-                    <input type="submit" value='作成' />
+                    <input type="submit" className='create_button' value='作成' />
                 </form>
             </div>
             
@@ -127,4 +126,4 @@ function AddChannel() {
     }
 }
 
-export default AddChannel;
+export default React.memo(AddChannel);

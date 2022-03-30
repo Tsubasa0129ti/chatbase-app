@@ -116,8 +116,8 @@ function Channel(){
                     
                     <p className='channelName'>#{channel.channelName}</p>
                     <div className='channelDetail'>
-                        <p className='description'>このチャンネルについて</p>
-                        <input type="text" className='content' value={channel.channelDetail} disabled />
+                        <p className='description'>チャンネル詳細</p>
+                        <p className='content'>{channel.channelDetail}</p>
                     </div>
                     <div className='createdBy'>
                         <p className='description'>チャンネル作成者ID</p>

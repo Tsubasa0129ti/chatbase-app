@@ -15,5 +15,85 @@
     .addChannelModal {
         text-align: center;
         background-color: white;
+        border-radius: 10px;
+        position: relative;
+
+        .description {
+            margin: 20px 30px;
+            .description-title {
+                font-size: 21px;
+            }
+
+            .description-msg {
+                font-size: 15px;
+                margin: 0 10px;
+            }
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            
+            .close_button {
+                font-weight: bold;
+                font-size: 21px;
+                text-decoration: none;
+                color: black;
+            }
+        }
+
+        .error {
+            p {
+                margin: 10px 0;
+                font-size: 13px;
+                color: red;
+            }
+        }
+
+        .channel_name {
+            margin: 0 30px;
+            label {
+                float: left;
+            }
+            input {
+                display: block;
+                width: 100%;
+                box-sizing: border-box;
+                height: 28px;
+            }
+            .validation {
+                font-size: 12px;
+                color: rgb(255, 166, 0);
+                margin: 0;
+                float: left;
+            }
+            .clear {
+                clear: both;
+            }
+        }
+
+        .channel_detail {
+            margin: 10px 30px;
+            label {
+                float: left;
+            }
+            input {
+                display: block;
+                width: 100%;
+                box-sizing: border-box;
+                height: 28px;
+            }
+        }
+
+        .create_button {
+            margin: 10px 0;
+            width: 120px;
+            height: 30px;
+            border-radius: 10px;
+        }
+
     }
 }
+
+//一応仮のデザインを作成してみた。まあ不足点としてはエラー発生時においてもpopupのサイズが変わらないように調整したいかも
