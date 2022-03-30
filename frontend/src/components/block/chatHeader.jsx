@@ -1,3 +1,4 @@
+import React from 'react';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faUserCircle} from '@fortawesome/free-regular-svg-icons'
 
@@ -26,4 +27,4 @@ function ChatHeader(){
     )
 }
 
-export default ChatHeader;
+export default React.memo(ChatHeader);

@@ -27,7 +27,7 @@ function ChatPage(){
         .then(HandleError)
         .then((obj) => { //ここでstateが2回更新されてしまうので、どうにかしたい。
             setChannel(obj.channel);
-            setCount(obj.count);
+            setCount(obj.count); //これによってページの枚数も決定せしめている。だからこそuseEffectの後もレンダリングが実行され、paginationにも影響を与えている
         }).catch((err) => {
             if(err.status === 401){
                 Code401(err,history);

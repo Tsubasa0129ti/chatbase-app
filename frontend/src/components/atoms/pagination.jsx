@@ -1,4 +1,4 @@
-import {useState,useEffect} from 'react';
+import React,{useState,useEffect} from 'react';
 import {useHistory,useLocation} from 'react-router-dom';
 import ReactPaginate from 'react-paginate';
 import queryString from 'query-string';
@@ -57,4 +57,4 @@ function Pagination(props){
     )
 }
 
-export default Pagination;
+export default React.memo(Pagination);
